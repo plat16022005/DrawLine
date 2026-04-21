@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(LineRenderer))]
 [RequireComponent(typeof(EdgeCollider2D))]
@@ -12,10 +13,14 @@ public class Line : MonoBehaviour
     [Tooltip("Khoảng cách tối thiểu giữa 2 điểm để nét vẽ được tạo ra mượt mà mà không tốn quá nhiều hiệu năng")]
     public float pointsMinDistance = 0.1f;
 
+    // Ghi nhớ loại đường để khi tách đoạn vẫn giữ nguyên tính chất
+    [HideInInspector] public LineType myType;
+
     private List<Vector2> points;
 
     public void Initialize(LineType lineType)
     {
+        myType = lineType;
         lineRenderer = GetComponent<LineRenderer>();
         edgeCollider = GetComponent<EdgeCollider2D>();
         points = new List<Vector2>();
@@ -109,6 +114,17 @@ public class Line : MonoBehaviour
         }
     }
 
+    // Hàm này được dùng nội bộ để tái tạo đường từ một danh sách điểm có sẵn
+    // (dùng khi tách các mảnh sau khi bị tẩy)
+    public void InitializeFromPoints(List<Vector2> existingPoints, LineType lineType)
+    {
+        Initialize(lineType);
+        foreach (var p in existingPoints)
+        {
+            SetPoint(p);
+        }
+    }
+
     public void UpdateLine(Vector2 mousePos)
     {
         if (points == null)
@@ -123,6 +139,7 @@ public class Line : MonoBehaviour
 
     private void SetPoint(Vector2 point)
     {
+        if (points == null) points = new List<Vector2>();
         points.Add(point);
 
         // Cập nhật hiển thị đồ họa
@@ -139,6 +156,96 @@ public class Line : MonoBehaviour
             {
                 edgeCollider.enabled = true;
             }
+        }
+    }
+
+    // --- CORE CỦA CHỨC NĂNG TẨY XÓA ---
+    // Hàm này nhận vào vị trí cục tẩy và bán kính, xóa các điểm nằm trong vùng đó.
+    // Nếu đường bị cắt làm nhiều đoạn, sẽ sinh ra các GameObject mới cho từng đoạn.
+    // Trả về true nếu đối tượng này cần bị Destroy (rỗng/chỉ còn 1 điểm)
+    public bool EraseAt(Vector2 eraserPos, float radius)
+    {
+        if (points == null || points.Count == 0) return true;
+
+        // 1. Đánh dấu các điểm nằm trong vòng tròn cục tẩy
+        bool[] toErase = new bool[points.Count];
+        bool anyErased = false;
+
+        for (int i = 0; i < points.Count; i++)
+        {
+            if (Vector2.Distance(points[i], eraserPos) <= radius)
+            {
+                toErase[i] = true;
+                anyErased = true;
+            }
+        }
+
+        if (!anyErased) return false; // Không có gì bị xóa, giữ nguyên
+
+        // 2. Tách danh sách thành các "mảnh" liên tiếp (các điểm không bị xóa)
+        List<List<Vector2>> segments = new List<List<Vector2>>();
+        List<Vector2> currentSegment = new List<Vector2>();
+
+        for (int i = 0; i < points.Count; i++)
+        {
+            if (!toErase[i])
+            {
+                currentSegment.Add(points[i]);
+            }
+            else
+            {
+                if (currentSegment.Count > 0)
+                {
+                    segments.Add(currentSegment);
+                    currentSegment = new List<Vector2>();
+                }
+            }
+        }
+        // Đừng quên đoạn cuối cùng
+        if (currentSegment.Count > 0)
+            segments.Add(currentSegment);
+
+        // 3. Nếu không còn đoạn nào hợp lệ, xóa đối tượng này
+        if (segments.Count == 0)
+            return true;
+
+        // 4. Dùng đoạn đầu tiên để cập nhật đối tượng hiện tại
+        RebuildFromPoints(segments[0]);
+
+        // 5. Với các đoạn còn lại (từ đoạn thứ 2 trở đi), tạo GameObject mới cho mỗi đoạn
+        for (int i = 1; i < segments.Count; i++)
+        {
+            if (segments[i].Count >= 2) // Cần ít nhất 2 điểm để tạo nét vẽ có ý nghĩa
+            {
+                GameObject newLineGO = new GameObject("Drawn Line (Split)");
+                Line newLine = newLineGO.AddComponent<Line>();
+                newLine.InitializeFromPoints(segments[i], myType);
+            }
+        }
+
+        // Nếu đoạn đầu tiên không đủ điểm, báo xóa đối tượng này
+        return segments[0].Count < 2;
+    }
+
+    // Tái cấu trúc đường dựa trên danh sách điểm mới (sau khi tẩy)
+    private void RebuildFromPoints(List<Vector2> newPoints)
+    {
+        points = newPoints;
+
+        lineRenderer.positionCount = points.Count;
+        for (int i = 0; i < points.Count; i++)
+        {
+            lineRenderer.SetPosition(i, points[i]);
+        }
+
+        if (points.Count >= 2)
+        {
+            edgeCollider.points = points.ToArray();
+            edgeCollider.enabled = true;
+        }
+        else
+        {
+            edgeCollider.enabled = false;
         }
     }
 }

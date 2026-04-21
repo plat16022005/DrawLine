@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LineCreator : MonoBehaviour
 {
@@ -6,83 +7,135 @@ public class LineCreator : MonoBehaviour
 
     // Lưu trạng thái hiện tại đang chọn bút màu gì
     public LineType currentLineType = LineType.Normal;
+    public Image CurrentColor;
 
     [Header("Cursor Settings")]
     public Texture2D pencilCursor;
-    public Vector2 hotSpot = new Vector2(0, 32); // Điểm tác động của chuột (đầu bút chì)
+    public Texture2D eraserCursor;
+    public Vector2 pencilHotSpot = new Vector2(0, 32); // Điểm tác động của chuột (đầu bút chì)
+    public Vector2 eraserHotSpot = new Vector2(8, 8);  // Điểm tác động của cục tẩy (giữa)
+
+    [Header("Eraser Settings")]
+    [Tooltip("Bán kính vùng tẩy trong World Space")]
+    public float eraserRadius = 0.3f;
 
     void Start()
     {
         SetPencilCursor();
+        CurrentColor.color = Color.black;
     }
 
     public void SetPencilCursor()
     {
         if (pencilCursor != null)
-        {
-            Cursor.SetCursor(pencilCursor, hotSpot, CursorMode.Auto);
-        }
+            Cursor.SetCursor(pencilCursor, pencilHotSpot, CursorMode.Auto);
+        else
+            Debug.LogWarning("Chưa gán ảnh pencilCursor trong Inspector cho LineCreator!");
     }
 
-    // Hàm gọi từ nút UI để đổi sang Bút Đen
+    public void SetEraserCursor()
+    {
+        if (eraserCursor != null)
+            Cursor.SetCursor(eraserCursor, eraserHotSpot, CursorMode.Auto);
+        else
+            Debug.LogWarning("Chưa gán ảnh eraserCursor trong Inspector cho LineCreator!");
+    }
+
+    // --- CÁC HÀM CHỌN BÚT ---
+
     public void SelectNormalPen()
     {
         currentLineType = LineType.Normal;
         SetPencilCursor();
         Debug.Log("Lựa chọn Bút: ĐEN (Đứng yên)");
+        CurrentColor.color = Color.black;
     }
 
-    // Hàm gọi từ nút UI để đổi sang Bút Xanh
     public void SelectBouncyPen()
     {
         currentLineType = LineType.Bouncy;
         SetPencilCursor();
         Debug.Log("Lựa chọn Bút: XANH LÁ CÂY (Phản lực nhún nhảy)");
+        CurrentColor.color = Color.green;
     }
 
-    // Hàm gọi từ nút UI để đổi sang Bút Tím (Dây cao su)
     public void SelectRubberPen()
     {
         currentLineType = LineType.Rubber;
         SetPencilCursor();
         Debug.Log("Lựa chọn Bút: MÀU TÍM (Dây cao su đàn hồi)");
+        CurrentColor.color = new Color(0.6f, 0.1f, 0.9f);
     }
 
-    // Hàm gọi từ nút UI để đổi sang Bút Đỏ (Tăng tốc không đổi)
     public void SelectSpeedBoostPen()
     {
         currentLineType = LineType.SpeedBoost;
         SetPencilCursor();
         Debug.Log("Lựa chọn Bút: MÀU ĐỎ (Tăng tốc x2 và giữ vận tốc)");
+        CurrentColor.color = Color.red;
     }
 
-    // Hàm gọi từ nút UI để đổi sang Bút Xanh Dương (Giữ nguyên vận tốc/Lực ma sát bằng 0)
     public void SelectConstantSpeedPen()
     {
         currentLineType = LineType.ConstantSpeed;
         SetPencilCursor();
         Debug.Log("Lựa chọn Bút: MÀU XANH DƯƠNG (Giữ nguyên vận tốc)");
+        CurrentColor.color = Color.blue;
     }
 
-    // Hàm gọi từ nút UI để đổi sang Bút Nâu (Giảm tốc chậm dần)
     public void SelectSlowDownPen()
     {
         currentLineType = LineType.SlowDown;
         SetPencilCursor();
         Debug.Log("Lựa chọn Bút: MÀU NÂU (Giảm tốc dần dần)");
+        CurrentColor.color = new Color(0.5f, 0.25f, 0.0f);
+    }
+
+    // Hàm gọi từ nút UI để chuyển sang chế độ Tẩy
+    public void SelectEraserTool()
+    {
+        currentLineType = LineType.Eraser;
+        SetEraserCursor();
+        Debug.Log("Lựa chọn: CỤC TẨY (Xóa đường vẽ)");
     }
 
     void Update()
     {
-        // Nếu trò chơi đã diễn ra (thời gian đã chạy), người chơi sẽ không được phép vẽ thêm nữa.
+        // Nếu trò chơi đã diễn ra (thời gian đã chạy), không cho vẽ hay tẩy thêm nữa.
         if (GameController.isPlaying) return;
+
+        // --- CHẾ ĐỘ TẨY ---
+        if (currentLineType == LineType.Eraser)
+        {
+            if (Input.GetMouseButton(0))
+            {
+                Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+                // Tìm tất cả các Collider trong vùng bán kính của cục tẩy
+                Collider2D[] hits = Physics2D.OverlapCircleAll(mousePos, eraserRadius);
+
+                foreach (Collider2D hit in hits)
+                {
+                    Line line = hit.GetComponent<Line>();
+                    if (line == null) continue;
+
+                    // Gọi hàm xóa đoạn, nếu trả về true thì GameObject này đã rỗng => xóa luôn
+                    bool shouldDestroy = line.EraseAt(mousePos, eraserRadius);
+                    if (shouldDestroy)
+                    {
+                        Destroy(line.gameObject);
+                    }
+                }
+            }
+            return; // Chế độ tẩy => không vẽ thêm
+        }
+
+        // --- CHẾ ĐỘ VẼ ---
 
         // Khi nhấn chuột trái xuống
         if (Input.GetMouseButtonDown(0))
         {
-            // Thay vì dùng Prefab như thông thường, ta tự sinh ra GameObject hoàn toàn bằng code!
             GameObject lineGO = new GameObject("Drawn Line");
-            // Tự cài Component Line vào vật thể vừa sinh (Code nó sẽ tự thêm LineRenderer và EdgeCollider)
             activeLine = lineGO.AddComponent<Line>();
             activeLine.Initialize(currentLineType);
         }
@@ -96,7 +149,6 @@ public class LineCreator : MonoBehaviour
         // Nếu đang trong quá trình vẽ
         if (activeLine != null)
         {
-            // Chuyển tọa độ màn hình (pixel) của chuột sang tọa độ thế giới (world space) trong 2D
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             activeLine.UpdateLine(mousePos);
         }

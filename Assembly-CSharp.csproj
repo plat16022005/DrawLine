@@ -70,6 +70,8 @@
     <Compile Include="Assets\Scripts\LineCreator.cs" />
     <Compile Include="Assets\Scripts\SlowDownBehavior.cs" />
     <Compile Include="Assets\Scripts\StoryController.cs" />
+    <Compile Include="Assets\Scripts\BangSlideToggle.cs" />
+    <Compile Include="Assets\Scripts\MainMenuAuthFlow.cs" />
     <Compile Include="Assets\Scripts\LineType.cs" />
     <Compile Include="Assets\Scripts\SpeedBoostBehavior.cs" />
     <Compile Include="Assets\Scripts\Line.cs" />

@@ -5,5 +5,6 @@ public enum LineType
     Rubber,
     SpeedBoost,
     ConstantSpeed,
-    SlowDown
+    SlowDown,
+    Eraser
 }
