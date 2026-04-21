@@ -2,5 +2,8 @@ public enum LineType
 {
     Normal,
     Bouncy,
-    Rubber
+    Rubber,
+    SpeedBoost,
+    ConstantSpeed,
+    SlowDown
 }

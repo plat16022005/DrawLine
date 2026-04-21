@@ -7,10 +7,28 @@ public class LineCreator : MonoBehaviour
     // Lưu trạng thái hiện tại đang chọn bút màu gì
     public LineType currentLineType = LineType.Normal;
 
+    [Header("Cursor Settings")]
+    public Texture2D pencilCursor;
+    public Vector2 hotSpot = new Vector2(0, 32); // Điểm tác động của chuột (đầu bút chì)
+
+    void Start()
+    {
+        SetPencilCursor();
+    }
+
+    public void SetPencilCursor()
+    {
+        if (pencilCursor != null)
+        {
+            Cursor.SetCursor(pencilCursor, hotSpot, CursorMode.Auto);
+        }
+    }
+
     // Hàm gọi từ nút UI để đổi sang Bút Đen
     public void SelectNormalPen()
     {
         currentLineType = LineType.Normal;
+        SetPencilCursor();
         Debug.Log("Lựa chọn Bút: ĐEN (Đứng yên)");
     }
 
@@ -18,6 +36,7 @@ public class LineCreator : MonoBehaviour
     public void SelectBouncyPen()
     {
         currentLineType = LineType.Bouncy;
+        SetPencilCursor();
         Debug.Log("Lựa chọn Bút: XANH LÁ CÂY (Phản lực nhún nhảy)");
     }
 
@@ -25,7 +44,32 @@ public class LineCreator : MonoBehaviour
     public void SelectRubberPen()
     {
         currentLineType = LineType.Rubber;
+        SetPencilCursor();
         Debug.Log("Lựa chọn Bút: MÀU TÍM (Dây cao su đàn hồi)");
+    }
+
+    // Hàm gọi từ nút UI để đổi sang Bút Đỏ (Tăng tốc không đổi)
+    public void SelectSpeedBoostPen()
+    {
+        currentLineType = LineType.SpeedBoost;
+        SetPencilCursor();
+        Debug.Log("Lựa chọn Bút: MÀU ĐỎ (Tăng tốc x2 và giữ vận tốc)");
+    }
+
+    // Hàm gọi từ nút UI để đổi sang Bút Xanh Dương (Giữ nguyên vận tốc/Lực ma sát bằng 0)
+    public void SelectConstantSpeedPen()
+    {
+        currentLineType = LineType.ConstantSpeed;
+        SetPencilCursor();
+        Debug.Log("Lựa chọn Bút: MÀU XANH DƯƠNG (Giữ nguyên vận tốc)");
+    }
+
+    // Hàm gọi từ nút UI để đổi sang Bút Nâu (Giảm tốc chậm dần)
+    public void SelectSlowDownPen()
+    {
+        currentLineType = LineType.SlowDown;
+        SetPencilCursor();
+        Debug.Log("Lựa chọn Bút: MÀU NÂU (Giảm tốc dần dần)");
     }
 
     void Update()

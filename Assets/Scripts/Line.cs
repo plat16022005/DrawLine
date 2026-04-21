@@ -58,6 +58,42 @@ public class Line : MonoBehaviour
                 // Thêm script RubberBehavior để xử lý đàn hồi
                 gameObject.AddComponent<RubberBehavior>();
             }
+            else if (lineType == LineType.SpeedBoost)
+            {
+                mat.color = Color.red; // Nét vẽ tăng tốc màu Đỏ
+                
+                PhysicsMaterial2D speedMaterial = new PhysicsMaterial2D("RedSpeed");
+                speedMaterial.bounciness = 0.0f;
+                speedMaterial.friction = 0.4f; // Không ma sát để giữ vận tốc
+                edgeCollider.sharedMaterial = speedMaterial;
+                
+                // Thêm script SpeedBoostBehavior để buff tốc độ và giữ nguyên vận tốc
+                gameObject.AddComponent<SpeedBoostBehavior>();
+            }
+            else if (lineType == LineType.ConstantSpeed)
+            {
+                mat.color = Color.blue; // Nét vẽ giữ vận tốc màu Xanh Dương
+                
+                PhysicsMaterial2D constantMaterial = new PhysicsMaterial2D("BlueIce");
+                constantMaterial.bounciness = 0.0f;
+                constantMaterial.friction = 0.0f; // Lực ma sát bằng 0
+                edgeCollider.sharedMaterial = constantMaterial;
+                
+                // Thêm script ConstantSpeedBehavior để giữ nguyên tốc độ của bóng
+                gameObject.AddComponent<ConstantSpeedBehavior>();
+            }
+            else if (lineType == LineType.SlowDown)
+            {
+                mat.color = new Color(0.5f, 0.25f, 0.0f); // Nét vẽ màu Nâu (Brown)
+                
+                PhysicsMaterial2D slowMaterial = new PhysicsMaterial2D("BrownMud");
+                slowMaterial.bounciness = 0.0f;
+                slowMaterial.friction = 5f; // Thêm ma sát vật lý cao
+                edgeCollider.sharedMaterial = slowMaterial;
+                
+                // Thêm script để rút vận tốc thành 0 từ từ như đi vào bùn lầy
+                gameObject.AddComponent<SlowDownBehavior>();
+            }
             else
             {
                 mat.color = Color.black; // Nét vẽ bình thường có màu Đen

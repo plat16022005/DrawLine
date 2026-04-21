@@ -126,7 +126,7 @@ public class RubberBehavior : MonoBehaviour
     {
         if (isBreaking) return;
         isBreaking = true;
-        StartCoroutine(BreakAfterDelay(3f));
+        StartCoroutine(BreakAfterDelay(5f));
     }
 
     private IEnumerator BreakAfterDelay(float delay)
