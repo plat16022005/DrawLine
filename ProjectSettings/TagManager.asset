@@ -11,8 +11,8 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - Cage
+  - Princess
   - 
   - 
   - 
@@ -38,9 +38,15 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 3112481231
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Player
+  - name: Ground
+    uniqueID: 2104292539
+    locked: 0
+  - name: Object
     uniqueID: 411496213
     locked: 0

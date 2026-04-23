@@ -93,7 +93,7 @@ public class Line : MonoBehaviour
                 
                 PhysicsMaterial2D slowMaterial = new PhysicsMaterial2D("BrownMud");
                 slowMaterial.bounciness = 0.0f;
-                slowMaterial.friction = 5f; // Thêm ma sát vật lý cao
+                slowMaterial.friction = 10f; // Thêm ma sát vật lý cao
                 edgeCollider.sharedMaterial = slowMaterial;
                 
                 // Thêm script để rút vận tốc thành 0 từ từ như đi vào bùn lầy
@@ -163,8 +163,10 @@ public class Line : MonoBehaviour
     // Hàm này nhận vào vị trí cục tẩy và bán kính, xóa các điểm nằm trong vùng đó.
     // Nếu đường bị cắt làm nhiều đoạn, sẽ sinh ra các GameObject mới cho từng đoạn.
     // Trả về true nếu đối tượng này cần bị Destroy (rỗng/chỉ còn 1 điểm)
-    public bool EraseAt(Vector2 eraserPos, float radius)
+    // refundedLength = tổng độ dài các đoạn bị xóa (để hoàn mực)
+    public bool EraseAt(Vector2 eraserPos, float radius, out float refundedLength)
     {
+        refundedLength = 0f;
         if (points == null || points.Count == 0) return true;
 
         // 1. Đánh dấu các điểm nằm trong vòng tròn cục tẩy
@@ -181,6 +183,14 @@ public class Line : MonoBehaviour
         }
 
         if (!anyErased) return false; // Không có gì bị xóa, giữ nguyên
+
+        // Tính độ dài các đoạn bị xóa (để hoàn mực)
+        // Một segment i→(i+1) bị mất nếu BẤT KỲ đầu nào của nó nằm trong vùng xóa
+        for (int i = 0; i < points.Count - 1; i++)
+        {
+            if (toErase[i] || toErase[i + 1])
+                refundedLength += Vector2.Distance(points[i], points[i + 1]);
+        }
 
         // 2. Tách danh sách thành các "mảnh" liên tiếp (các điểm không bị xóa)
         List<List<Vector2>> segments = new List<List<Vector2>>();

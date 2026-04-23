@@ -4,6 +4,7 @@ using UnityEngine.UI;
 public class LineCreator : MonoBehaviour
 {
     private Line activeLine;
+    private Vector2 lastDrawPoint; // Điểm cuối cùng đã vẽ (để tính khoảng cách tiêu mực)
 
     // Lưu trạng thái hiện tại đang chọn bút màu gì
     public LineType currentLineType = LineType.Normal;
@@ -119,8 +120,13 @@ public class LineCreator : MonoBehaviour
                     Line line = hit.GetComponent<Line>();
                     if (line == null) continue;
 
-                    // Gọi hàm xóa đoạn, nếu trả về true thì GameObject này đã rỗng => xóa luôn
-                    bool shouldDestroy = line.EraseAt(mousePos, eraserRadius);
+                    // Gọi hàm xóa đoạn, nhận về độ dài bị xóa để hoàn mực
+                    bool shouldDestroy = line.EraseAt(mousePos, eraserRadius, out float refundedLength);
+
+                    // Hoàn lại mực tương ứng với phần đường đã bị tẩy
+                    if (InkManager.Instance != null && refundedLength > 0f)
+                        InkManager.Instance.RefundInk(refundedLength);
+
                     if (shouldDestroy)
                     {
                         Destroy(line.gameObject);
@@ -135,6 +141,12 @@ public class LineCreator : MonoBehaviour
         // Khi nhấn chuột trái xuống
         if (Input.GetMouseButtonDown(0))
         {
+            // Không bắt đầu vẽ nếu không còn mực
+            if (!InkManager.HasInk()) return;
+
+            Vector2 startPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            lastDrawPoint = startPos;
+
             GameObject lineGO = new GameObject("Drawn Line");
             activeLine = lineGO.AddComponent<Line>();
             activeLine.Initialize(currentLineType);
@@ -150,6 +162,23 @@ public class LineCreator : MonoBehaviour
         if (activeLine != null)
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+            // Tính khoảng cách từ điểm cuối đến vị trí chuột hiện tại
+            float dist = Vector2.Distance(lastDrawPoint, mousePos);
+
+            if (dist >= activeLine.pointsMinDistance)
+            {
+                // Thử tiêu mực theo khoảng cách; nếu hết mực thì kết thúc nét vẽ
+                if (InkManager.Instance != null && !InkManager.Instance.ConsumeInk(dist))
+                {
+                    // Hết mực — kết thúc nét hiện tại
+                    activeLine = null;
+                    return;
+                }
+
+                lastDrawPoint = mousePos;
+            }
+
             activeLine.UpdateLine(mousePos);
         }
     }

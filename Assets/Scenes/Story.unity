@@ -192,12 +192,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -706,7 +706,7 @@ MonoBehaviour:
   storyText: {fileID: 1407981639}
   sfxSource: {fileID: 1437264571}
   typingClip: {fileID: 8300000, guid: d80aacbb932e67341ab2aaa714250c59, type: 3}
-  typingSfxMinInterval: 0.03
+  typingVolume: 1
   slides:
   - image: {fileID: 21300000, guid: 60d90cee5e87f1e4fa84ede688208d7b, type: 3}
     text: "C\xE2u chuy\u1EC7n k\u1EC3 v\u1EC1 m\u1ED9t n\xE0ng c\xF4ng ch\xFAa \u0111\u1EB9p

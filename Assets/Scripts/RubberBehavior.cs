@@ -13,6 +13,9 @@ public class RubberBehavior : MonoBehaviour
     private int breakIndex = -1;
     private LineRenderer lineRenderer2;
 
+    // Lưu lại toàn bộ điểm gốc của đường vẽ TRƯỚC KHI chuyển thành rope
+    private Vector3[] originalLinePositions;
+
     void Start()
     {
         line = GetComponent<Line>();
@@ -59,6 +62,14 @@ public class RubberBehavior : MonoBehaviour
 
     private void CreatePhysicsRope()
     {
+        // 0. Chụp snapshot các điểm gốc để có thể restore sau
+        int snapCount = line.lineRenderer.positionCount;
+        originalLinePositions = new Vector3[snapCount];
+        for (int s = 0; s < snapCount; s++)
+        {
+            originalLinePositions[s] = line.lineRenderer.GetPosition(s);
+        }
+
         // 1. Tắt EdgeCollider tĩnh để tránh xung đột
         if (line.edgeCollider != null)
         {
@@ -177,6 +188,53 @@ public class RubberBehavior : MonoBehaviour
             
             // Số lượng điểm ảnh đoạn 2
             lineRenderer2.positionCount = ropeNodes.Count - breakIndex;
+        }
+    }
+
+    // --- Hàm được GameController gọi khi StopSimulation() ---
+    // Phá bỏ toàn bộ rope vật lý & khôi phục lineRenderer về trạng thái đường vẽ ban đầu
+    public void ResetToDrawnState()
+    {
+        // Hủy coroutine đang chạy (nếu có đang đếm ngược break)
+        StopAllCoroutines();
+
+        // Destroy tất cả rope nodes (children) đã tạo ra lúc CreatePhysicsRope()
+        foreach (Transform node in ropeNodes)
+        {
+            if (node != null)
+                Destroy(node.gameObject);
+        }
+        ropeNodes.Clear();
+
+        // Destroy LineRenderer phụ của đoạn dây đứt (nếu có)
+        if (lineRenderer2 != null)
+        {
+            Destroy(lineRenderer2.gameObject);
+            lineRenderer2 = null;
+        }
+
+        // Reset cờ trạng thái để lần start tiếp theo có thể tạo rope lại
+        ropeCreated = false;
+        isBreaking = false;
+        breakIndex = -1;
+
+        // Khôi phục LineRenderer về các điểm gốc ban đầu
+        if (originalLinePositions != null && originalLinePositions.Length >= 2)
+        {
+            line.lineRenderer.positionCount = originalLinePositions.Length;
+            for (int i = 0; i < originalLinePositions.Length; i++)
+            {
+                line.lineRenderer.SetPosition(i, originalLinePositions[i]);
+            }
+
+            // Bật lại EdgeCollider với điểm gốc
+            Vector2[] colliderPoints = new Vector2[originalLinePositions.Length];
+            for (int i = 0; i < originalLinePositions.Length; i++)
+            {
+                colliderPoints[i] = new Vector2(originalLinePositions[i].x, originalLinePositions[i].y);
+            }
+            line.edgeCollider.points = colliderPoints;
+            line.edgeCollider.enabled = true;
         }
     }
 }
