@@ -22,6 +22,12 @@ public class StoryController : MonoBehaviour
     public Image backgroundImageB;
     public TextMeshProUGUI storyText;
 
+    [Header("SFX")]
+    public AudioSource sfxSource;
+    public AudioClip typingClip;
+    [Tooltip("Âm lượng tiếng gõ chữ")]
+    [Range(0f, 1f)] public float typingVolume = 1f;
+
     [Header("Story Settings")]
     public List<StorySlide> slides;
     public float fadeDuration = 1.5f;
@@ -36,6 +42,19 @@ public class StoryController : MonoBehaviour
         if (backgroundImageA != null) backgroundImageA.color = new Color(1, 1, 1, 0);
         if (backgroundImageB != null) backgroundImageB.color = new Color(1, 1, 1, 0);
         if (storyText != null) storyText.text = "";
+
+        // Auto-wire SFX if not assigned.
+        if (sfxSource == null)
+        {
+            sfxSource = GetComponent<AudioSource>();
+            if (sfxSource == null)
+                sfxSource = gameObject.AddComponent<AudioSource>();
+
+            sfxSource.playOnAwake = false;
+            sfxSource.loop = false;
+        }
+
+        // typingClip should be assigned in the inspector (Assets/Sound/typing.mp3).
     }
 
     void Start()
@@ -171,11 +190,26 @@ public class StoryController : MonoBehaviour
     IEnumerator TypeTextCoroutine(string textToType)
     {
         storyText.text = "";
+
+        // Play typing SFX continuously while typing.
+        if (typingClip != null && sfxSource != null)
+        {
+            sfxSource.clip = typingClip;
+            sfxSource.volume = typingVolume;
+            sfxSource.loop = true;
+            if (!sfxSource.isPlaying)
+                sfxSource.Play();
+        }
+
         foreach (char c in textToType.ToCharArray())
         {
             storyText.text += c;
             yield return new WaitForSeconds(typingSpeed);
         }
+
+        // Stop typing SFX when done.
+        if (sfxSource != null && sfxSource.isPlaying)
+            sfxSource.Stop();
     }
 
     IEnumerator EraseTextCoroutine()

@@ -66,6 +66,9 @@
   <ItemGroup>
     <Compile Include="Assets\Editor\AttachMainMenuAuthFlowEditor.cs" />
     <Compile Include="Assets\Editor\AttachBangSlideToggleEditor.cs" />
+    <Compile Include="Assets\_UI_COPLAY_GENERATED\UISpriteSheet\Scripts\Editor\Temp\SetUISpriteImportSettings.cs" />
+    <Compile Include="Assets\Editor\InstallUISfxEditor.cs" />
+    <Compile Include="Assets\Editor\WireStoryTypingSfxEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
