@@ -13,4 +13,8 @@ public class UIController : MonoBehaviour
     {
         SceneManager.LoadScene("Story");
     }
+    public void BackSelectLevel()
+    {
+        SceneManager.LoadScene("SampleScene");
+    }
 }

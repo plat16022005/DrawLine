@@ -12,7 +12,7 @@ public class SpeedBoostBehavior : MonoBehaviour
         {
             // Lấy vận tốc lúc vừa lăn vào x2
             float currentSpeed = rb.velocity.magnitude;
-            float targetSpeed = currentSpeed * 1.8f;
+            float targetSpeed = currentSpeed * 1.5f;
             
             // Ngay lập tức áp dụng vận tốc mới
             if (currentSpeed > 0.001f)

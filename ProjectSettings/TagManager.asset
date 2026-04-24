@@ -13,9 +13,9 @@ TagManager:
   - UI
   - Cage
   - Princess
-  - 
-  - 
-  - 
+  - Demon
+  - Player
+  - Ground
   - 
   - 
   - 
@@ -49,4 +49,7 @@ TagManager:
     locked: 0
   - name: Object
     uniqueID: 411496213
+    locked: 0
+  - name: Cage
+    uniqueID: 1661847841
     locked: 0

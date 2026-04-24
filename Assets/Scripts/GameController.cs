@@ -61,6 +61,13 @@ public class GameController : MonoBehaviour
         if (InkManager.Instance != null)
             InkManager.Instance.RestoreInk();
 
+        // 5. Khôi phục đầy máu cho người chơi
+        PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
+        if (playerHealth != null)
+        {
+            playerHealth.ResetHealth();
+        }
+
         Debug.Log("Simulation đã dừng, mọi thứ đã về trạng thái ban đầu.");
     }
     public void StartStop()

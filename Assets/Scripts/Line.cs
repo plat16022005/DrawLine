@@ -112,6 +112,17 @@ public class Line : MonoBehaviour
 
             lineRenderer.material = mat;
         }
+
+        // Tự động gán layer Ground cho đường vẽ
+        int groundLayer = LayerMask.NameToLayer("Ground");
+        if (groundLayer != -1)
+        {
+            gameObject.layer = groundLayer;
+        }
+        else
+        {
+            Debug.LogWarning("Chưa có layer 'Ground' trong Unity. Vui lòng tạo layer tên là 'Ground' ở góc trên cùng bên phải Inspector!");
+        }
     }
 
     // Hàm này được dùng nội bộ để tái tạo đường từ một danh sách điểm có sẵn

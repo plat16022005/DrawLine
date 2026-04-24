@@ -26,6 +26,12 @@ public class LineCreator : MonoBehaviour
         CurrentColor.color = Color.black;
     }
 
+    void OnDisable()
+    {
+        // Reset lại con trỏ chuột về mặc định khi sang Scene khác hoặc khi ẩn công cụ vẽ
+        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+    }
+
     public void SetPencilCursor()
     {
         if (pencilCursor != null)
