@@ -17,4 +17,8 @@ public class UIController : MonoBehaviour
     {
         SceneManager.LoadScene("SampleScene");
     }
+    public void SkipStory()
+    {
+        SceneManager.LoadScene("SampleScene");
+    } 
 }
