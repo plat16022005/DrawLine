@@ -7,6 +7,7 @@ public class GameController : MonoBehaviour
     public Image StartPause;
     public Sprite[] sprites;
     public static bool isPlaying = false;
+    public static bool isGameOver = false;
 
     // --- Snapshot cho các vật thể vật lý (Rigidbody2D) ---
     private struct RigidbodySnapshot
@@ -22,6 +23,7 @@ public class GameController : MonoBehaviour
         // Khi game vừa mở lên, đóng băng thời gian (các vật thể sẽ lơ lửng trên không/không chịu lực hấp dẫn)
         Time.timeScale = 0f;
         isPlaying = false;
+        isGameOver = false;
         Debug.Log("Thời gian đã dừng, bạn có thể bắt đầu vẽ.");
     }
 

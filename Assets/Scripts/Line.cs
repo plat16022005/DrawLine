@@ -114,14 +114,18 @@ public class Line : MonoBehaviour
         }
 
         // Tự động gán layer Ground cho đường vẽ
-        int groundLayer = LayerMask.NameToLayer("Ground");
-        if (groundLayer != -1)
+        // Tự động gán layer Ground cho đường vẽ (trừ line xanh)
+        if (lineType != LineType.Bouncy)
         {
-            gameObject.layer = groundLayer;
-        }
-        else
-        {
-            Debug.LogWarning("Chưa có layer 'Ground' trong Unity. Vui lòng tạo layer tên là 'Ground' ở góc trên cùng bên phải Inspector!");
+            int groundLayer = LayerMask.NameToLayer("Ground");
+            if (groundLayer != -1)
+            {
+                gameObject.layer = groundLayer;
+            }
+            else
+            {
+                Debug.LogWarning("Chưa có layer 'Ground' trong Unity!");
+            }
         }
     }
 

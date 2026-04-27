@@ -43,7 +43,7 @@ public class SelectLevelManager : MonoBehaviour
             NamePlayer.text = DataGame.instance.users.name;
             Coin.text = DataGame.instance.users.coin.ToString();
         }
-        if (DataGame.instance.CurrentLevel > 0)
+        if (DataGame.instance.CurrentLevel.level > 0)
         {
             LoadLevel();
         }
@@ -58,8 +58,11 @@ public class SelectLevelManager : MonoBehaviour
             Transform lockObj = item.Find("Lock");
 
             TextMeshProUGUI textLv = bd?.Find("LV")?.GetComponent<TextMeshProUGUI>();
+            Image star1 = bd?.Find("1")?.GetComponent<Image>();
+            Image star2 = bd?.Find("2")?.GetComponent<Image>();
+            Image star3 = bd?.Find("3")?.GetComponent<Image>();
 
-            bool isUnlocked = current <= DataGame.instance.CurrentLevel;
+            bool isUnlocked = current <= DataGame.instance.CurrentLevel.level;
 
             if (bd != null) bd.gameObject.SetActive(isUnlocked);
             if (lockObj != null) lockObj.gameObject.SetActive(!isUnlocked);
@@ -80,10 +83,32 @@ public class SelectLevelManager : MonoBehaviour
 
                 btn.onClick.AddListener(() => EnterLevel(levelIndex));
             }
+            star1.color = Color.black;
+            star2.color = Color.black;
+            star3.color = Color.black;
+            if (current != DataGame.instance.CurrentLevel.level)
+            {
+                string levelName = "Lv" + current;
+
+                Level lvData = DataGame.instance.levels
+                    .Find(l => l != null && l.level == levelName);
+
+                if (lvData != null)
+                {
+                    if (lvData.star >= 1)
+                        star1.color = Color.white;
+
+                    if (lvData.star >= 2)
+                        star2.color = Color.white;
+
+                    if (lvData.star >= 3)
+                        star3.color = Color.white;
+                }
+            }
 
             current++;
 
-            if (current > DataGame.instance.CurrentLevel)
+            if (current > DataGame.instance.CurrentLevel.level)
             {
                 break;
             }
@@ -98,17 +123,21 @@ public class SelectLevelManager : MonoBehaviour
     {
         Users users = new Users(Name.text, 0);
         MySkin myskin = new MySkin(new List<int>());
+        TotalPoint totalPoint = new TotalPoint(Name.text, 0);
+        CurrentLevel currentLevel= new CurrentLevel(Name.text, 1);
         DataGame.instance.users = users;
         NamePlayer.text = Name.text;
         Coin.text = users.coin.ToString();
         PanelSetName.SetActive(false);
         FirebaseDataManager.instance.WriteDatabase("Users", user.UserId, users.ToString());
-        FirebaseDataManager.instance.WriteDatabase("CurrentLevel", user.UserId, "1");
+        FirebaseDataManager.instance.WriteDatabase("CurrentLevel", user.UserId, currentLevel.ToString());
         FirebaseDataManager.instance.WriteDatabase("CurrentSkin", user.UserId, "0");
         FirebaseDataManager.instance.WriteDatabase("MySkin", user.UserId, myskin.ToString());
-        DataGame.instance.CurrentLevel = 3;
+        FirebaseDataManager.instance.WriteDatabase("TotalPoint", user.UserId, totalPoint.ToString());
+        DataGame.instance.CurrentLevel = new CurrentLevel(Name.text, 1);
         DataGame.instance.CurrentSkin = 0;
         DataGame.instance.MySkin = myskin;
+        DataGame.instance.totalPoint = totalPoint;
         LoadLevel();
     }
     public void OpenShop()
@@ -194,6 +223,9 @@ public class SelectLevelManager : MonoBehaviour
             FirebaseDataManager.instance.WriteDatabase("CurrentSkin", user.UserId, index.ToString());
             NameSkin.text = namesSkin[index];
             ResetShop();
+            notificationSkin.text = "Bạn đang mặc skin: " + namesSkin[index];
+            notificationSkin.color = Color.green;
+            notificationSkin.gameObject.SetActive(true);
         }
     }
     void CancelSkin()
@@ -203,6 +235,9 @@ public class SelectLevelManager : MonoBehaviour
         FirebaseDataManager.instance.WriteDatabase("CurrentSkin", user.UserId, "0");
         NameSkin.text = namesSkin[0];
         ResetShop();
+        notificationSkin.text = "Bạn đã hủy mặc skin và trở về mặc định";
+        notificationSkin.color = Color.green;
+        notificationSkin.gameObject.SetActive(true);
     }
     public void CloseShop()
     {

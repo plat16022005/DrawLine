@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 2573242209935495768}
   - component: {fileID: 8751615927967190261}
   - component: {fileID: 8177883846356052911}
+  - component: {fileID: 2061065824406544851}
   m_Layer: 8
   m_Name: Demon
-  m_TagString: Untagged
+  m_TagString: Demon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -158,3 +159,17 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 3.4789941, y: 4.2699184}
   m_EdgeRadius: 0
+--- !u!114 &2061065824406544851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2166196056495709507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d68b6e31aad548f4da2d5638960d4014, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  smokeEffectPrefab: {fileID: 8542657122560618456, guid: 8720cc926148c4745adf7e7728b1c915, type: 3}
+  smokeYOffset: 0.6

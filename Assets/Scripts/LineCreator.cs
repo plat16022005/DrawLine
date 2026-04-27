@@ -108,8 +108,8 @@ public class LineCreator : MonoBehaviour
 
     void Update()
     {
-        // Nếu trò chơi đã diễn ra (thời gian đã chạy), không cho vẽ hay tẩy thêm nữa.
-        if (GameController.isPlaying) return;
+        // Nếu trò chơi đang diễn ra, HOẶC đã kết thúc (thắng/thua), không cho vẽ hay tẩy thêm nữa.
+        if (GameController.isPlaying || GameController.isGameOver) return;
 
         // --- CHẾ ĐỘ TẨY ---
         if (currentLineType == LineType.Eraser)

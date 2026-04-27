@@ -10,7 +10,7 @@ public class PlayerHealth : MonoBehaviour
     [Header("Health Settings")]
     [Tooltip("Lượng máu tối đa của Player")]
     public float maxHealth = 100f;
-    private float currentHealth;
+    public static float currentHealth;
 
     [Header("Fall Damage Settings")]
     [Tooltip("Vận tốc va chạm tối thiểu để bắt đầu bị trừ máu")]
@@ -20,11 +20,23 @@ public class PlayerHealth : MonoBehaviour
 
     private bool isDead = false;
 
+    [Header("Instant Death Settings")]
+    [Tooltip("Nếu player rơi xuống dưới giá trị Y này thì chết ngay")]
+    public float deathY = -7f;
+
     void Start()
     {
         ResetHealth();
     }
+    void Update()
+    {
+        if (isDead) return;
 
+        if (transform.position.y < deathY)
+        {
+            Die();
+        }
+    }
     public void ResetHealth()
     {
         currentHealth = maxHealth;

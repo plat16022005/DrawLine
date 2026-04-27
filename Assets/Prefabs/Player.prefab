@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 335603417805423339}
   - component: {fileID: 7338905024030835704}
   - component: {fileID: 3689218562234860651}
-  m_Layer: 0
+  - component: {fileID: 1120655123543100533}
+  m_Layer: 9
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -148,3 +149,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1120655123543100533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1428189316682868590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4271d9a90d33d9d4b97133c1bfb1d9ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  fallDamageThreshold: 3
+  damageMultiplier: 5

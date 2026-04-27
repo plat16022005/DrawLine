@@ -11,18 +11,22 @@ public class DataGame : MonoBehaviour
     public static DataGame instance;
     private FirebaseUser user;
     public Users users = null;
-    public int CurrentLevel = 0;
+    public CurrentLevel CurrentLevel;
     public int CurrentSkin = 0;
     public MySkin MySkin;
-    private void Awake()
+    public List<Level> levels;
+    public TotalPoint totalPoint;
+    private async void Awake()
     {
         instance = this;
         DontDestroyOnLoad(this);
         user = FirebaseAuth.DefaultInstance.CurrentUser;
         FindUsers();
-        FindCurrentLevel();
+        await FindCurrentLevel();
         FindCurrentSkin();
         FindMySkin();
+        await LoadAllLevel();
+        LoadTotalPoint();
     }
     // async void Start()
     // {
@@ -61,7 +65,7 @@ public class DataGame : MonoBehaviour
 
         // isLoaded = true;
     }
-    async void FindCurrentLevel()
+    async Task FindCurrentLevel()
     {
         DataSnapshot currentLevel = await FirebaseDataManager.instance.ReadDatabase("CurrentLevel", user.UserId);
 
@@ -82,7 +86,7 @@ public class DataGame : MonoBehaviour
                 cleanJson = JsonConvert.DeserializeObject<string>(raw);
             }
 
-            CurrentLevel = JsonConvert.DeserializeObject<int>(cleanJson);
+            CurrentLevel = JsonConvert.DeserializeObject<CurrentLevel>(cleanJson);
 
             Debug.Log("Load thành công! Level hiện tại: " + CurrentLevel);
         }
@@ -148,11 +152,85 @@ public class DataGame : MonoBehaviour
 
             MySkin = JsonConvert.DeserializeObject<MySkin>(cleanJson);
 
-            Debug.Log("Load thành công! Skin hiện tại: " + MySkin.myskin);
+            Debug.Log("Load thành công! Skin hiện tại: " + string.Join(",", MySkin.myskin));
         }
         catch (System.Exception e)
         {
             Debug.LogError("Lỗi Parse Json: " + e.Message);
         }       
+    }
+    async Task LoadAllLevel()
+    {
+        Debug.Log(CurrentLevel);
+        for (int i = 1; i < CurrentLevel.level; i++)
+        {
+            Debug.Log("Lấy thông tin lv: " + i);
+            Level level = await FindPointofLevel(i);
+            levels.Add(level);
+        }
+    }
+    async Task<Level> FindPointofLevel(int lv)
+    {
+        Level currentLevel = new Level();
+        string level = "Lv" + lv.ToString();
+        DataSnapshot myLevel = await FirebaseDataManager.instance.ReadDatabase(level, user.UserId);
+
+        if (myLevel == null || !myLevel.Exists)
+        {
+            Debug.Log("Không tìm thấy dữ liệu");
+            // isLoaded = true;
+            return null;
+        }
+
+        try 
+        {
+            string raw = myLevel.GetRawJsonValue();
+            string cleanJson = raw;
+
+            if (raw.StartsWith("\"") && raw.EndsWith("\""))
+            {
+                cleanJson = JsonConvert.DeserializeObject<string>(raw);
+            }
+
+            currentLevel = JsonConvert.DeserializeObject<Level>(cleanJson);
+
+            Debug.Log("Load thành công! Level đang được load hiện tại: " + currentLevel.level);
+            return currentLevel;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Lỗi Parse Json: " + e.Message);
+            return null;
+        }             
+    }
+    async void LoadTotalPoint()
+    {
+        DataSnapshot myTotalPoint = await FirebaseDataManager.instance.ReadDatabase("TotalPoint", user.UserId);
+
+        if (myTotalPoint == null || !myTotalPoint.Exists)
+        {
+            Debug.Log("Không tìm thấy dữ liệu");
+            // isLoaded = true;
+            return;
+        }
+
+        try 
+        {
+            string raw = myTotalPoint.GetRawJsonValue();
+            string cleanJson = raw;
+
+            if (raw.StartsWith("\"") && raw.EndsWith("\""))
+            {
+                cleanJson = JsonConvert.DeserializeObject<string>(raw);
+            }
+
+            totalPoint = JsonConvert.DeserializeObject<TotalPoint>(cleanJson);
+
+            Debug.Log("Load thành công! Tổng điểm hiện tại: " + totalPoint.point);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Lỗi Parse Json: " + e.Message);
+        }             
     }
 }
