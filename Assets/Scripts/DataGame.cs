@@ -16,6 +16,8 @@ public class DataGame : MonoBehaviour
     public MySkin MySkin;
     public List<Level> levels;
     public TotalPoint totalPoint;
+    public List<TotalPoint> TotalPointRank;
+    public List<CurrentLevel> LevelRank;
     private async void Awake()
     {
         instance = this;
@@ -27,6 +29,7 @@ public class DataGame : MonoBehaviour
         FindMySkin();
         await LoadAllLevel();
         LoadTotalPoint();
+        // LoadTotalPointRank();
     }
     // async void Start()
     // {
@@ -233,4 +236,23 @@ public class DataGame : MonoBehaviour
             Debug.LogError("Lỗi Parse Json: " + e.Message);
         }             
     }
+
+    public async Task LoadTotalPointRank()
+    {
+        TotalPointRank = await FirebaseDataManager.instance.GetTop10TotalPoint();
+        Debug.Log("Load thành công! Rank điểm hiện tại: " + TotalPointRank);
+    }
+    public async Task<int> FindMyRank()
+    {
+        return await FirebaseDataManager.instance.GetMyRank();
+    }
+    public async Task LoadLevelRank()
+    {
+        LevelRank = await FirebaseDataManager.instance.GetTop10Level();
+        Debug.Log("Load thành công! Rank điểm hiện tại: " + LevelRank);
+    }
+    public async Task<int> FindMyLevelRank()
+    {
+        return await FirebaseDataManager.instance.GetMyLevelRank();
+    }    
 }

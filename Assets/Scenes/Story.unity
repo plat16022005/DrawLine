@@ -715,6 +715,20 @@ MonoBehaviour:
   users:
     name: 
     coin: 999
+  CurrentLevel:
+    name: 
+    level: 0
+    time: 1777396134605
+    timeText: 29/04/2026 00:08:54
+  CurrentSkin: 0
+  MySkin:
+    myskin: 
+  levels: []
+  totalPoint:
+    name: 
+    point: 0
+  TotalPointRank: []
+  LevelRank: []
 --- !u!4 &773850565
 Transform:
   m_ObjectHideFlags: 0
@@ -897,6 +911,7 @@ MonoBehaviour:
   backgroundImageA: {fileID: 1683506546}
   backgroundImageB: {fileID: 442479780}
   storyText: {fileID: 1407981639}
+  skipButton: {fileID: 743752641}
   sfxSource: {fileID: 1437264571}
   typingClip: {fileID: 8300000, guid: d80aacbb932e67341ab2aaa714250c59, type: 3}
   typingVolume: 1

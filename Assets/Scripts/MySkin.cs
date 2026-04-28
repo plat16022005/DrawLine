@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 [System.Serializable]
 public class MySkin
 {
-    public List<int> myskin;
+    public List<int> myskin = new List<int>();
     public MySkin()
     {
         

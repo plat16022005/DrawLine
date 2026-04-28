@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Firebase.Auth;
 using TMPro;
 using Unity.VisualScripting;
@@ -28,12 +29,33 @@ public class SelectLevelManager : MonoBehaviour
     public TextMeshProUGUI NameSkin;
     public Transform ContentSkin;
     public TextMeshProUGUI notificationSkin;
+    [Header("Panel Rank")]
+    public GameObject PanelRank;
+    public Transform ContentRank;
+    public GameObject RankPrefabs;
+    public TextMeshProUGUI RankPlayer;
+    public TextMeshProUGUI NamePlayerRank;
+    public TextMeshProUGUI PointPlayerRank;
+    [Header("Panel Level Detail")]
+    public GameObject PanelLevelDetail;
+    public Image ImageLevelDetail;
+    public Sprite[] ImageDetail;
+    public Image Star1Level;
+    public Image Star2Level;
+    public Image Star3Level;
+    public TextMeshProUGUI PointLevel;
+    public Button EnterLevelButton;
     private void Awake()
     {
         user = FirebaseAuth.DefaultInstance.CurrentUser;
     }
     void Start()
     {
+        // Giới hạn tối đa 15 ký tự
+        Name.characterLimit = 15;
+
+        // Mỗi khi người chơi nhập sẽ tự kiểm tra
+        Name.onValueChanged.AddListener(ValidateName);
         if (DataGame.instance.users.name == "")
         {
             PanelSetName.SetActive(true);
@@ -46,6 +68,30 @@ public class SelectLevelManager : MonoBehaviour
         if (DataGame.instance.CurrentLevel.level > 0)
         {
             LoadLevel();
+        }
+    }
+    void ValidateName(string value)
+    {
+        /*
+         Cho phép:
+         - Chữ thường + chữ hoa
+         - Chữ có dấu tiếng Việt
+         - Số
+         - Dấu cách
+
+         Không cho:
+         - Ký tự đặc biệt: @ # $ % ^ & * ...
+        */
+
+        string filtered = Regex.Replace(
+            value,
+            @"[^a-zA-Z0-9À-ỹ\s]",
+            ""
+        );
+
+        if (filtered != value)
+        {
+            Name.text = filtered;
         }
     }
     void LoadLevel()
@@ -81,7 +127,7 @@ public class SelectLevelManager : MonoBehaviour
 
                 btn.interactable = isUnlocked;
 
-                btn.onClick.AddListener(() => EnterLevel(levelIndex));
+                btn.onClick.AddListener(() => OpenPanelDetailLevel(levelIndex));
             }
             star1.color = Color.black;
             star2.color = Color.black;
@@ -122,18 +168,18 @@ public class SelectLevelManager : MonoBehaviour
     public void SetName()
     {
         Users users = new Users(Name.text, 0);
-        MySkin myskin = new MySkin(new List<int>());
+        MySkin myskin = new MySkin(new List<int>(){-1});
         TotalPoint totalPoint = new TotalPoint(Name.text, 0);
         CurrentLevel currentLevel= new CurrentLevel(Name.text, 1);
         DataGame.instance.users = users;
         NamePlayer.text = Name.text;
         Coin.text = users.coin.ToString();
         PanelSetName.SetActive(false);
-        FirebaseDataManager.instance.WriteDatabase("Users", user.UserId, users.ToString());
-        FirebaseDataManager.instance.WriteDatabase("CurrentLevel", user.UserId, currentLevel.ToString());
-        FirebaseDataManager.instance.WriteDatabase("CurrentSkin", user.UserId, "0");
-        FirebaseDataManager.instance.WriteDatabase("MySkin", user.UserId, myskin.ToString());
-        FirebaseDataManager.instance.WriteDatabase("TotalPoint", user.UserId, totalPoint.ToString());
+        FirebaseDataManager.instance.WriteDatabase("Users", user.UserId, users);
+        FirebaseDataManager.instance.WriteDatabase("CurrentLevel", user.UserId, currentLevel);
+        FirebaseDataManager.instance.WriteDatabase("CurrentSkin", user.UserId, 0);
+        FirebaseDataManager.instance.WriteDatabase("MySkin", user.UserId, myskin);
+        FirebaseDataManager.instance.WriteDatabase("TotalPoint", user.UserId, totalPoint);
         DataGame.instance.CurrentLevel = new CurrentLevel(Name.text, 1);
         DataGame.instance.CurrentSkin = 0;
         DataGame.instance.MySkin = myskin;
@@ -167,7 +213,8 @@ public class SelectLevelManager : MonoBehaviour
         }
         foreach (int index in DataGame.instance.MySkin.myskin)
         {
-            Transform item = ContentSkin.GetChild(index-1);
+            if (index <= 0) continue;
+            Transform item = ContentSkin.GetChild(index - 1);
             Image img = item.Find("Image")?.GetComponent<Image>();
             TextMeshProUGUI txtCost = item.Find("Buy/Text (TMP)")?.GetComponent<TextMeshProUGUI>();
             Button btnBuy = item.Find("Buy")?.GetComponent<Button>();
@@ -199,8 +246,8 @@ public class SelectLevelManager : MonoBehaviour
         {
             DataGame.instance.users.coin -= costSkin[index];
             DataGame.instance.MySkin.myskin.Add(index);
-            FirebaseDataManager.instance.WriteDatabase("Users", user.UserId, DataGame.instance.users.ToString());
-            FirebaseDataManager.instance.WriteDatabase("MySkin", user.UserId, DataGame.instance.MySkin.ToString());
+            FirebaseDataManager.instance.WriteDatabase("Users", user.UserId, DataGame.instance.users);
+            FirebaseDataManager.instance.WriteDatabase("MySkin", user.UserId, DataGame.instance.MySkin);
             ResetShop();
             notificationSkin.text = "Bạn đã mua thành công skin: " + namesSkin[index];
             notificationSkin.color = Color.green;
@@ -220,7 +267,7 @@ public class SelectLevelManager : MonoBehaviour
         {
             DataGame.instance.CurrentSkin = index;
             CurrentSkin.sprite = spritesSkin[index];
-            FirebaseDataManager.instance.WriteDatabase("CurrentSkin", user.UserId, index.ToString());
+            FirebaseDataManager.instance.WriteDatabase("CurrentSkin", user.UserId, index);
             NameSkin.text = namesSkin[index];
             ResetShop();
             notificationSkin.text = "Bạn đang mặc skin: " + namesSkin[index];
@@ -232,7 +279,7 @@ public class SelectLevelManager : MonoBehaviour
     {
         DataGame.instance.CurrentSkin = 0;
         CurrentSkin.sprite = spritesSkin[0];
-        FirebaseDataManager.instance.WriteDatabase("CurrentSkin", user.UserId, "0");
+        FirebaseDataManager.instance.WriteDatabase("CurrentSkin", user.UserId, 0);
         NameSkin.text = namesSkin[0];
         ResetShop();
         notificationSkin.text = "Bạn đã hủy mặc skin và trở về mặc định";
@@ -242,5 +289,102 @@ public class SelectLevelManager : MonoBehaviour
     public void CloseShop()
     {
         PanelShop.SetActive(false);
+    }
+    public async void OpenRankPanel()
+    {
+        PanelRank.SetActive(true);
+        LoadPointRank();
+    }
+    public async void LoadPointRank()
+    {
+        foreach (Transform item in ContentRank)
+        {
+            Destroy(item.gameObject);
+        }
+        await DataGame.instance.LoadTotalPointRank();
+        int currentRantPlayer = 0;
+        foreach (TotalPoint player in DataGame.instance.TotalPointRank)
+        {
+            currentRantPlayer++;
+            GameObject obj = Instantiate(RankPrefabs, ContentRank);
+            TextMeshProUGUI XH = obj.transform.Find("XH")?.GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI Name = obj.transform.Find("Name")?.GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI Point = obj.transform.Find("Point")?.GetComponent<TextMeshProUGUI>();
+
+            XH.text = currentRantPlayer.ToString();
+            Name.text = player.name;
+            Point.text = player.point.ToString();
+        }
+        int myRank = await DataGame.instance.FindMyRank();
+
+        RankPlayer.text = myRank.ToString();
+        NamePlayerRank.text = DataGame.instance.users.name;
+        PointPlayerRank.text = DataGame.instance.totalPoint.point.ToString();        
+    }
+    public async void LoadLevelRank()
+    {
+        foreach (Transform item in ContentRank)
+        {
+            Destroy(item.gameObject);
+        }
+        await DataGame.instance.LoadLevelRank();
+        int currentRantPlayer = 0;
+        foreach (CurrentLevel level in DataGame.instance.LevelRank)
+        {
+            currentRantPlayer++;
+            GameObject obj = Instantiate(RankPrefabs, ContentRank);
+            TextMeshProUGUI XH = obj.transform.Find("XH")?.GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI Name = obj.transform.Find("Name")?.GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI Point = obj.transform.Find("Point")?.GetComponent<TextMeshProUGUI>();
+
+            XH.text = currentRantPlayer.ToString();
+            Name.text = level.name;
+            Point.text = "LV." + (level.level - 1).ToString();
+        }
+        int myRank = await DataGame.instance.FindMyLevelRank();
+
+        RankPlayer.text = myRank.ToString();
+        NamePlayerRank.text = DataGame.instance.users.name;
+        PointPlayerRank.text = "LV." + (DataGame.instance.CurrentLevel.level - 1).ToString();        
+    }
+    public void CloseRankPanel()
+    {
+        PanelRank.SetActive(false);
+    }
+    void OpenPanelDetailLevel(int level)
+    {
+        PanelLevelDetail.SetActive(true);
+        Level result = DataGame.instance.levels.Find(l => l.level == "Lv" + level);
+        if (result != null)
+        {
+            ImageLevelDetail.sprite = ImageDetail[0];
+            if (result.star >= 1)
+            {
+                Star1Level.color = Color.white;
+            }
+            if (result.star >= 2)
+            {
+                Star2Level.color = Color.white;
+            }
+            if (result.star >= 3)
+            {
+                Star3Level.color = Color.white;
+            }
+            PointLevel.text = result.point.ToString();
+            EnterLevelButton.onClick.AddListener(() => EnterLevel(level));
+        }
+        else
+        {
+            ImageLevelDetail.sprite = ImageDetail[1];
+            Star1Level.color = Color.black;
+            Star2Level.color = Color.black;
+            Star3Level.color = Color.black;
+            PointLevel.text = "0";
+            EnterLevelButton.onClick.AddListener(() => EnterLevel(level));
+        }
+    }
+    public void ClosePanelDetailLevel()
+    {
+        PanelLevelDetail.SetActive(false);
     }
 }

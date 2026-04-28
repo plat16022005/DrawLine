@@ -2446,6 +2446,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7949824960999810891, guid: 22c94c733d826434b8ab82ac489ca167, type: 3}
+      propertyPath: m_ScreenMatchMode
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8487212137041083222, guid: 22c94c733d826434b8ab82ac489ca167, type: 3}
       propertyPath: m_Name
       value: BangVe
