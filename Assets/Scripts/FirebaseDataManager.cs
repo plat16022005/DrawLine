@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -264,5 +265,123 @@ public class FirebaseDataManager : MonoBehaviour
         }
 
         return myRank;
+    }
+    public async Task<List<Level>> GetTop10Level(string levelName)
+    {
+        List<Level> top10 = new List<Level>();
+
+        try
+        {
+            // Ví dụ:
+            // levelName = "Lv1"
+            // levelName = "Lv2"
+
+            var snapshot = await reference
+                .Child(levelName)
+                .OrderByChild("point")
+                .LimitToLast(10) // lấy 10 điểm cao nhất
+                .GetValueAsync();
+
+            if (snapshot.Exists)
+            {
+                foreach (var child in snapshot.Children)
+                {
+                    string json = child.GetRawJsonValue();
+
+                    if (!string.IsNullOrEmpty(json))
+                    {
+                        Level levelData =
+                            JsonConvert.DeserializeObject<Level>(json);
+
+                        if (levelData != null)
+                        {
+                            top10.Add(levelData);
+                        }
+                    }
+                }
+
+                // Firebase trả tăng dần
+                // cần đảo lại để cao nhất đứng đầu
+                top10.Reverse();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Lỗi lấy Top 10 Level: " + ex.Message);
+        }
+
+        return top10;
+    }
+    public async Task<int> GetMyLevelRank(string levelName)
+    {
+        try
+        {
+            FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
+
+            if (user == null)
+                return -1;
+
+            // Lấy dữ liệu của bản thân trước
+            var mySnapshot = await reference
+                .Child(levelName)
+                .Child(user.UserId)
+                .GetValueAsync();
+
+            if (!mySnapshot.Exists)
+                return -1;
+
+            string myJson = mySnapshot.GetRawJsonValue();
+
+            if (string.IsNullOrEmpty(myJson))
+                return -1;
+
+            Level myData =
+                JsonConvert.DeserializeObject<Level>(myJson);
+
+            if (myData == null)
+                return -1;
+
+            // Lấy toàn bộ để tính rank
+            var allSnapshot = await reference
+                .Child(levelName)
+                .OrderByChild("point")
+                .GetValueAsync();
+
+            List<Level> allPlayers = new List<Level>();
+
+            foreach (var child in allSnapshot.Children)
+            {
+                string json = child.GetRawJsonValue();
+
+                if (!string.IsNullOrEmpty(json))
+                {
+                    Level levelData =
+                        JsonConvert.DeserializeObject<Level>(json);
+
+                    if (levelData != null)
+                    {
+                        allPlayers.Add(levelData);
+                    }
+                }
+            }
+
+            // Sắp xếp giảm dần theo point
+            allPlayers.Sort((a, b) => b.point.CompareTo(a.point));
+
+            for (int i = 0; i < allPlayers.Count; i++)
+            {
+                if (allPlayers[i].namePlayer == myData.namePlayer
+                    && allPlayers[i].point == myData.point)
+                {
+                    return i + 1; // rank bắt đầu từ 1
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Lỗi lấy rank bản thân: " + ex.Message);
+        }
+
+        return -1;
     }
 }

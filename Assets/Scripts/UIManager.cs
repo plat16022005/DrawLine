@@ -32,6 +32,12 @@ public class UIManager : MonoBehaviour
     public Image Star1Ink;
     public Image Star2Ink;
     public Image Star3Ink;
+    [Header("Detail Rank")]
+    public Transform ContentLevelDetail;
+    public GameObject LevelDetailPrefab;
+    public TextMeshProUGUI XHLevel;
+    public TextMeshProUGUI NamePlayerLevel;
+    public TextMeshProUGUI PointPlayerLevel;
     void Update()
     {
         if (InkManager.CurrentInk < 700)
@@ -219,9 +225,46 @@ public class UIManager : MonoBehaviour
 
         int levelNumber = int.Parse(numberPart);
         NextLevel.onClick.AddListener(() => NextToLevel(prefix + (levelNumber + 1).ToString()));
+        LoadLevelXRank(levelNumber);
     }
     void NextToLevel(string level)
     {
         SceneManager.LoadScene(level);
+    }
+    public async void LoadLevelXRank(int lv)
+    {
+        foreach (Transform item in ContentLevelDetail)
+        {
+            Destroy(item.gameObject);
+        }
+        await DataGame.instance.LoadTop10Level(lv);
+        int currentRantPlayer = 0;
+        foreach (Level level in DataGame.instance.LvXRank)
+        {
+            currentRantPlayer++;
+            GameObject obj = Instantiate(LevelDetailPrefab, ContentLevelDetail);
+            TextMeshProUGUI XH = obj.transform.Find("XH")?.GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI Name = obj.transform.Find("Name")?.GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI Point = obj.transform.Find("Point")?.GetComponent<TextMeshProUGUI>();
+
+            XH.text = currentRantPlayer.ToString();
+            Name.text = level.namePlayer;
+            Point.text = level.point.ToString();
+        }
+        int myRank = await DataGame.instance.FindMyLevelXRank(lv);
+
+        Level myLevel = DataGame.instance.levels.Find(level => (level.level == "Lv" + lv.ToString()));
+        if (myLevel != null)
+        {
+            XHLevel.text = myRank.ToString();
+            NamePlayerLevel.text = DataGame.instance.users.name;
+            PointPlayerLevel.text = myLevel.point.ToString();        
+        }
+        else
+        {
+            XHLevel.text = "???";
+            NamePlayerLevel.text = DataGame.instance.users.name;
+            PointPlayerLevel.text = "0";                  
+        }
     }
 }

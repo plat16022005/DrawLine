@@ -45,6 +45,13 @@ public class SelectLevelManager : MonoBehaviour
     public Image Star3Level;
     public TextMeshProUGUI PointLevel;
     public Button EnterLevelButton;
+    public Transform ContentLevelDetail;
+    public GameObject LevelDetailPrefab;
+    public TextMeshProUGUI XHLevel;
+    public TextMeshProUGUI NamePlayerLevel;
+    public TextMeshProUGUI PointPlayerLevel;
+    [Header("Panel Answer")]
+    public GameObject PanelAnswer;
     private void Awake()
     {
         user = FirebaseAuth.DefaultInstance.CurrentUser;
@@ -290,7 +297,7 @@ public class SelectLevelManager : MonoBehaviour
     {
         PanelShop.SetActive(false);
     }
-    public async void OpenRankPanel()
+    public void OpenRankPanel()
     {
         PanelRank.SetActive(true);
         LoadPointRank();
@@ -372,6 +379,7 @@ public class SelectLevelManager : MonoBehaviour
             }
             PointLevel.text = result.point.ToString();
             EnterLevelButton.onClick.AddListener(() => EnterLevel(level));
+
         }
         else
         {
@@ -382,9 +390,54 @@ public class SelectLevelManager : MonoBehaviour
             PointLevel.text = "0";
             EnterLevelButton.onClick.AddListener(() => EnterLevel(level));
         }
+        LoadLevelXRank(level);
     }
     public void ClosePanelDetailLevel()
     {
         PanelLevelDetail.SetActive(false);
+    }
+    public async void LoadLevelXRank(int lv)
+    {
+        foreach (Transform item in ContentLevelDetail)
+        {
+            Destroy(item.gameObject);
+        }
+        await DataGame.instance.LoadTop10Level(lv);
+        int currentRantPlayer = 0;
+        foreach (Level level in DataGame.instance.LvXRank)
+        {
+            currentRantPlayer++;
+            GameObject obj = Instantiate(LevelDetailPrefab, ContentLevelDetail);
+            TextMeshProUGUI XH = obj.transform.Find("XH")?.GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI Name = obj.transform.Find("Name")?.GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI Point = obj.transform.Find("Point")?.GetComponent<TextMeshProUGUI>();
+
+            XH.text = currentRantPlayer.ToString();
+            Name.text = level.namePlayer;
+            Point.text = level.point.ToString();
+        }
+        int myRank = await DataGame.instance.FindMyLevelXRank(lv);
+
+        Level myLevel = DataGame.instance.levels.Find(level => (level.level == "Lv" + lv.ToString()));
+        if (myLevel != null)
+        {
+            XHLevel.text = myRank.ToString();
+            NamePlayerLevel.text = DataGame.instance.users.name;
+            PointPlayerLevel.text = myLevel.point.ToString();        
+        }
+        else
+        {
+            XHLevel.text = "???";
+            NamePlayerLevel.text = DataGame.instance.users.name;
+            PointPlayerLevel.text = "0";                  
+        }
+    }
+    public void OpenPanelAnswer()
+    {
+        PanelAnswer.SetActive(true);
+    }
+    public void ClosePanelAnswer()
+    {
+        PanelAnswer.SetActive(false);
     }
 }

@@ -18,6 +18,7 @@ public class DataGame : MonoBehaviour
     public TotalPoint totalPoint;
     public List<TotalPoint> TotalPointRank;
     public List<CurrentLevel> LevelRank;
+    public List<Level> LvXRank;
     private async void Awake()
     {
         instance = this;
@@ -254,5 +255,13 @@ public class DataGame : MonoBehaviour
     public async Task<int> FindMyLevelRank()
     {
         return await FirebaseDataManager.instance.GetMyLevelRank();
-    }    
+    }
+    public async Task LoadTop10Level(int lv)
+    {
+        LvXRank = await FirebaseDataManager.instance.GetTop10Level("Lv" + lv.ToString());
+    }
+    public async Task<int> FindMyLevelXRank(int lv)
+    {
+        return await FirebaseDataManager.instance.GetMyLevelRank("Lv" + lv.ToString());
+    }        
 }

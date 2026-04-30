@@ -70,6 +70,13 @@ public class GameController : MonoBehaviour
             playerHealth.ResetHealth();
         }
 
+        // 6. Khôi phục Demon và Cage nếu chúng đã bị ẩn (do Player chạm vào Demon)
+        Demon[] demons = FindObjectsOfType<Demon>(true); // true = include inactive GameObjects
+        foreach (Demon demon in demons)
+        {
+            demon.ResetDemon();
+        }
+
         Debug.Log("Simulation đã dừng, mọi thứ đã về trạng thái ban đầu.");
     }
     public void StartStop()

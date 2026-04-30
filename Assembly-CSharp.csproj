@@ -67,6 +67,7 @@
     <Compile Include="Assets\Scripts\GameController.cs" />
     <Compile Include="Assets\Firebase\FirebaseApp\Internal\FirebaseInterops.cs" />
     <Compile Include="Assets\Scripts\RubberBehavior.cs" />
+    <Compile Include="Assets\Scripts\CameraPinchZoom.cs" />
     <Compile Include="Assets\Scripts\LevelSceneManager.cs" />
     <Compile Include="Assets\Scripts\Users.cs" />
     <Compile Include="Assets\Scripts\ConstantSpeedBehavior.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="Assets\Scripts\SpeedBoostBehavior.cs" />
     <Compile Include="Assets\Scripts\Line.cs" />
     <Compile Include="Assets\Scripts\Princess.cs" />
+    <Compile Include="Assets\Scripts\SessionManager.cs" />
     <Compile Include="Assets\Scripts\UIButtonSfx.cs" />
   </ItemGroup>
   <ItemGroup>
