@@ -77,6 +77,20 @@ public class GameController : MonoBehaviour
             demon.ResetDemon();
         }
 
+        // 7. Khôi phục các BreakablePlatform đã vỡ về trạng thái ban đầu
+        BreakablePlatform[] platforms = FindObjectsOfType<BreakablePlatform>(true); // true = include inactive
+        foreach (BreakablePlatform platform in platforms)
+        {
+            platform.ResetPlatform();
+        }
+
+        // 8. Đưa tất cả MovingBlock về vị trí ban đầu
+        MovingBlock[] movingBlocks = FindObjectsOfType<MovingBlock>();
+        foreach (MovingBlock block in movingBlocks)
+        {
+            block.ResetBlock();
+        }
+
         Debug.Log("Simulation đã dừng, mọi thứ đã về trạng thái ban đầu.");
     }
     public void StartStop()

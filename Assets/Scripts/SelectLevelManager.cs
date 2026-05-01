@@ -11,6 +11,8 @@ using UnityEngine.UI;
 
 public class SelectLevelManager : MonoBehaviour
 {
+    public AudioSource AudioSource;
+    public AudioClip[] SoundClip;
     [SerializeField] private Sprite[] spritesSkin;
     [SerializeField] private String[] namesSkin;
     [SerializeField] private int[] costSkin;
@@ -191,6 +193,7 @@ public class SelectLevelManager : MonoBehaviour
         DataGame.instance.CurrentSkin = 0;
         DataGame.instance.MySkin = myskin;
         DataGame.instance.totalPoint = totalPoint;
+        AudioSource.PlayOneShot(SoundClip[1]);
         LoadLevel();
     }
     public void OpenShop()
@@ -249,6 +252,10 @@ public class SelectLevelManager : MonoBehaviour
     }
     void BuySkin(int index)
     {
+        if (DataGame.instance.MySkin.myskin.Contains(index))
+        {
+            return;
+        }
         if (DataGame.instance.users.coin >= costSkin[index])
         {
             DataGame.instance.users.coin -= costSkin[index];
@@ -260,12 +267,14 @@ public class SelectLevelManager : MonoBehaviour
             notificationSkin.color = Color.green;
             notificationSkin.gameObject.SetActive(true);
             Coin.text = DataGame.instance.users.coin.ToString();
+            AudioSource.PlayOneShot(SoundClip[1]);
         }
         else
         {
             notificationSkin.text = "Bạn không đủ tiền để mua skin này!";
             notificationSkin.color = Color.red;
             notificationSkin.gameObject.SetActive(true);
+            AudioSource.PlayOneShot(SoundClip[0]);
         }
     }
     void EquipSkin(int index)

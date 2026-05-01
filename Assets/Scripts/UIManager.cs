@@ -8,6 +8,9 @@ using Unity.VisualScripting;
 
 public class UIManager : MonoBehaviour
 {
+    public AudioSource MusicBackGround;
+    public AudioSource SoundEffect;
+    public AudioClip[] SoundClip;
     [Header("Health UI")]
     [Tooltip("Thanh máu (Slider)")]
     public Slider healthBar;
@@ -112,6 +115,8 @@ public class UIManager : MonoBehaviour
     private void ShowGameOverScreen()
     {
         GameController.isGameOver = true;
+        MusicBackGround.Stop();
+        SoundEffect.PlayOneShot(SoundClip[1]);
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
@@ -140,7 +145,7 @@ public class UIManager : MonoBehaviour
 
         // 2. Chờ 1 giây
         yield return new WaitForSeconds(1f);
-
+        MusicBackGround.Stop();
         // 3. Dừng game
         Time.timeScale = 0f;
         GameController.isPlaying = false;
@@ -204,6 +209,8 @@ public class UIManager : MonoBehaviour
     {
         winPanel.SetActive(true);
         DataGame.instance.users.coin += money;
+        MusicBackGround.Stop();
+        SoundEffect.PlayOneShot(SoundClip[0]);
         FirebaseDataManager.instance.WriteDatabase("Users", user.UserId, DataGame.instance.users);
         if (star >= 1)
         {

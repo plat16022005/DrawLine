@@ -65,14 +65,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\GameController.cs" />
+    <Compile Include="Assets\Scripts\BreakablePlatform.cs" />
     <Compile Include="Assets\Firebase\FirebaseApp\Internal\FirebaseInterops.cs" />
     <Compile Include="Assets\Scripts\RubberBehavior.cs" />
     <Compile Include="Assets\Scripts\CameraPinchZoom.cs" />
     <Compile Include="Assets\Scripts\LevelSceneManager.cs" />
+    <Compile Include="Assets\Scripts\FireSpawner.cs" />
     <Compile Include="Assets\Scripts\Users.cs" />
     <Compile Include="Assets\Scripts\ConstantSpeedBehavior.cs" />
     <Compile Include="Assets\Scripts\LineCreator.cs" />
+    <Compile Include="Assets\Scripts\MovingBlock.cs" />
     <Compile Include="Assets\Firebase\FirebaseApp\Internal\HttpHelpers.cs" />
+    <Compile Include="Assets\Scripts\RemoveTouchedTile.cs" />
     <Compile Include="Assets\Scripts\SlowDownBehavior.cs" />
     <Compile Include="Assets\Scripts\CurrentLevel.cs" />
     <Compile Include="Assets\Scripts\StoryController.cs" />
@@ -87,15 +91,18 @@
     <Compile Include="Assets\Scripts\SelectLevelManager.cs" />
     <Compile Include="Assets\Scripts\UISfxInstaller.cs" />
     <Compile Include="Assets\Scripts\FirebaseAuthManager.cs" />
+    <Compile Include="Assets\Scripts\FireDamage.cs" />
     <Compile Include="Assets\Scripts\TotalPoint.cs" />
     <Compile Include="Assets\Scripts\PlayerHealth.cs" />
     <Compile Include="Assets\Scripts\DataGame.cs" />
+    <Compile Include="Assets\Scripts\AutoScaleBackground.cs" />
     <Compile Include="Assets\Scripts\MainMenuAuthFlow.cs" />
     <Compile Include="Assets\Scripts\UIManager.cs" />
     <Compile Include="Assets\Scripts\LineType.cs" />
     <Compile Include="Assets\Scripts\CameraController.cs" />
     <Compile Include="Assets\Scripts\SpeedBoostBehavior.cs" />
     <Compile Include="Assets\Scripts\Line.cs" />
+    <Compile Include="Assets\TooCubeForest\demoScenes\Movement.cs" />
     <Compile Include="Assets\Scripts\Princess.cs" />
     <Compile Include="Assets\Scripts\SessionManager.cs" />
     <Compile Include="Assets\Scripts\UIButtonSfx.cs" />
@@ -131,6 +138,7 @@
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\Firebase\Plugins\iOS\Firebase.Database.dll" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
+    <None Include="Assets\BigManJD\readme.txt" />
     <None Include="Assets\Firebase\Plugins\Firebase.Platform.dll" />
     <None Include="Assets\Image\UI\_README.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
@@ -509,6 +517,14 @@
     </Reference>
     <Reference Include="Google.MiniJson">
       <HintPath>Assets\Firebase\Plugins\Google.MiniJson.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEditor.iOS.Extensions.Xcode">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.44f1\Editor\Data\PlaybackEngines\iOSSupport\UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEditor.iOS.Extensions.Common">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.44f1\Editor\Data\PlaybackEngines\iOSSupport\UnityEditor.iOS.Extensions.Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Android.Types">

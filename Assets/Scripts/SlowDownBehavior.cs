@@ -3,7 +3,7 @@ using UnityEngine;
 public class SlowDownBehavior : MonoBehaviour
 {
     [Tooltip("Hệ số làm chậm, càng lớn bóng càng mau dừng lại (VD: 1.0 là giảm 100% vận tốc mỗi giây)")]
-    public float slowRate = 0.9f;
+    public float slowRate = 10f;
 
     void OnCollisionStay2D(Collision2D collision)
     {

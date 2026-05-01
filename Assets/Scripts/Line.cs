@@ -93,7 +93,7 @@ public class Line : MonoBehaviour
                 
                 PhysicsMaterial2D slowMaterial = new PhysicsMaterial2D("BrownMud");
                 slowMaterial.bounciness = 0.0f;
-                slowMaterial.friction = 10f; // Thêm ma sát vật lý cao
+                slowMaterial.friction = 100f; // Thêm ma sát vật lý cao
                 edgeCollider.sharedMaterial = slowMaterial;
                 
                 // Thêm script để rút vận tốc thành 0 từ từ như đi vào bùn lầy
