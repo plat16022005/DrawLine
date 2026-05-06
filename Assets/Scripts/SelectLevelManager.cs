@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Firebase.Auth;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.Video;
 
 public class SelectLevelManager : MonoBehaviour
 {
@@ -54,6 +54,14 @@ public class SelectLevelManager : MonoBehaviour
     public TextMeshProUGUI PointPlayerLevel;
     [Header("Panel Answer")]
     public GameObject PanelAnswer;
+    [Header("Panel Tutorial")]
+    public GameObject PanelTutorial;
+    public Transform ButtonsPlayVideo;
+    public GameObject PanelPlayVideo;
+    public VideoPlayer videoPlayer;
+    public VideoClip[] videoClip;
+    public TextMeshProUGUI DetailVideo;
+    public string[] Details;
     private void Awake()
     {
         user = FirebaseAuth.DefaultInstance.CurrentUser;
@@ -212,7 +220,9 @@ public class SelectLevelManager : MonoBehaviour
             Image img = item.Find("Image")?.GetComponent<Image>();
             TextMeshProUGUI txtCost = item.Find("Buy/Text (TMP)")?.GetComponent<TextMeshProUGUI>();
             Button btnBuy = item.Find("Buy")?.GetComponent<Button>();
-            btnBuy.onClick.AddListener(() => BuySkin(index));
+            int tempIndex = index;
+            btnBuy.onClick.RemoveAllListeners();
+            btnBuy.onClick.AddListener(() => BuySkin(tempIndex));
 
             img.sprite = spritesSkin[index];
             txtCost.text = costSkin[index].ToString();            
@@ -448,5 +458,47 @@ public class SelectLevelManager : MonoBehaviour
     public void ClosePanelAnswer()
     {
         PanelAnswer.SetActive(false);
+    }
+    public void OpenPanelTutorial()
+    {
+        PanelTutorial.SetActive(true);
+
+        int currentVideo = 0;
+
+        foreach (Transform item in ButtonsPlayVideo)
+        {
+            Button btn = item.GetComponent<Button>();
+
+            btn.onClick.RemoveAllListeners();
+
+            int videoIndex = currentVideo; // FIX closure bug
+
+            btn.onClick.AddListener(() => OpenTutorial(videoIndex));
+
+            currentVideo++;
+        }
+    }
+    public void ClosePanelTutorial()
+    {
+        PanelTutorial.SetActive(false);
+    }
+    public void OpenTutorial(int index)
+    {
+        Debug.Log("Phát video: " + index.ToString());
+        if (index < 0 || index >= videoClip.Length)
+            return;
+
+        PanelPlayVideo.SetActive(true);
+
+        videoPlayer.Stop();
+        videoPlayer.audioOutputMode = VideoAudioOutputMode.None;
+        videoPlayer.clip = videoClip[index];
+        videoPlayer.Play();
+        DetailVideo.text = Details[index];
+    }
+    public void CloseTutorial()
+    {
+        videoPlayer.Stop();
+        PanelPlayVideo.SetActive(false);
     }
 }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class LineCreator : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class LineCreator : MonoBehaviour
     // Lưu trạng thái hiện tại đang chọn bút màu gì
     public LineType currentLineType = LineType.Normal;
     public Image CurrentColor;
+    public Image CurrentTool;
+    public Sprite[] Tools;
 
     [Header("Cursor Settings")]
     public Texture2D pencilCursor;
@@ -22,8 +25,8 @@ public class LineCreator : MonoBehaviour
 
     void Start()
     {
-        SetPencilCursor();
-        CurrentColor.color = Color.black;
+        // Khởi tạo mặc định là bút đen
+        SelectNormalPen();
     }
 
     void OnDisable()
@@ -50,10 +53,18 @@ public class LineCreator : MonoBehaviour
 
     // --- CÁC HÀM CHỌN BÚT ---
 
+    // Helper: bật lại bút (tắt camera mode)
+    private void ActivatePen()
+    {
+        if (CameraControl.Instance != null) CameraControl.Instance.DisableCameraMode();
+        SetPencilCursor();
+        CurrentTool.sprite = Tools[0];
+    }
+
     public void SelectNormalPen()
     {
         currentLineType = LineType.Normal;
-        SetPencilCursor();
+        ActivatePen();
         Debug.Log("Lựa chọn Bút: ĐEN (Đứng yên)");
         CurrentColor.color = Color.black;
     }
@@ -61,7 +72,7 @@ public class LineCreator : MonoBehaviour
     public void SelectBouncyPen()
     {
         currentLineType = LineType.Bouncy;
-        SetPencilCursor();
+        ActivatePen();
         Debug.Log("Lựa chọn Bút: XANH LÁ CÂY (Phản lực nhún nhảy)");
         CurrentColor.color = Color.green;
     }
@@ -69,7 +80,7 @@ public class LineCreator : MonoBehaviour
     public void SelectRubberPen()
     {
         currentLineType = LineType.Rubber;
-        SetPencilCursor();
+        ActivatePen();
         Debug.Log("Lựa chọn Bút: MÀU TÍM (Dây cao su đàn hồi)");
         CurrentColor.color = new Color(0.6f, 0.1f, 0.9f);
     }
@@ -77,7 +88,7 @@ public class LineCreator : MonoBehaviour
     public void SelectSpeedBoostPen()
     {
         currentLineType = LineType.SpeedBoost;
-        SetPencilCursor();
+        ActivatePen();
         Debug.Log("Lựa chọn Bút: MÀU ĐỎ (Tăng tốc x2 và giữ vận tốc)");
         CurrentColor.color = Color.red;
     }
@@ -85,7 +96,7 @@ public class LineCreator : MonoBehaviour
     public void SelectConstantSpeedPen()
     {
         currentLineType = LineType.ConstantSpeed;
-        SetPencilCursor();
+        ActivatePen();
         Debug.Log("Lựa chọn Bút: MÀU XANH DƯƠNG (Giữ nguyên vận tốc)");
         CurrentColor.color = Color.blue;
     }
@@ -93,7 +104,7 @@ public class LineCreator : MonoBehaviour
     public void SelectSlowDownPen()
     {
         currentLineType = LineType.SlowDown;
-        SetPencilCursor();
+        ActivatePen();
         Debug.Log("Lựa chọn Bút: MÀU NÂU (Giảm tốc dần dần)");
         CurrentColor.color = new Color(0.5f, 0.25f, 0.0f);
     }
@@ -102,8 +113,25 @@ public class LineCreator : MonoBehaviour
     public void SelectEraserTool()
     {
         currentLineType = LineType.Eraser;
+        // Tắt camera mode TRƯỚC (nó reset cursor về default)
+        if (CameraControl.Instance != null) CameraControl.Instance.DisableCameraMode();
+        // Rồi mới set cursor tẩy (để không bị ghi đè)
         SetEraserCursor();
         Debug.Log("Lựa chọn: CỤC TẨY (Xóa đường vẽ)");
+        CurrentTool.sprite = Tools[1];
+    }
+
+    // Hàm gọi từ nút UI để chuyển sang chế độ điều khiển Camera
+    public void SelectCameraMode()
+    {
+        // Kết thúc nét đang vẽ (nếu có)
+        activeLine = null;
+        // Đặt con trỏ về mặc định
+        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+        // Bật chế độ camera
+        if (CameraControl.Instance != null) CameraControl.Instance.EnableCameraMode();
+        Debug.Log("Lựa chọn: CHẾ ĐỘ CAMERA (Zoom & Pan)");
+        CurrentTool.sprite = Tools[2];
     }
 
     void Update()
@@ -111,11 +139,18 @@ public class LineCreator : MonoBehaviour
         // Nếu trò chơi đang diễn ra, HOẶC đã kết thúc (thắng/thua), không cho vẽ hay tẩy thêm nữa.
         if (GameController.isPlaying || GameController.isGameOver) return;
 
+        // Đang ở chế độ Camera — nhường input cho CameraControl, không vẽ/tẩy.
+        if (CameraControl.Instance != null && CameraControl.Instance.IsActive) return;
+
         // --- CHẾ ĐỘ TẨY ---
         if (currentLineType == LineType.Eraser)
         {
             if (Input.GetMouseButton(0))
             {
+                // Tránh tẩy khi chạm vào UI
+                if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                    return;
+
                 Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
                 // Tìm tất cả các Collider trong vùng bán kính của cục tẩy
@@ -147,6 +182,10 @@ public class LineCreator : MonoBehaviour
         // Khi nhấn chuột trái xuống
         if (Input.GetMouseButtonDown(0))
         {
+            // Tránh vẽ xuyên UI
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
+
             // Không bắt đầu vẽ nếu không còn mực
             if (!InkManager.HasInk()) return;
 

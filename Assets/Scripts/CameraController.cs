@@ -15,6 +15,7 @@ public class CameraController : MonoBehaviour
     public float zoomSpeed = 5f;
     
     private bool isFollowing = false;
+    private bool isReturning = false;
     [Tooltip("Kéo thả Camera vào đây. Nếu để trống, script sẽ tự tìm Main Camera.")]
     public Camera targetCamera;
     
@@ -60,7 +61,7 @@ public class CameraController : MonoBehaviour
                 targetCamera.orthographicSize = Mathf.Lerp(targetCamera.orthographicSize, followZoom, zoomSpeed * Time.unscaledDeltaTime);
             }
         }
-        else
+        else if (isReturning)
         {
             // Trở về vị trí và kích thước tổng thể map ban đầu
             targetCamera.transform.position = Vector3.Lerp(targetCamera.transform.position, originalPosition, followSpeed * Time.unscaledDeltaTime);
@@ -69,7 +70,19 @@ public class CameraController : MonoBehaviour
             {
                 targetCamera.orthographicSize = Mathf.Lerp(targetCamera.orthographicSize, originalZoom, zoomSpeed * Time.unscaledDeltaTime);
             }
+
+            // Dừng lerp khi đã về gần sát vị trí/zoom ban đầu
+            if (Vector3.Distance(targetCamera.transform.position, originalPosition) < 0.01f && 
+                Mathf.Abs(targetCamera.orthographicSize - originalZoom) < 0.01f)
+            {
+                isReturning = false;
+            }
         }
+    }
+
+    public void CancelReturn()
+    {
+        isReturning = false;
     }
 
     // Hàm này được gọi từ UI Button OnClick
@@ -81,10 +94,12 @@ public class CameraController : MonoBehaviour
         {
             // Nếu chưa có target, thử tìm lại trước khi follow
             if (target == null) FindTarget();
+            isReturning = false;
             Debug.Log("Camera: Đang focus và follow Player.");
         }
         else
         {
+            isReturning = true;
             Debug.Log("Camera: Trở về chế độ tổng thể map.");
         }
     }
