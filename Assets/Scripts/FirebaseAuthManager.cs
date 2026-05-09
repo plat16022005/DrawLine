@@ -92,9 +92,10 @@ public class FirebaseAuthManager : MonoBehaviour
 
             if (task.IsCompleted)
             {
-                notificationRegister.text = "Đăng ký thành công! Mau quay về trang đăng nhập!";
+                notificationRegister.text = "Đăng ký thành công!";
                 notificationRegister.color = Color.green;
                 notificationRegister.gameObject.SetActive(true);
+                SceneManager.LoadScene("Story");
             }
         });
     }

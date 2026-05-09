@@ -1,9 +1,15 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class LineCreator : MonoBehaviour
 {
+    /// <summary>
+    /// Phát mỗi khi người chơi vẽ một điểm mới trong World Space.
+    /// TutorialManager subscribe event này để kiểm tra điều kiện DrawInRegion.
+    /// </summary>
+    public static event Action<Vector2> OnDrawPoint;
     private Line activeLine;
     private Vector2 lastDrawPoint; // Điểm cuối cùng đã vẽ (để tính khoảng cách tiêu mực)
 
@@ -190,6 +196,11 @@ public class LineCreator : MonoBehaviour
             if (!InkManager.HasInk()) return;
 
             Vector2 startPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+            // Tutorial: Chặn vẽ nếu ngoài vùng sáng
+            if (TutorialManager.Instance != null && !TutorialManager.Instance.IsPositionAllowed(startPos))
+                return;
+
             lastDrawPoint = startPos;
 
             GameObject lineGO = new GameObject("Drawn Line");
@@ -208,6 +219,13 @@ public class LineCreator : MonoBehaviour
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
+            // Tutorial: Nếu rê chuột ra ngoài vùng xám -> coi như nhấc chuột lên
+            if (TutorialManager.Instance != null && !TutorialManager.Instance.IsPositionAllowed(mousePos))
+            {
+                activeLine = null;
+                return;
+            }
+
             // Tính khoảng cách từ điểm cuối đến vị trí chuột hiện tại
             float dist = Vector2.Distance(lastDrawPoint, mousePos);
 
@@ -222,6 +240,7 @@ public class LineCreator : MonoBehaviour
                 }
 
                 lastDrawPoint = mousePos;
+                OnDrawPoint?.Invoke(mousePos); // Thông báo cho TutorialManager (DrawInRegion)
             }
 
             activeLine.UpdateLine(mousePos);

@@ -19,6 +19,7 @@ public class DataGame : MonoBehaviour
     public List<TotalPoint> TotalPointRank;
     public List<CurrentLevel> LevelRank;
     public List<Level> LvXRank;
+    public bool Tutorial = false;
     private async void Awake()
     {
         instance = this;
@@ -31,6 +32,7 @@ public class DataGame : MonoBehaviour
         await LoadAllLevel();
         LoadTotalPoint();
         // LoadTotalPointRank();
+        FindTutorial();
     }
     // async void Start()
     // {
@@ -61,6 +63,38 @@ public class DataGame : MonoBehaviour
             users = JsonConvert.DeserializeObject<Users>(cleanJson);
 
             Debug.Log("Load thành công! Tên: " + users.name);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Lỗi Parse Json: " + e.Message);
+        }
+
+        // isLoaded = true;
+    }
+    async void FindTutorial()
+    {
+        DataSnapshot dataUsers = await FirebaseDataManager.instance.ReadDatabase("Tutorial", user.UserId);
+
+        if (dataUsers == null || !dataUsers.Exists)
+        {
+            Debug.Log("Không tìm thấy dữ liệu");
+            // isLoaded = true;
+            return;
+        }
+
+        try 
+        {
+            string raw = dataUsers.GetRawJsonValue();
+            string cleanJson = raw;
+
+            if (raw.StartsWith("\"") && raw.EndsWith("\""))
+            {
+                cleanJson = JsonConvert.DeserializeObject<string>(raw);
+            }
+
+            Tutorial = JsonConvert.DeserializeObject<bool>(cleanJson);
+
+            Debug.Log("Load thành công! Hoàn thành Tutorial: " + Tutorial);
         }
         catch (System.Exception e)
         {

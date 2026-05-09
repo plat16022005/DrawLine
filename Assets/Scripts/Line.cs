@@ -17,6 +17,7 @@ public class Line : MonoBehaviour
     [HideInInspector] public LineType myType;
 
     private List<Vector2> points;
+    public IReadOnlyList<Vector2> Points => points;
 
     public void Initialize(LineType lineType)
     {
@@ -250,6 +251,65 @@ public class Line : MonoBehaviour
 
         // Nếu đoạn đầu tiên không đủ điểm, báo xóa đối tượng này
         return segments[0].Count < 2;
+    }
+
+    /// <summary>Trả về tổng độ dài hiện tại của đường vẽ này.</summary>
+    public float CurrentLength
+    {
+        get
+        {
+            if (points == null || points.Count < 2) return 0f;
+            float total = 0f;
+            for (int i = 0; i < points.Count - 1; i++)
+            {
+                total += Vector2.Distance(points[i], points[i + 1]);
+            }
+            return total;
+        }
+    }
+
+    /// <summary>Tính tổng độ dài của các đoạn thẳng nằm trong vùng chỉ định.</summary>
+    public float GetLengthInRegion(Vector2 center, float radius, Vector2 size, bool isRect)
+    {
+        if (points == null || points.Count < 2) return 0f;
+        float total = 0f;
+        for (int i = 0; i < points.Count - 1; i++)
+        {
+            Vector2 p1 = points[i];
+            Vector2 p2 = points[i + 1];
+            Vector2 mid = (p1 + p2) * 0.5f;
+
+            if (IsPointInRegion(mid, center, radius, size, isRect))
+            {
+                total += Vector2.Distance(p1, p2);
+            }
+        }
+        return total;
+    }
+
+    /// <summary>Kiểm tra xem có bất kỳ điểm nào của đường nằm trong vùng không.</summary>
+    public bool HasPointInRegion(Vector2 center, float radius, Vector2 size, bool isRect)
+    {
+        if (points == null) return false;
+        foreach (var p in points)
+        {
+            if (IsPointInRegion(p, center, radius, size, isRect)) return true;
+        }
+        return false;
+    }
+
+    private bool IsPointInRegion(Vector2 p, Vector2 center, float radius, Vector2 size, bool isRect)
+    {
+        if (isRect)
+        {
+            Vector2 halfSize = size * 0.5f;
+            return p.x >= center.x - halfSize.x && p.x <= center.x + halfSize.x &&
+                   p.y >= center.y - halfSize.y && p.y <= center.y + halfSize.y;
+        }
+        else
+        {
+            return Vector2.Distance(p, center) <= radius;
+        }
     }
 
     // Tái cấu trúc đường dựa trên danh sách điểm mới (sau khi tẩy)

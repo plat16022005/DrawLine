@@ -35,12 +35,7 @@ public class InkManager : MonoBehaviour
 
     void Awake()
     {
-        // Singleton setup
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        // Ghi đè Instance bằng component mới nhất (hữu ích khi load lại level prefab)
         Instance = this;
     }
 

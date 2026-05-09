@@ -62,6 +62,8 @@ public class SelectLevelManager : MonoBehaviour
     public VideoClip[] videoClip;
     public TextMeshProUGUI DetailVideo;
     public string[] Details;
+    [Header("Panel Ask Tutorial")]
+    public GameObject PanelAskTutorial;
     private void Awake()
     {
         user = FirebaseAuth.DefaultInstance.CurrentUser;
@@ -85,6 +87,10 @@ public class SelectLevelManager : MonoBehaviour
         if (DataGame.instance.CurrentLevel.level > 0)
         {
             LoadLevel();
+        }
+        if (DataGame.instance.Tutorial == false)
+        {
+            PanelAskTutorial.SetActive(true);
         }
     }
     void ValidateName(string value)
@@ -500,5 +506,14 @@ public class SelectLevelManager : MonoBehaviour
     {
         videoPlayer.Stop();
         PanelPlayVideo.SetActive(false);
+    }
+    public void AcceptTutorial()
+    {
+        SceneManager.LoadScene("Tutorial");
+    }
+    public void DeniedTutorial()
+    {
+        DataGame.instance.Tutorial = true;
+        FirebaseDataManager.instance.WriteDatabase("Tutorial", user.UserId, true);
     }
 }

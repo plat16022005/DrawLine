@@ -100,12 +100,15 @@
     <Compile Include="Assets\Scripts\DataGame.cs" />
     <Compile Include="Assets\Scripts\AutoScaleBackground.cs" />
     <Compile Include="Assets\Scripts\MainMenuAuthFlow.cs" />
+    <Compile Include="Assets\Scripts\TutorialTargetRegistry.cs" />
+    <Compile Include="Assets\Scripts\TutorialScenario.cs" />
     <Compile Include="Assets\Scripts\UIManager.cs" />
     <Compile Include="Assets\Scripts\LineType.cs" />
     <Compile Include="Assets\Scripts\CameraController.cs" />
     <Compile Include="Assets\Scripts\SpeedBoostBehavior.cs" />
     <Compile Include="Assets\Scripts\Line.cs" />
     <Compile Include="Assets\TooCubeForest\demoScenes\Movement.cs" />
+    <Compile Include="Assets\Scripts\TutorialTarget.cs" />
     <Compile Include="Assets\Scripts\Princess.cs" />
     <Compile Include="Assets\Scripts\SessionManager.cs" />
     <Compile Include="Assets\Scripts\UIButtonSfx.cs" />
@@ -1067,12 +1070,16 @@
       <HintPath>Library\ScriptAssemblies\Unity.2D.Tilemap.Extras.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.Rider.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.2D.PixelPerfect.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.2D.PixelPerfect.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Rider.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.2D.Aseprite.Common">
@@ -1093,10 +1100,6 @@
     </Reference>
     <Reference Include="Unity.2D.Common.Runtime">
       <HintPath>Library\ScriptAssemblies\Unity.2D.Common.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.2D.Tilemap.Extras.Editor">
