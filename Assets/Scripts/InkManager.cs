@@ -37,12 +37,15 @@ public class InkManager : MonoBehaviour
     {
         // Ghi đè Instance bằng component mới nhất (hữu ích khi load lại level prefab)
         Instance = this;
+
+        // Khởi tạo mực ngay trong Awake để các Script khác (như UndoRedoManager) 
+        // có thể lấy được giá trị đúng trong Start() của chúng.
+        CurrentInk = maxInk;
+        inkAtStart = maxInk;
     }
 
     void Start()
     {
-        CurrentInk = maxInk;
-        inkAtStart = maxInk;
         RefreshUI();
     }
 
@@ -90,6 +93,13 @@ public class InkManager : MonoBehaviour
     public void RestoreInk()
     {
         CurrentInk = inkAtStart;
+        RefreshUI();
+    }
+
+    /// <summary>Cài đặt trực tiếp lượng mực hiện tại (dùng cho Undo/Redo).</summary>
+    public void SetCurrentInk(float amount)
+    {
+        CurrentInk = Mathf.Clamp(amount, 0f, maxInk);
         RefreshUI();
     }
 

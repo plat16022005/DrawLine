@@ -2,7 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+#if !UNITY_WEBGL || UNITY_EDITOR
 using Firebase.Auth;
+#endif
 using System.Linq;
 
 public class UIManager : MonoBehaviour
@@ -29,7 +31,9 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI Point;
     public TextMeshProUGUI Reward;
     public Button NextLevel;
+#if !UNITY_WEBGL || UNITY_EDITOR
     private FirebaseUser user;
+#endif
     [Header("Star Ink")]
     public Image Star1Ink;
     public Image Star2Ink;
@@ -94,7 +98,9 @@ public class UIManager : MonoBehaviour
         {
             winPanel.SetActive(false);
         }
+#if !UNITY_WEBGL || UNITY_EDITOR
         user = FirebaseAuth.DefaultInstance.CurrentUser;
+#endif
     }
 
     private void UpdateHealthUI(float currentHealth, float maxHealth)
@@ -184,22 +190,26 @@ public class UIManager : MonoBehaviour
         {
             if (foundLevel.point < level.point)
             {
+#if !UNITY_WEBGL || UNITY_EDITOR
                 FirebaseDataManager.instance.WriteDatabase(sceneName, user.UserId, level);
                 DataGame.instance.levels[index] = level;
                 DataGame.instance.totalPoint.point -= foundLevel.point;
                 DataGame.instance.totalPoint.point += level.point;
                 FirebaseDataManager.instance.WriteDatabase("TotalPoint", user.UserId, DataGame.instance.totalPoint);
+#endif
                 money = 0;
             }
         }
         else
         {
+#if !UNITY_WEBGL || UNITY_EDITOR
             FirebaseDataManager.instance.WriteDatabase(sceneName, user.UserId, level);
             DataGame.instance.levels.Add(level);
             DataGame.instance.CurrentLevel = new CurrentLevel(DataGame.instance.users.name, DataGame.instance.CurrentLevel.level + 1);
             DataGame.instance.totalPoint.point += value;
             FirebaseDataManager.instance.WriteDatabase("CurrentLevel", user.UserId, DataGame.instance.CurrentLevel);
             FirebaseDataManager.instance.WriteDatabase("TotalPoint", user.UserId, DataGame.instance.totalPoint);
+#endif
             money = 50;
         }
         OpenWinPanel(sceneName, star, value, money);
@@ -210,7 +220,9 @@ public class UIManager : MonoBehaviour
         DataGame.instance.users.coin += money;
         MusicBackGround.Stop();
         SoundEffect.PlayOneShot(SoundClip[0]);
+#if !UNITY_WEBGL || UNITY_EDITOR
         FirebaseDataManager.instance.WriteDatabase("Users", user.UserId, DataGame.instance.users);
+#endif
         if (star >= 1)
         {
             Star1.color = Color.white;
@@ -239,6 +251,7 @@ public class UIManager : MonoBehaviour
     }
     public async void LoadLevelXRank(int lv)
     {
+#if !UNITY_WEBGL || UNITY_EDITOR
         foreach (Transform item in ContentLevelDetail)
         {
             Destroy(item.gameObject);
@@ -272,5 +285,6 @@ public class UIManager : MonoBehaviour
             NamePlayerLevel.text = DataGame.instance.users.name;
             PointPlayerLevel.text = "0";                  
         }
+#endif
     }
 }

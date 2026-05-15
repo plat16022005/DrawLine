@@ -1,3 +1,6 @@
+// This file is conditionally compiled to exclude it from WebGL builds
+// where Firebase SDK is not supported.
+#if !UNITY_WEBGL || UNITY_EDITOR
 /*
  * Copyright 2025 Google LLC
  *
@@ -252,7 +255,7 @@ namespace Firebase.Internal
         }
 
         // Get the Result property from the Task<AppCheckToken>
-        object tokenResult = _appCheckTokenResultProperty.GetValue(appCheckTokenTask); // This is the AppCheckToken struct
+        object tokenResult = _appCheckTokenResultProperty.GetValue(appCheckTokenTask);
         if (tokenResult == null)
         {
           LogError("App Check token result was null.");
@@ -264,7 +267,6 @@ namespace Firebase.Internal
       }
       catch (Exception e)
       {
-        // Log any exceptions during the reflection/invocation process
         LogError($"An error occurred while trying to fetch App Check token: {e}");
       }
       return null;
@@ -397,7 +399,6 @@ namespace Firebase.Internal
       }
       catch (Exception e)
       {
-        // Log any exceptions during the reflection/invocation process
         LogError($"An error occurred while trying to fetch Auth token: {e}");
       }
       return null;
@@ -435,5 +436,5 @@ namespace Firebase.Internal
       }
     }
   }
-
 }
+#endif

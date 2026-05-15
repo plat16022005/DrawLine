@@ -1,5 +1,7 @@
+#if !UNITY_WEBGL || UNITY_EDITOR
 using Firebase.Database;
 using Firebase.Auth;
+#endif
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,6 +13,7 @@ public class SessionManager : MonoBehaviour
     async void Start()
     {
         DontDestroyOnLoad(this);
+#if !UNITY_WEBGL || UNITY_EDITOR
         if (FirebaseAuth.DefaultInstance.CurrentUser == null)
         {
             Debug.LogError("Chưa đăng nhập!");
@@ -18,11 +21,8 @@ public class SessionManager : MonoBehaviour
         }
 
         uid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
-
-        // tạo token ngẫu nhiên cho thiết bị hiện tại
         sessionToken = System.Guid.NewGuid().ToString();
 
-        // lưu vào UserSession thay vì Users
         await FirebaseDatabase.DefaultInstance
             .RootReference
             .Child("UserSession")
@@ -30,12 +30,15 @@ public class SessionManager : MonoBehaviour
             .Child("sessionToken")
             .SetValueAsync(sessionToken);
 
-        // kiểm tra định kỳ
         InvokeRepeating(nameof(CheckSession), 5f, 5f);
+#else
+        await System.Threading.Tasks.Task.Yield();
+#endif
     }
 
     async void CheckSession()
     {
+#if !UNITY_WEBGL || UNITY_EDITOR
         var snapshot = await FirebaseDatabase.DefaultInstance
             .RootReference
             .Child("UserSession")
@@ -54,13 +57,12 @@ public class SessionManager : MonoBehaviour
         if (serverToken != sessionToken)
         {
             Debug.Log("Tài khoản đã đăng nhập ở thiết bị khác!");
-
             CancelInvoke(nameof(CheckSession));
-
             FirebaseAuth.DefaultInstance.SignOut();
             SceneManager.LoadScene("MainMenu");
-            // TODO: chuyển về scene login
-            // SceneManager.LoadScene("Login");
         }
+#else
+        await System.Threading.Tasks.Task.Yield();
+#endif
     }
 }

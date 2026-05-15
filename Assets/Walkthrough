@@ -1,0 +1,147 @@
+# Walkthrough – Setup Scene MakeMap trong Unity
+
+## Scripts đã tạo
+
+Tất cả 7 script trong `Assets/Scripts/MapEditor/`:
+
+| File | Vai trò |
+|------|---------|
+| `MapEditorTool.cs` | Enum 6 công cụ |
+| `TrapType.cs` | Enum 5 loại bẫy + `TrapData` |
+| `MapData.cs` | Data class serialize map (tiles, spawns, traps) |
+| `MapEditorManager.cs` | Điều phối chính – nhận input, xử lý tilemap/marker/trap |
+| `TrapPanelManager.cs` | Panel nhập thông số bẫy (5 sub-panel) |
+| `MapEditorUI.cs` | Toolbar nút công cụ + dropdown + Save/Load/Back |
+| `MapEditorSceneLoader.cs` | Nút chuyển scene từ MainMenu → MakeMap |
+
+---
+
+## Bước 1 – Tạo Scene MakeMap
+
+1. `File > New Scene` → lưu thành **`MakeMap.unity`** vào `Assets/Scenes/`.
+2. `File > Build Settings` → **Add Open Scenes** → kéo `MakeMap` vào danh sách.
+
+---
+
+## Bước 2 – Tạo Hierarchy
+
+```
+MakeMap (Scene)
+├── MapEditorManager          ← Empty GameObject
+├── Grid                      ← Add component: Grid
+│   └── Tilemap               ← Add components: Tilemap + Tilemap Renderer
+│       └── Tilemap Collider 2D
+├── LocationObjects           ← Empty GameObject (cha marker Player/Demon/Princess)
+├── LocationTraps             ← Empty GameObject (cha các trap marker)
+└── Canvas                    ← Canvas (Screen Space – Overlay) + EventSystem
+    ├── Toolbar               ← Panel UI (góc trên-trái)
+    │   ├── BtnTile           ← Button
+    │   ├── BtnErase          ← Button
+    │   ├── BtnPlayer         ← Button
+    │   ├── BtnDemon          ← Button
+    │   ├── BtnPrincess       ← Button
+    │   ├── BtnTrap           ← Button
+    │   ├── TileDropdown      ← TMP_Dropdown (chọn tile)
+    │   └── TrapDropdown      ← TMP_Dropdown (chọn loại bẫy)
+    ├── TrapPanel             ← Panel (ẩn mặc định – **SetActive: false**)
+    │   ├── FireSpawnerPanel
+    │   │   ├── InputFireDuration   (TMP_InputField)
+    │   │   ├── InputRespawnDelay   (TMP_InputField)
+    │   │   ├── InputFireAngle      (TMP_InputField)
+    │   │   └── InputYOffset        (TMP_InputField)
+    │   ├── MovingBlockPanel
+    │   │   ├── InputMoveX (TMP_InputField)
+    │   │   ├── InputMoveY (TMP_InputField)
+    │   │   └── InputSpeed (TMP_InputField)
+    │   ├── BreakablePlatformPanel
+    │   │   └── InputBreakDelay (TMP_InputField)
+    │   ├── SlowDownPanel
+    │   │   └── InputSlowRate (TMP_InputField)
+    │   ├── SpeedBoostPanel   ← (không cần input, chỉ có text xác nhận)
+    │   ├── BtnConfirm        ← Button
+    │   └── BtnCancel         ← Button
+    └── BottomBar             ← Panel (dưới màn hình)
+        ├── MapNameInput      ← TMP_InputField (tên map)
+        ├── BtnSave           ← Button
+        ├── BtnLoad           ← Button
+        ├── BtnClear          ← Button
+        ├── BtnBack           ← Button
+        └── SaveMessage       ← TextMeshProUGUI (ẩn mặc định)
+```
+
+---
+
+## Bước 3 – Gắn Component & Configure Inspector
+
+### MapEditorManager (GameObject `MapEditorManager`)
+Gắn script `MapEditorManager.cs`, kéo thả:
+
+| Field | Gán vào |
+|-------|---------|
+| `Tilemap` | GameObject `Grid/Tilemap` |
+| `Tiles[]` | Các `TileBase` asset trong project |
+| `Location Objects` | GameObject `LocationObjects` |
+| `Location Traps` | GameObject `LocationTraps` |
+| `Player Marker Prefab` | `Assets/Prefabs/Player.prefab` |
+| `Demon Marker Prefab` | `Assets/Prefabs/Demon.prefab` |
+| `Princess Marker Prefab` | `Assets/Prefabs/Princess.prefab` |
+| `Trap Marker Prefab` | Tạo một prefab sprite đơn giản (VD: icon dấu chấm than ⚠) |
+| `Trap Panel Manager` | Component `TrapPanelManager` trên `TrapPanel` |
+| `Editor UI` | Component `MapEditorUI` trên Canvas |
+| `Editor Camera` | Camera chính trong scene |
+
+### TrapPanelManager (GameObject `TrapPanel`)
+Gắn script `TrapPanelManager.cs`, gán tất cả InputField + Button + sub-panel tương ứng.
+
+### MapEditorUI (GameObject Canvas hoặc Toolbar)
+Gắn script `MapEditorUI.cs`, gán:
+- `Manager` → `MapEditorManager`
+- Tất cả Button và Dropdown
+- `Tile Names[]` → điền tên tile theo thứ tự khớp với `tiles[]` của Manager
+- `Save Message Text` → TextMeshProUGUI `SaveMessage`
+
+---
+
+## Bước 4 – Nút chuyển Scene từ MainMenu
+
+1. Mở scene `MainMenu`.
+2. Tạo hoặc chọn Button (VD: "Thiết kế Map").
+3. Gắn script `MapEditorSceneLoader.cs` vào Button đó.
+4. Trong Inspector của Button > **OnClick()** → kéo GameObject vào → chọn `MapEditorSceneLoader.OpenMapEditor()`.
+
+---
+
+## Bước 5 – Tạo Trap Marker Prefab đơn giản
+
+1. Tạo `GameObject > 2D Object > Sprite` trong scene.
+2. Gán sprite icon (ví dụ dấu `!` hoặc skull icon từ asset).
+3. Thêm `TextMeshPro – Text (3D)` làm child để hiển thị tên loại bẫy.
+4. Kéo thành Prefab vào `Assets/Prefabs/TrapMarker.prefab`.
+5. Gán vào field `Trap Marker Prefab` của `MapEditorManager`.
+
+---
+
+## Luồng sử dụng trong game
+
+```
+MainMenu → [Nút "Thiết kế Map"] → Scene MakeMap
+│
+├── Chọn công cụ trên Toolbar
+│   ├── Tile Paint + chọn tile → click vào scene → vẽ tile
+│   ├── Tile Erase → click → xóa tile
+│   ├── Place Player/Demon/Princess → click → di chuyển marker
+│   └── Place Trap → chọn loại bẫy → click → mở panel nhập thông số
+│                                              → Confirm → đặt bẫy
+│
+├── Nhập tên map → [Save] → JSON tại persistentDataPath/<tenmap>.json
+├── [Load] → tải lại map đã lưu
+├── [Clear] → xóa toàn bộ
+└── [Back] → quay về MainMenu
+```
+
+---
+
+> [!NOTE]
+> Map được lưu dưới dạng JSON tại `Application.persistentDataPath`.  
+> Trên Windows (Editor): `C:\Users\<user>\AppData\LocalLow\<Company>\<Product>\`  
+> Map có thể được đọc và dùng để generate level thực tế bằng cách parse `MapData` và instantiate đúng prefab.

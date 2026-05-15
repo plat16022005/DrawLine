@@ -2,7 +2,12 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
+
+#if !UNITY_WEBGL || UNITY_EDITOR
 using Firebase.Auth;
+#endif
+using System.Linq;
 
 /// <summary>
 /// Singleton quản lý toàn bộ luồng tutorial cho scene hiện tại.
@@ -76,6 +81,8 @@ public class TutorialManager : MonoBehaviour
     [Tooltip("Tốc độ dao động (Hz — chu kỳ/giây)")]
     public float handBobFrequency = 1.6f;
 
+    public Button BtnBack;
+
     // ── Private State ─────────────────────────────────────────────────────
     private int   _stepIndex    = -1;
     private int   _currentScenarioListIndex = -1; // Index của scenario đang chạy trong scenarioList
@@ -91,7 +98,9 @@ public class TutorialManager : MonoBehaviour
 
     private Canvas    _canvas;
     private RectTransform _canvasRect;
+#if !UNITY_WEBGL || UNITY_EDITOR
     private FirebaseUser user;
+#endif
 
     private TutorialStepData CurrentStep =>
         (scenario != null && _stepIndex >= 0 && _stepIndex < scenario.steps.Count)
@@ -102,7 +111,9 @@ public class TutorialManager : MonoBehaviour
 
     private void Awake()
     {
+#if !UNITY_WEBGL || UNITY_EDITOR
         user = FirebaseAuth.DefaultInstance.CurrentUser;
+#endif
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
@@ -114,6 +125,18 @@ public class TutorialManager : MonoBehaviour
             _canvasRect = _canvas.GetComponent<RectTransform>();
             // Đảm bảo Tutorial luôn đè lên trên mọi UI khác để chặn tương tác
             _canvas.sortingOrder = 999;
+
+            // Đảm bảo Canvas này không chặn Raycast nếu không cần thiết
+            GraphicRaycaster gr = _canvas.GetComponent<GraphicRaycaster>();
+            if (gr == null) gr = _canvas.gameObject.AddComponent<GraphicRaycaster>();
+        }
+        if (DataGame.instance.Tutorial == true)
+        {
+            BtnBack.gameObject.SetActive(true);
+        }
+        else
+        {
+            BtnBack.gameObject.SetActive(false);
         }
     }
 
@@ -264,9 +287,14 @@ public class TutorialManager : MonoBehaviour
     public void LoadScenario(TutorialScenario newScenario)
     {
         Debug.Log($"[TutorialManager] --- Bắt đầu LoadScenario: {newScenario?.name} ---");
+        
         // 1. Dừng tutorial đang chạy và dọn dẹp
         _isActive = false;
+        _stepDone = false;
+        
+        // Đảm bảo thời gian không bị kẹt ở mức 0 của bài trước (trừ khi bài mới yêu cầu freeze ngay bước 1)
         Time.timeScale = GameController.isPlaying ? 1f : 0f;
+        
         HideAll();
 
         // Xóa tất cả các đường vẽ hiện tại & khôi phục mực
@@ -284,16 +312,14 @@ public class TutorialManager : MonoBehaviour
             lc.SelectNormalPen();
         }
 
-        // 2. Ẩn bảng chúc mừng (Kiểm tra null để tránh lỗi đỏ Console)
+        // 2. Ẩn bảng chúc mừng
         if (congratulationsPanel != null) 
         {
             congratulationsPanel.SetActive(false);
-            Debug.Log("[TutorialManager] LoadScenario: Đã thực hiện ẩn congratulationsPanel.");
         }
 
         scenario   = newScenario;
         _stepIndex = -1;
-        _stepDone  = false;
 
         if (newScenario == null || newScenario.steps.Count == 0)
         {
@@ -309,11 +335,20 @@ public class TutorialManager : MonoBehaviour
             return;
         }
 
+        // 3. Sử dụng Coroutine để bắt đầu bài mới sau 1 frame
+        // Điều này cực kỳ quan trọng để các TutorialTarget trong Prefab mới kịp chạy OnEnable/Register
+        StartCoroutine(StartScenarioRoutine());
+    }
+
+    private System.Collections.IEnumerator StartScenarioRoutine()
+    {
+        // Chờ đến cuối frame để đảm bảo tất cả Instantiate/Awake/OnEnable của bài mới đã xong
+        yield return new WaitForEndOfFrame();
+
         _isActive = true;
-        // 3. Đặt thời gian chờ để tránh click xuyên thấu
         _ignoreInputTimer = 0.2f;
 
-        Debug.Log($"[TutorialManager] Bắt đầu chạy bước đầu tiên của {newScenario.name}");
+        Debug.Log($"[TutorialManager] Bắt đầu chạy bước đầu tiên của {scenario.name}");
         AdvanceStep(true);
     }
 
@@ -458,11 +493,27 @@ public class TutorialManager : MonoBehaviour
 
     private void ShowStep(TutorialStepData step)
     {
-        // 1. Dọn dẹp giao diện cũ trước khi hiện cái mới
+        // 1. Kích hoạt Raycaster để bắt đầu chặn tương tác theo kịch bản
+        if (_canvas != null)
+        {
+            GraphicRaycaster gr = _canvas.GetComponent<GraphicRaycaster>();
+            if (gr != null) gr.enabled = true;
+        }
+
+        // 2. Dọn dẹp giao diện cũ trước khi hiện cái mới
         if (tutorialText != null) tutorialText.text = "";
         HideOverlay();
 
-        if (tutorialRoot != null) tutorialRoot.SetActive(true);
+        // Kiểm tra an toàn cho tutorialRoot
+        if (tutorialRoot != null) 
+        {
+            tutorialRoot.SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("[TutorialManager] tutorialRoot bị NULL! Hãy kiểm tra xem bạn có lỡ tay xóa nó khi chuyển bài không.");
+            return;
+        }
 
         // 2. Cập nhật Text
         if (tutorialText != null) tutorialText.text = step.description;
@@ -537,11 +588,22 @@ public class TutorialManager : MonoBehaviour
             Debug.Log($"[TutorialManager] Hiển thị bảng chúc mừng của bài: {scenarioName}");
             if (tutorialRoot != null) tutorialRoot.SetActive(true);
             congratulationsPanel.SetActive(true);
+            
+            // Đảm bảo nút "Tiếp theo" có thể bấm được bằng cách bật lại Raycaster
+            if (_canvas != null)
+            {
+                GraphicRaycaster gr = _canvas.GetComponent<GraphicRaycaster>();
+                if (gr != null) gr.enabled = true;
+            }
+
+            // QUAN TRỌNG: Đảm bảo thời gian dừng để người chơi đọc bảng
             Time.timeScale = 0f; 
         }
         else
         {
             Debug.Log($"[TutorialManager] Bài {scenarioName} không có panel, tìm bài tiếp theo...");
+            // Nếu không có panel, phải đảm bảo trả lại thời gian trước khi sang bài mới
+            Time.timeScale = GameController.isPlaying ? 1f : 0f;
             CheckNextScenario();
         }
     }
@@ -560,22 +622,65 @@ public class TutorialManager : MonoBehaviour
 
     private void CheckNextScenario()
     {
-        if (scenarioList == null) return;
+        // Lấy tên scene hiện tại (ví dụ: "Tutorial1")
+        string currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        
+        // Tìm phần số trong tên scene
+        string prefix = new string(currentSceneName.TakeWhile(c => !char.IsDigit(c)).ToArray());
+        string numberPart = new string(currentSceneName.SkipWhile(c => !char.IsDigit(c)).ToArray());
 
-        int nextIndex = _currentScenarioListIndex + 1;
-        if (nextIndex >= 0 && nextIndex < scenarioList.Length)
+        if (int.TryParse(numberPart, out int levelNumber))
         {
-            Debug.Log($"[TutorialManager] Tìm thấy bài tiếp theo tại Index: {nextIndex}. Đang nạp...");
-            LoadScenarioByIndex(nextIndex);
+            // Nếu đã tới Tutorial4, khi nhấn Next sẽ về SampleScene
+            if (levelNumber >= 4)
+            {
+                Debug.Log("[TutorialManager] Đã hoàn thành Tutorial 4. Chuyển sang SampleScene.");
+                _isActive = false;
+                Time.timeScale = 1f;
+
+                // Đánh dấu đã hoàn thành Tutorial
+                DataGame.instance.Tutorial = true;
+#if !UNITY_WEBGL || UNITY_EDITOR
+                FirebaseDataManager.instance.WriteDatabase("Tutorial", user.UserId, true);
+#endif
+
+                UnityEngine.SceneManagement.SceneManager.LoadScene("SampleScene");
+                return;
+            }
+
+            int nextLevelNumber = levelNumber + 1;
+            string nextSceneName = prefix + nextLevelNumber;
+            
+            Debug.Log($"[TutorialManager] Chuyển từ {currentSceneName} sang {nextSceneName}");
+            
+            _isActive = false;
+            Time.timeScale = 1f;
+
+            // Kiểm tra xem scene tiếp theo có tồn tại trong Build Settings không
+            if (Application.CanStreamedLevelBeLoaded(nextSceneName))
+            {
+                Debug.Log($"[TutorialManager] Đang chuyển sang: {nextSceneName}");
+                UnityEngine.SceneManagement.SceneManager.LoadScene(nextSceneName);
+            }
+            else
+            {
+                Debug.Log($"[TutorialManager] Không tìm thấy {nextSceneName} trong Build Settings. Hoàn tất Tutorial và về SampleScene.");
+                
+                // Đánh dấu đã hoàn thành Tutorial
+                DataGame.instance.Tutorial = true;
+#if !UNITY_WEBGL || UNITY_EDITOR
+                FirebaseDataManager.instance.WriteDatabase("Tutorial", user.UserId, true);
+#endif
+
+                UnityEngine.SceneManagement.SceneManager.LoadScene("SampleScene");
+            }
         }
         else
         {
-            Debug.Log("[TutorialManager] Đã hết danh sách bài hướng dẫn. Kết thúc hoàn toàn. Chuyển sang SampleScene.");
-            // Không xóa TutorialWorldObject theo yêu cầu khi chuyển Scene
+            // Nếu tên scene không có số (ví dụ đang ở bài cuối hoặc bài đặc biệt)
+            Debug.Log("[TutorialManager] Không xác định được số thứ tự bài, chuyển sang SampleScene.");
             _isActive = false;
-            DataGame.instance.Tutorial = true;
-            FirebaseDataManager.instance.WriteDatabase("Tutorial", user.UserId, true);
-            Time.timeScale = 1f; // Phải đảm bảo thời gian chạy bình thường trước khi chuyển Scene
+            Time.timeScale = 1f;
             UnityEngine.SceneManagement.SceneManager.LoadScene("SampleScene");
         }
     }
@@ -1223,6 +1328,13 @@ public class TutorialManager : MonoBehaviour
         if (tutorialRoot != null) tutorialRoot.SetActive(false);
         HideOverlay();
         if (handPointer != null) handPointer.gameObject.SetActive(false);
+
+        // Giải phóng hoàn toàn Raycast của Canvas Tutorial để không chặn UI bên dưới
+        if (_canvas != null)
+        {
+            GraphicRaycaster gr = _canvas.GetComponent<GraphicRaycaster>();
+            if (gr != null) gr.enabled = _isActive; 
+        }
     }
 
     private string PrefKey() => $"Tutorial_{scenario.scenarioId}_Done";
@@ -1262,4 +1374,8 @@ public class TutorialManager : MonoBehaviour
 #endif
 
     #endregion
+    public void ExitTutorial()
+    {
+        SceneManager.LoadScene("SampleScene");
+    }
 }

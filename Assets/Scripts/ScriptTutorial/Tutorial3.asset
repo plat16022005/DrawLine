@@ -25,6 +25,7 @@ MonoBehaviour:
     highlightPadding: 0
     blockInteraction: 1
     highlightWorldTarget: 0
+    followTarget: 0
     showHandPointer: 0
     handPointerAnchorId: 
     handPointerAlignment: 0
@@ -42,6 +43,7 @@ MonoBehaviour:
     targetWorldPosition: {x: 0, y: 0}
     targetWorldRadius: 0
     isRectangleTarget: 0
+    autoFitCollider: 1
     targetWorldSize: {x: 0, y: 0}
     minDrawLength: 0
     useCustomUIPosition: 0
@@ -49,9 +51,10 @@ MonoBehaviour:
     customUIRadius: 50
     autoAdvanceDelay: 0
     freezeTime: 0
+    clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
   - description: "\u0110\xE2y l\xE0 b\xE0i h\u01B0\u1EDBng d\u1EABn s\u1EED d\u1EE5ng
-      ch\u1EE9c n\u0103ng qu\u1EA3n l\xFD Camera"
+      ch\u1EE9c n\u0103ng qu\u1EA3n l\xFD Camera v\xE0 Undo/Redo"
     completionCondition: 5
     textPanelPreset: 4
     textPanelCustomPos: {x: 0, y: 0}
@@ -60,6 +63,7 @@ MonoBehaviour:
     highlightPadding: 0
     blockInteraction: 1
     highlightWorldTarget: 0
+    followTarget: 0
     showHandPointer: 0
     handPointerAnchorId: 
     handPointerAlignment: 0
@@ -77,6 +81,7 @@ MonoBehaviour:
     targetWorldPosition: {x: 0, y: 0}
     targetWorldRadius: 0
     isRectangleTarget: 0
+    autoFitCollider: 1
     targetWorldSize: {x: 0, y: 0}
     minDrawLength: 0
     useCustomUIPosition: 0
@@ -84,6 +89,7 @@ MonoBehaviour:
     customUIRadius: 50
     autoAdvanceDelay: 0
     freezeTime: 0
+    clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
   - description: "Nh\u1EA5n v\xE0o n\xFAt c\xF3 bi\u1EC3u t\u01B0\u1EE3ng b\xE0n
       tay tr\xEAn b\u1EA3ng c\xF4ng c\u1EE5 v\u1EBD."
@@ -95,6 +101,7 @@ MonoBehaviour:
     highlightPadding: 0
     blockInteraction: 1
     highlightWorldTarget: 1
+    followTarget: 0
     showHandPointer: 1
     handPointerAnchorId: CameraTool
     handPointerAlignment: 2
@@ -112,6 +119,7 @@ MonoBehaviour:
     targetWorldPosition: {x: 0, y: 0}
     targetWorldRadius: 0
     isRectangleTarget: 0
+    autoFitCollider: 1
     targetWorldSize: {x: 0, y: 0}
     minDrawLength: 0
     useCustomUIPosition: 0
@@ -119,6 +127,7 @@ MonoBehaviour:
     customUIRadius: 50
     autoAdvanceDelay: 0
     freezeTime: 0
+    clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
   - description: "\u0110\u1ED1i v\u1EDBi pc th\xEC ta c\xF3 th\u1EC3 s\u1EED d\u1EE5ng
       con l\u0103n chu\u1ED9t \u0111\u1EC3 zoom camera v\xE0 nh\u1EA5n gi\u1EEF chu\u1ED9t
@@ -134,6 +143,7 @@ MonoBehaviour:
     highlightPadding: 0
     blockInteraction: 1
     highlightWorldTarget: 1
+    followTarget: 0
     showHandPointer: 1
     handPointerAnchorId: CameraTool
     handPointerAlignment: 2
@@ -151,6 +161,7 @@ MonoBehaviour:
     targetWorldPosition: {x: 0, y: 0}
     targetWorldRadius: 0
     isRectangleTarget: 0
+    autoFitCollider: 1
     targetWorldSize: {x: 0, y: 0}
     minDrawLength: 0
     useCustomUIPosition: 0
@@ -158,6 +169,7 @@ MonoBehaviour:
     customUIRadius: 50
     autoAdvanceDelay: 0
     freezeTime: 0
+    clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
   - description: "Test th\u1EED nh\xE9!"
     completionCondition: 1
@@ -168,6 +180,7 @@ MonoBehaviour:
     highlightPadding: 0
     blockInteraction: 1
     highlightWorldTarget: 1
+    followTarget: 0
     showHandPointer: 0
     handPointerAnchorId: 
     handPointerAlignment: 2
@@ -185,6 +198,7 @@ MonoBehaviour:
     targetWorldPosition: {x: 0, y: 0}
     targetWorldRadius: 4
     isRectangleTarget: 0
+    autoFitCollider: 1
     targetWorldSize: {x: 0, y: 0}
     minDrawLength: 0
     useCustomUIPosition: 0
@@ -192,6 +206,7 @@ MonoBehaviour:
     customUIRadius: 50
     autoAdvanceDelay: 15
     freezeTime: 0
+    clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
   - description: "N\u1EBFu b\u1EA1n zoom \u0111\u1EBFn m\u1ED9t kho\u1EA3ng n\xE0o
       \u0111\xF3 v\xE0 \u0111\u1ED5i sang c\xF4ng c\u1EE5 kh\xE1c, th\xEC g\xF3c
@@ -205,6 +220,7 @@ MonoBehaviour:
     highlightPadding: 0
     blockInteraction: 1
     highlightWorldTarget: 1
+    followTarget: 0
     showHandPointer: 0
     handPointerAnchorId: 
     handPointerAlignment: 2
@@ -222,6 +238,7 @@ MonoBehaviour:
     targetWorldPosition: {x: 0, y: 0}
     targetWorldRadius: 4
     isRectangleTarget: 0
+    autoFitCollider: 1
     targetWorldSize: {x: 0, y: 0}
     minDrawLength: 0
     useCustomUIPosition: 0
@@ -229,6 +246,7 @@ MonoBehaviour:
     customUIRadius: 50
     autoAdvanceDelay: 15
     freezeTime: 0
+    clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
   - description: "Ch\u1ECDn m\u1EF1c \u0111en"
     completionCondition: 4
@@ -239,6 +257,7 @@ MonoBehaviour:
     highlightPadding: 0
     blockInteraction: 1
     highlightWorldTarget: 1
+    followTarget: 0
     showHandPointer: 0
     handPointerAnchorId: BlackInk
     handPointerAlignment: 2
@@ -256,6 +275,7 @@ MonoBehaviour:
     targetWorldPosition: {x: 0, y: 0}
     targetWorldRadius: 4
     isRectangleTarget: 0
+    autoFitCollider: 1
     targetWorldSize: {x: 0, y: 0}
     minDrawLength: 0
     useCustomUIPosition: 0
@@ -263,6 +283,7 @@ MonoBehaviour:
     customUIRadius: 50
     autoAdvanceDelay: 15
     freezeTime: 0
+    clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
   - description: "V\u1EBD th\u1EED \u0111i n\xE0o!"
     completionCondition: 6
@@ -273,6 +294,7 @@ MonoBehaviour:
     highlightPadding: 0
     blockInteraction: 1
     highlightWorldTarget: 1
+    followTarget: 0
     showHandPointer: 0
     handPointerAnchorId: 
     handPointerAlignment: 2
@@ -290,6 +312,7 @@ MonoBehaviour:
     targetWorldPosition: {x: 0, y: 0}
     targetWorldRadius: 4
     isRectangleTarget: 0
+    autoFitCollider: 1
     targetWorldSize: {x: 0, y: 0}
     minDrawLength: 10
     useCustomUIPosition: 1
@@ -297,6 +320,7 @@ MonoBehaviour:
     customUIRadius: 400
     autoAdvanceDelay: 15
     freezeTime: 0
+    clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
   - description: "Tuy\u1EC7t v\u1EDDi! Gi\u1EDD th\u1EED x\xF3a \u0111\u01B0\u1EDDng
       nh\xE9"
@@ -308,6 +332,7 @@ MonoBehaviour:
     highlightPadding: 0
     blockInteraction: 1
     highlightWorldTarget: 1
+    followTarget: 0
     showHandPointer: 0
     handPointerAnchorId: ButtonErase
     handPointerAlignment: 2
@@ -325,6 +350,7 @@ MonoBehaviour:
     targetWorldPosition: {x: 0, y: 0}
     targetWorldRadius: 4
     isRectangleTarget: 0
+    autoFitCollider: 1
     targetWorldSize: {x: 0, y: 0}
     minDrawLength: 10
     useCustomUIPosition: 0
@@ -332,6 +358,7 @@ MonoBehaviour:
     customUIRadius: 400
     autoAdvanceDelay: 15
     freezeTime: 0
+    clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
   - description: "X\xF3a c\xE1c \u0111\u01B0\u1EDDng b\u1EA1n v\u1EBD khi n\xE3y
       n\xE0o!"
@@ -343,6 +370,7 @@ MonoBehaviour:
     highlightPadding: 0
     blockInteraction: 1
     highlightWorldTarget: 1
+    followTarget: 0
     showHandPointer: 0
     handPointerAnchorId: 
     handPointerAlignment: 2
@@ -360,6 +388,7 @@ MonoBehaviour:
     targetWorldPosition: {x: 0, y: 0}
     targetWorldRadius: 4
     isRectangleTarget: 0
+    autoFitCollider: 1
     targetWorldSize: {x: 0, y: 0}
     minDrawLength: 10
     useCustomUIPosition: 1
@@ -367,6 +396,240 @@ MonoBehaviour:
     customUIRadius: 400
     autoAdvanceDelay: 15
     freezeTime: 0
+    clearLinesOnComplete: 0
+    gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+  - description: "Ti\u1EBFp theo l\xE0 ch\u1EE9c n\u0103ng Undo. Ch\u1EE9c n\u0103ng
+      n\xE0y cho ph\xE9p b\u1EA1n quay l\u1EA1i tr\u1EA1ng th\xE1i tr\u01B0\u1EDBc
+      \u0111\xF3 b\u1EB1ng c\xE1ch ho\xE0n t\xE1c h\xE0nh \u0111\u1ED9ng v\u1EBD
+      ho\u1EB7c x\xF3a \u0111\u01B0\u1EDDng g\u1EA7n nh\u1EA5t m\xE0 b\u1EA1n v\u1EEBa
+      th\u1EF1c hi\u1EC7n."
+    completionCondition: 5
+    textPanelPreset: 3
+    textPanelCustomPos: {x: 0, y: 0}
+    textPanelOffset: {x: 0, y: 0}
+    highlightTargetId: 
+    highlightPadding: 0
+    blockInteraction: 1
+    highlightWorldTarget: 1
+    followTarget: 0
+    showHandPointer: 0
+    handPointerAnchorId: 
+    handPointerAlignment: 2
+    handPointerWorldPos: {x: 0, y: 0}
+    handPointerOffset: {x: 0, y: -80}
+    clickViewportRect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    targetObject: {fileID: 0}
+    worldTargetId: 
+    worldTargetObject: {fileID: 0}
+    targetWorldPosition: {x: 0, y: 0}
+    targetWorldRadius: 4
+    isRectangleTarget: 0
+    autoFitCollider: 1
+    targetWorldSize: {x: 0, y: 0}
+    minDrawLength: 10
+    useCustomUIPosition: 0
+    customUIPosition: {x: 0, y: 0}
+    customUIRadius: 400
+    autoAdvanceDelay: 15
+    freezeTime: 0
+    clearLinesOnComplete: 0
+    gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+  - description: "Th\u1EED xem nh\xE9!"
+    completionCondition: 4
+    textPanelPreset: 3
+    textPanelCustomPos: {x: 0, y: 0}
+    textPanelOffset: {x: 0, y: 0}
+    highlightTargetId: Undo
+    highlightPadding: 0
+    blockInteraction: 1
+    highlightWorldTarget: 1
+    followTarget: 0
+    showHandPointer: 1
+    handPointerAnchorId: Undo
+    handPointerAlignment: 2
+    handPointerWorldPos: {x: 0, y: 0}
+    handPointerOffset: {x: 0, y: -80}
+    clickViewportRect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    targetObject: {fileID: 0}
+    worldTargetId: 
+    worldTargetObject: {fileID: 0}
+    targetWorldPosition: {x: 0, y: 0}
+    targetWorldRadius: 4
+    isRectangleTarget: 0
+    autoFitCollider: 1
+    targetWorldSize: {x: 0, y: 0}
+    minDrawLength: 10
+    useCustomUIPosition: 0
+    customUIPosition: {x: 0, y: 0}
+    customUIRadius: 400
+    autoAdvanceDelay: 15
+    freezeTime: 0
+    clearLinesOnComplete: 0
+    gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+  - description: "\u0110\u1EC3 \xFD r\u1EB1ng \u0111\u01B0\u1EDDng b\u1EA1n x\xF3a
+      khi n\xE3y \u0111\xE3 \u0111\u01B0\u1EE3c kh\xF4i ph\u1EE5c l\u1EA1i nh\u01B0
+      c\u0169!"
+    completionCondition: 5
+    textPanelPreset: 3
+    textPanelCustomPos: {x: 0, y: 0}
+    textPanelOffset: {x: 0, y: 0}
+    highlightTargetId: 
+    highlightPadding: 0
+    blockInteraction: 1
+    highlightWorldTarget: 1
+    followTarget: 0
+    showHandPointer: 0
+    handPointerAnchorId: 
+    handPointerAlignment: 2
+    handPointerWorldPos: {x: 0, y: 0}
+    handPointerOffset: {x: 0, y: -80}
+    clickViewportRect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    targetObject: {fileID: 0}
+    worldTargetId: 
+    worldTargetObject: {fileID: 0}
+    targetWorldPosition: {x: 0, y: 0}
+    targetWorldRadius: 4
+    isRectangleTarget: 0
+    autoFitCollider: 1
+    targetWorldSize: {x: 0, y: 0}
+    minDrawLength: 10
+    useCustomUIPosition: 0
+    customUIPosition: {x: 0, y: 0}
+    customUIRadius: 400
+    autoAdvanceDelay: 15
+    freezeTime: 0
+    clearLinesOnComplete: 0
+    gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+  - description: "Ti\u1EBFp theo l\xE0 ch\u1EE9c n\u0103ng Redo. Ch\u1EE9c n\u0103ng
+      n\xE0y cho ph\xE9p b\u1EA1n kh\xF4i ph\u1EE5c l\u1EA1i h\xE0nh \u0111\u1ED9ng
+      v\u1EEBa \u0111\u01B0\u1EE3c ho\xE0n t\xE1c b\u1EDFi Undo, t\u1EE9c l\xE0 th\u1EF1c
+      hi\u1EC7n l\u1EA1i thao t\xE1c v\u1EBD ho\u1EB7c x\xF3a \u0111\u01B0\u1EDDng
+      g\u1EA7n nh\u1EA5t m\xE0 b\u1EA1n \u0111\xE3 quay lui tr\u01B0\u1EDBc \u0111\xF3."
+    completionCondition: 5
+    textPanelPreset: 3
+    textPanelCustomPos: {x: 0, y: 0}
+    textPanelOffset: {x: 0, y: 0}
+    highlightTargetId: 
+    highlightPadding: 0
+    blockInteraction: 1
+    highlightWorldTarget: 1
+    followTarget: 0
+    showHandPointer: 0
+    handPointerAnchorId: 
+    handPointerAlignment: 2
+    handPointerWorldPos: {x: 0, y: 0}
+    handPointerOffset: {x: 0, y: -80}
+    clickViewportRect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    targetObject: {fileID: 0}
+    worldTargetId: 
+    worldTargetObject: {fileID: 0}
+    targetWorldPosition: {x: 0, y: 0}
+    targetWorldRadius: 4
+    isRectangleTarget: 0
+    autoFitCollider: 1
+    targetWorldSize: {x: 0, y: 0}
+    minDrawLength: 10
+    useCustomUIPosition: 0
+    customUIPosition: {x: 0, y: 0}
+    customUIRadius: 400
+    autoAdvanceDelay: 15
+    freezeTime: 0
+    clearLinesOnComplete: 0
+    gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+  - description: "Th\u1EED xem nh\xE9!"
+    completionCondition: 4
+    textPanelPreset: 3
+    textPanelCustomPos: {x: 0, y: 0}
+    textPanelOffset: {x: 0, y: 0}
+    highlightTargetId: Redo
+    highlightPadding: 0
+    blockInteraction: 1
+    highlightWorldTarget: 1
+    followTarget: 0
+    showHandPointer: 1
+    handPointerAnchorId: Redo
+    handPointerAlignment: 2
+    handPointerWorldPos: {x: 0, y: 0}
+    handPointerOffset: {x: 0, y: -80}
+    clickViewportRect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    targetObject: {fileID: 0}
+    worldTargetId: 
+    worldTargetObject: {fileID: 0}
+    targetWorldPosition: {x: 0, y: 0}
+    targetWorldRadius: 4
+    isRectangleTarget: 0
+    autoFitCollider: 1
+    targetWorldSize: {x: 0, y: 0}
+    minDrawLength: 10
+    useCustomUIPosition: 0
+    customUIPosition: {x: 0, y: 0}
+    customUIRadius: 400
+    autoAdvanceDelay: 15
+    freezeTime: 0
+    clearLinesOnComplete: 0
+    gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+  - description: "\u0110\xE3 kh\xF4i ph\u1EE5c tr\u1EA1ng th\xE1i tr\u01B0\u1EDBc
+      khi b\u1EA1n nh\u1EA5n Undo th\xE0nh c\xF4ng!"
+    completionCondition: 5
+    textPanelPreset: 3
+    textPanelCustomPos: {x: 0, y: 0}
+    textPanelOffset: {x: 0, y: 0}
+    highlightTargetId: 
+    highlightPadding: 0
+    blockInteraction: 1
+    highlightWorldTarget: 1
+    followTarget: 0
+    showHandPointer: 0
+    handPointerAnchorId: 
+    handPointerAlignment: 2
+    handPointerWorldPos: {x: 0, y: 0}
+    handPointerOffset: {x: 0, y: -80}
+    clickViewportRect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    targetObject: {fileID: 0}
+    worldTargetId: 
+    worldTargetObject: {fileID: 0}
+    targetWorldPosition: {x: 0, y: 0}
+    targetWorldRadius: 4
+    isRectangleTarget: 0
+    autoFitCollider: 1
+    targetWorldSize: {x: 0, y: 0}
+    minDrawLength: 10
+    useCustomUIPosition: 0
+    customUIPosition: {x: 0, y: 0}
+    customUIRadius: 400
+    autoAdvanceDelay: 15
+    freezeTime: 0
+    clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
   - description: "Ch\xFAc m\u1EEBng b\u1EA1n \u0111\xE3 ho\xE0n th\xE0nh b\xE0i h\u01B0\u1EDBng
       d\u1EABn n\xE0y!"
@@ -378,6 +641,7 @@ MonoBehaviour:
     highlightPadding: 0
     blockInteraction: 1
     highlightWorldTarget: 1
+    followTarget: 0
     showHandPointer: 0
     handPointerAnchorId: 
     handPointerAlignment: 2
@@ -395,6 +659,7 @@ MonoBehaviour:
     targetWorldPosition: {x: 0, y: 0}
     targetWorldRadius: 4
     isRectangleTarget: 0
+    autoFitCollider: 1
     targetWorldSize: {x: 0, y: 0}
     minDrawLength: 10
     useCustomUIPosition: 0
@@ -402,4 +667,5 @@ MonoBehaviour:
     customUIRadius: 400
     autoAdvanceDelay: 15
     freezeTime: 0
+    clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}

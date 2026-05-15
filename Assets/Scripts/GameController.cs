@@ -91,6 +91,13 @@ public class GameController : MonoBehaviour
             block.ResetBlock();
         }
 
+        // 9. Khôi phục các RotateObject về trạng thái ban đầu
+        RotateObject[] rotatingObjects = FindObjectsOfType<RotateObject>();
+        foreach (RotateObject obj in rotatingObjects)
+        {
+            obj.ResetRotation();
+        }
+
         Debug.Log("Simulation đã dừng, mọi thứ đã về trạng thái ban đầu.");
     }
     public void StartStop()

@@ -51,6 +51,9 @@ PluginImporter:
     Web:
       enabled: 0
       settings: {}
+    WebGL:
+      enabled: 0
+      settings: {}
     WebStreamed:
       enabled: 0
       settings: {}

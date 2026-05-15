@@ -79,10 +79,52 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1759085562421163953, guid: 269b391dd931107419588192093d21d1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6818434789530938525}
+    - targetCorrespondingSourceObject: {fileID: 7269667937100661247, guid: 269b391dd931107419588192093d21d1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8619070786127431136}
+    - targetCorrespondingSourceObject: {fileID: 2867033068078526050, guid: 269b391dd931107419588192093d21d1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4280547393652037449}
     - targetCorrespondingSourceObject: {fileID: 3135266277255450208, guid: 269b391dd931107419588192093d21d1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 280353298196825172}
   m_SourcePrefab: {fileID: 100100000, guid: 269b391dd931107419588192093d21d1, type: 3}
+--- !u!1 &1658035608076830866 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7269667937100661247, guid: 269b391dd931107419588192093d21d1, type: 3}
+  m_PrefabInstance: {fileID: 8350107883726227821}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8619070786127431136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1658035608076830866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2397380c77291d64a8ca0f6cc3e65820, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetId: Undo
+--- !u!1 &6064155738160146191 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2867033068078526050, guid: 269b391dd931107419588192093d21d1, type: 3}
+  m_PrefabInstance: {fileID: 8350107883726227821}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4280547393652037449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6064155738160146191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2397380c77291d64a8ca0f6cc3e65820, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetId: Redo
 --- !u!1 &6369003500585764621 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3135266277255450208, guid: 269b391dd931107419588192093d21d1, type: 3}

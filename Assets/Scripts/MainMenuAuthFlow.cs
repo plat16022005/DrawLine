@@ -17,12 +17,15 @@ public class MainMenuAuthFlow : MonoBehaviour
     [SerializeField] private RectTransform btnGroup; // Canvas/MainMenuUI/BTN
     [SerializeField] private RectTransform panelDangNhap; // Canvas/PanelDangNhap
     [SerializeField] private RectTransform panelDangKy; // Canvas/PanelDangKy
+    [SerializeField] private RectTransform panelQuenMatKhau; // Canvas/PanelQuenMatKhau
 
     [Header("Buttons")]
     [SerializeField] private Button dangNhapButton; // BTN/DangNhap
     [SerializeField] private Button dangKyButton; // BTN/DangKy
     [SerializeField] private Button quayLaiDangNhapButton; // PanelDangNhap/.../QuayLai
     [SerializeField] private Button quayLaiDangKyButton; // PanelDangKy/.../QuayLai
+    [SerializeField] private Button quenMatKhauButton; // PanelDangNhap/.../QuenMatKhau
+    [SerializeField] private Button quayLaiQuenMatKhauButton; // PanelQuenMatKhau/.../QuayLai
 
     [Header("Animation")]
     [SerializeField, Min(0.05f)] private float duration = 0.25f;
@@ -58,7 +61,7 @@ public class MainMenuAuthFlow : MonoBehaviour
 
         _canvasRect = canvas.GetComponent<RectTransform>();
 
-        if (btnGroup == null || panelDangNhap == null || panelDangKy == null)
+        if (btnGroup == null || panelDangNhap == null || panelDangKy == null || panelQuenMatKhau == null)
         {
             Debug.LogError("MainMenuAuthFlow: missing references (btnGroup/panels).", this);
             enabled = false;
@@ -72,11 +75,15 @@ public class MainMenuAuthFlow : MonoBehaviour
             panelDangNhap.gameObject.SetActive(false);
         if (panelDangKy.gameObject.activeSelf)
             panelDangKy.gameObject.SetActive(false);
+        if (panelQuenMatKhau.gameObject.activeSelf)
+            panelQuenMatKhau.gameObject.SetActive(false);
 
         if (dangNhapButton != null) dangNhapButton.onClick.AddListener(ShowDangNhap);
         if (dangKyButton != null) dangKyButton.onClick.AddListener(ShowDangKy);
+        if (quenMatKhauButton != null) quenMatKhauButton.onClick.AddListener(ShowQuenMatKhau);
         if (quayLaiDangNhapButton != null) quayLaiDangNhapButton.onClick.AddListener(BackToMain);
         if (quayLaiDangKyButton != null) quayLaiDangKyButton.onClick.AddListener(BackToMain);
+        if (quayLaiQuenMatKhauButton != null) quayLaiQuenMatKhauButton.onClick.AddListener(BackToMain);
     }
 
     private void OnEnable()
@@ -99,6 +106,7 @@ public class MainMenuAuthFlow : MonoBehaviour
 
     public void ShowDangNhap() => StartFlow(panelDangNhap);
     public void ShowDangKy() => StartFlow(panelDangKy);
+    public void ShowQuenMatKhau() => StartFlow(panelQuenMatKhau);
 
     private void StartFlow(RectTransform targetPanel)
     {
@@ -123,6 +131,7 @@ public class MainMenuAuthFlow : MonoBehaviour
         // Ensure both panels are off.
         if (panelDangNhap != targetPanel) panelDangNhap.gameObject.SetActive(false);
         if (panelDangKy != targetPanel) panelDangKy.gameObject.SetActive(false);
+        if (panelQuenMatKhau != targetPanel) panelQuenMatKhau.gameObject.SetActive(false);
 
         // Slide target panel in from the left.
         targetPanel.gameObject.SetActive(true);
@@ -138,6 +147,7 @@ public class MainMenuAuthFlow : MonoBehaviour
         RectTransform activePanel = null;
         if (panelDangNhap.gameObject.activeSelf) activePanel = panelDangNhap;
         else if (panelDangKy.gameObject.activeSelf) activePanel = panelDangKy;
+        else if (panelQuenMatKhau.gameObject.activeSelf) activePanel = panelQuenMatKhau;
 
         if (activePanel != null)
         {
