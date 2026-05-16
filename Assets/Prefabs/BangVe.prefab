@@ -7088,8 +7088,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 9256efd99c5b55346b85676282c9f45f, type: 3}
   pencilCursor: {fileID: 2800000, guid: b777f18e8a40a154ba5a0f283b48015c, type: 3}
   eraserCursor: {fileID: 2800000, guid: 893ea265254070e40bbcb71b012c31d7, type: 3}
-  pencilHotSpot: {x: 50, y: 150}
-  eraserHotSpot: {x: 50, y: 150}
+  pencilHotSpot: {x: 40, y: 120}
+  eraserHotSpot: {x: 40, y: 120}
   eraserRadius: 0.2
 --- !u!114 &1681353384759886539
 MonoBehaviour:

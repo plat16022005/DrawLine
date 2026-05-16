@@ -11,8 +11,25 @@ public class CameraPinchZoom : MonoBehaviour
 
     private Camera cam;
 
+    public static CameraPinchZoom instance;
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
+    public void ZoomFromJS(float difference)
+    {
+        Zoom(difference * zoomSpeed);
+    }
+
     private void Start()
     {
+        // Khởi tạo Bridge trực tiếp để tránh bị IL2CPP strip code
+#if UNITY_WEBGL && !UNITY_EDITOR
+        WebGLZoomBridge.Init();
+#endif
+
         // Tự động lấy Main Camera
         cam = Camera.main;
 
@@ -26,7 +43,13 @@ public class CameraPinchZoom : MonoBehaviour
     {
         if (cam == null) return;
 
-        // Chỉ xử lý khi có đúng 2 ngón chạm
+        // Xử lý zoom bằng cuộn chuột (PC) hoặc khi trình duyệt giả lập pinch thành scroll
+        if (Input.mouseScrollDelta.y != 0)
+        {
+            Zoom(Input.mouseScrollDelta.y * zoomSpeed * 50f);
+        }
+
+        // Chỉ xử lý khi có đúng 2 ngón chạm (Mobile)
         if (Input.touchCount == 2)
         {
             Touch touch0 = Input.GetTouch(0);

@@ -103,6 +103,15 @@ public class UIManager : MonoBehaviour
 #endif
     }
 
+    private string GetUserId()
+    {
+#if !UNITY_WEBGL || UNITY_EDITOR
+        return user.UserId;
+#else
+        return FirebaseJSBridge.instance.GetCurrentUserId();
+#endif
+    }
+
     private void UpdateHealthUI(float currentHealth, float maxHealth)
     {
         if (healthBar != null)
@@ -186,30 +195,27 @@ public class UIManager : MonoBehaviour
             .FindIndex(l => l != null && l.level == sceneName);
         int value = Mathf.RoundToInt(InkManager.CurrentInk * PlayerHealth.currentHealth);
         Level level = new Level(sceneName, DataGame.instance.users.name, star, value);
+        string userId = GetUserId();
         if (foundLevel != null)
         {
             if (foundLevel.point < level.point)
             {
-#if !UNITY_WEBGL || UNITY_EDITOR
-                FirebaseDataManager.instance.WriteDatabase(sceneName, user.UserId, level);
+                FirebaseDataManager.instance.WriteDatabase(sceneName, userId, level);
                 DataGame.instance.levels[index] = level;
                 DataGame.instance.totalPoint.point -= foundLevel.point;
                 DataGame.instance.totalPoint.point += level.point;
-                FirebaseDataManager.instance.WriteDatabase("TotalPoint", user.UserId, DataGame.instance.totalPoint);
-#endif
+                FirebaseDataManager.instance.WriteDatabase("TotalPoint", userId, DataGame.instance.totalPoint);
                 money = 0;
             }
         }
         else
         {
-#if !UNITY_WEBGL || UNITY_EDITOR
-            FirebaseDataManager.instance.WriteDatabase(sceneName, user.UserId, level);
+            FirebaseDataManager.instance.WriteDatabase(sceneName, userId, level);
             DataGame.instance.levels.Add(level);
             DataGame.instance.CurrentLevel = new CurrentLevel(DataGame.instance.users.name, DataGame.instance.CurrentLevel.level + 1);
             DataGame.instance.totalPoint.point += value;
-            FirebaseDataManager.instance.WriteDatabase("CurrentLevel", user.UserId, DataGame.instance.CurrentLevel);
-            FirebaseDataManager.instance.WriteDatabase("TotalPoint", user.UserId, DataGame.instance.totalPoint);
-#endif
+            FirebaseDataManager.instance.WriteDatabase("CurrentLevel", userId, DataGame.instance.CurrentLevel);
+            FirebaseDataManager.instance.WriteDatabase("TotalPoint", userId, DataGame.instance.totalPoint);
             money = 50;
         }
         OpenWinPanel(sceneName, star, value, money);
@@ -220,9 +226,8 @@ public class UIManager : MonoBehaviour
         DataGame.instance.users.coin += money;
         MusicBackGround.Stop();
         SoundEffect.PlayOneShot(SoundClip[0]);
-#if !UNITY_WEBGL || UNITY_EDITOR
-        FirebaseDataManager.instance.WriteDatabase("Users", user.UserId, DataGame.instance.users);
-#endif
+        string userId = GetUserId();
+        FirebaseDataManager.instance.WriteDatabase("Users", userId, DataGame.instance.users);
         if (star >= 1)
         {
             Star1.color = Color.white;
@@ -251,24 +256,26 @@ public class UIManager : MonoBehaviour
     }
     public async void LoadLevelXRank(int lv)
     {
-#if !UNITY_WEBGL || UNITY_EDITOR
         foreach (Transform item in ContentLevelDetail)
         {
             Destroy(item.gameObject);
         }
         await DataGame.instance.LoadTop10Level(lv);
         int currentRantPlayer = 0;
-        foreach (Level level in DataGame.instance.LvXRank)
+        if (DataGame.instance.LvXRank != null)
         {
-            currentRantPlayer++;
-            GameObject obj = Instantiate(LevelDetailPrefab, ContentLevelDetail);
-            TextMeshProUGUI XH = obj.transform.Find("XH")?.GetComponent<TextMeshProUGUI>();
-            TextMeshProUGUI Name = obj.transform.Find("Name")?.GetComponent<TextMeshProUGUI>();
-            TextMeshProUGUI Point = obj.transform.Find("Point")?.GetComponent<TextMeshProUGUI>();
+            foreach (Level level in DataGame.instance.LvXRank)
+            {
+                currentRantPlayer++;
+                GameObject obj = Instantiate(LevelDetailPrefab, ContentLevelDetail);
+                TextMeshProUGUI XH = obj.transform.Find("XH")?.GetComponent<TextMeshProUGUI>();
+                TextMeshProUGUI Name = obj.transform.Find("Name")?.GetComponent<TextMeshProUGUI>();
+                TextMeshProUGUI Point = obj.transform.Find("Point")?.GetComponent<TextMeshProUGUI>();
 
-            XH.text = currentRantPlayer.ToString();
-            Name.text = level.namePlayer;
-            Point.text = level.point.ToString();
+                XH.text = currentRantPlayer.ToString();
+                Name.text = level.namePlayer;
+                Point.text = level.point.ToString();
+            }
         }
         int myRank = await DataGame.instance.FindMyLevelXRank(lv);
 
@@ -285,6 +292,5 @@ public class UIManager : MonoBehaviour
             NamePlayerLevel.text = DataGame.instance.users.name;
             PointPlayerLevel.text = "0";                  
         }
-#endif
     }
 }

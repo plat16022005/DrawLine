@@ -32,9 +32,47 @@ public class SessionManager : MonoBehaviour
 
         InvokeRepeating(nameof(CheckSession), 5f, 5f);
 #else
-        await System.Threading.Tasks.Task.Yield();
+        StartCoroutine(WebGLStartSession());
 #endif
     }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+    private System.Threading.Tasks.TaskCompletionSource<string> _readTaskSource;
+
+    private async System.Threading.Tasks.Task<string> ReadSessionTokenWebGL(string path)
+    {
+        _readTaskSource = new System.Threading.Tasks.TaskCompletionSource<string>();
+        FirebaseJSBridge.instance.ReadDatabase(path, gameObject.name, "OnReadSessionResult");
+        return await _readTaskSource.Task;
+    }
+
+    public void OnReadSessionResult(string result)
+    {
+        if (_readTaskSource != null)
+        {
+            _readTaskSource.TrySetResult(result);
+        }
+    }
+
+    private System.Collections.IEnumerator WebGLStartSession()
+    {
+        while (FirebaseJSBridge.instance == null || !FirebaseJSBridge.instance.IsFirebaseReady())
+            yield return new WaitForSeconds(0.5f);
+
+        uid = FirebaseJSBridge.instance.GetCurrentUserId();
+        if (string.IsNullOrEmpty(uid))
+        {
+            Debug.LogError("Chưa đăng nhập!");
+            yield break;
+        }
+
+        sessionToken = System.Guid.NewGuid().ToString();
+        // Cần lưu là string JSON nên thêm quotes
+        FirebaseJSBridge.instance.WriteDatabase($"UserSession/{uid}/sessionToken", $"\"{sessionToken}\"");
+
+        InvokeRepeating(nameof(CheckSessionWebGL), 5f, 5f);
+    }
+#endif
 
     async void CheckSession()
     {
@@ -62,7 +100,31 @@ public class SessionManager : MonoBehaviour
             SceneManager.LoadScene("MainMenu");
         }
 #else
-        await System.Threading.Tasks.Task.Yield();
+        // Dummy function to prevent compiler error for WebGL builds if CheckSession isn't called
 #endif
     }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+    async void CheckSessionWebGL()
+    {
+        string json = await ReadSessionTokenWebGL($"UserSession/{uid}/sessionToken");
+        if (string.IsNullOrEmpty(json) || json.StartsWith("ERROR|") || json.StartsWith("NULL|"))
+        {
+            Debug.LogWarning("Không tìm thấy sessionToken trên server");
+            return;
+        }
+        
+        string serverToken = json.StartsWith("OK|") ? json.Substring(3) : json;
+        // Loại bỏ dấu ngoặc kép do JSON parsing
+        serverToken = serverToken.Replace("\"", "").Trim();
+
+        if (serverToken != sessionToken)
+        {
+            Debug.Log("Tài khoản đã đăng nhập ở thiết bị khác!");
+            CancelInvoke(nameof(CheckSessionWebGL));
+            FirebaseJSBridge.instance.SignOutUser();
+            SceneManager.LoadScene("MainMenu");
+        }
+    }
+#endif
 }
