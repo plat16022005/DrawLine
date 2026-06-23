@@ -54,6 +54,8 @@ public class FirebaseAuthManager : MonoBehaviour
         }
 
 #if UNITY_WEBGL && !UNITY_EDITOR
+        OpenNotificationPanel("Bạn đang trải nghiệm trò chơi trên nền tảng Web. Do giới hạn của trình duyệt, có thể phát sinh một số lỗi không mong muốn, đặc biệt là trên thiết bị di động. Để có trải nghiệm mượt mà và trọn vẹn nhất, vui lòng tải bản cài đặt dành cho PC hoặc Mobile.");
+
         // Đăng ký events từ FirebaseJSBridge
         if (FirebaseJSBridge.instance != null)
         {
@@ -132,7 +134,7 @@ public class FirebaseAuthManager : MonoBehaviour
         notificationForgot.color = Color.green;
         notificationForgot.gameObject.SetActive(true);
         notificationForgot.text = "Gửi yêu cầu thành công!";
-        OpenNotificationPanel("Đã gửi email khôi phục mật khẩu! Kiểm tra hộp thư của bạn.");
+        OpenNotificationPanel("Đã gửi email khôi phục mật khẩu! Vui lòng kiểm tra hộp thư đến hoặc thư mục thư rác (Spam) trong email đã đăng ký của bạn.");
     }
     private void HandlePasswordResetFailed(string code, string message)
     {
