@@ -9,4 +9,5 @@ public class MapData
     public int width;
     public int height;
     public List<TileData> tiles = new List<TileData>();
+    public List<TrapData> traps = new List<TrapData>();
 }

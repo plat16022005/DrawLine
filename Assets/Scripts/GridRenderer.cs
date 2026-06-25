@@ -11,13 +11,33 @@ public class GridRenderer : MonoBehaviour
     public int sortingOrder = 9999;
     public float zOffset = -5f;
 
+    private bool isDrawn = false;
+
     void Start()
     {
         DrawGrid();
+        SetGridVisible(false);
+    }
+
+    void Update()
+    {
+        bool shouldShow = PlacementModeManager.CurrentMode == PlacementMode.Tile;
+        SetGridVisible(shouldShow);
+    }
+
+    void SetGridVisible(bool visible)
+    {
+        foreach (Transform child in transform)
+        {
+            child.gameObject.SetActive(visible);
+        }
     }
 
     void DrawGrid()
     {
+        if (isDrawn) return;
+        isDrawn = true;
+
         float startX = -width * cellSize / 2f;
         float startY = -height * cellSize / 2f;
 

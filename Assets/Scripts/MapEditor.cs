@@ -9,6 +9,8 @@ public class MapEditor : MonoBehaviour
 
     void Update()
     {
+        if (PlacementModeManager.CurrentMode != PlacementMode.Tile)
+            return;
         // Không vẽ khi đang bấm UI dropdown/button
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             return;

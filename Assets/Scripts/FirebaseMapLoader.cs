@@ -8,6 +8,9 @@ public class FirebaseMapLoader : MonoBehaviour
     public Tilemap tilemap;
     public TileDatabase tileDatabase;
 
+    public TrapDatabase trapDatabase;
+    public Transform trapParent;
+
     private DatabaseReference dbRef;
     private bool firebaseReady = false;
 
@@ -20,7 +23,8 @@ public class FirebaseMapLoader : MonoBehaviour
             dbRef = FirebaseDatabase.DefaultInstance.RootReference;
             firebaseReady = true;
             Debug.Log("Firebase Ready");
-            LoadMap("-Ovp5AsV8-f-1C7VUy7Z");
+
+            LoadMap("-OvzbwyVMcT1hYCm_BDT");
         }
         else
         {
@@ -52,6 +56,7 @@ public class FirebaseMapLoader : MonoBehaviour
             MapData mapData = JsonUtility.FromJson<MapData>(json);
 
             tilemap.ClearAllTiles();
+            ClearOldTraps();
 
             foreach (TileData tileData in mapData.tiles)
             {
@@ -64,11 +69,59 @@ public class FirebaseMapLoader : MonoBehaviour
                 }
             }
 
+            foreach (TrapData trapData in mapData.traps)
+            {
+                TrapOption option = trapDatabase.GetTrapOptionById(trapData.trapId);
+
+                if (option == null || option.runtimePrefab == null)
+                {
+                    Debug.LogWarning("Không tìm thấy trap runtime prefab: " + trapData.trapId);
+                    continue;
+                }
+
+                GameObject trap = Instantiate(
+                    option.runtimePrefab,
+                    new Vector3(trapData.x, trapData.y, 0),
+                    Quaternion.Euler(0, 0, trapData.angle),
+                    trapParent
+                );
+
+                trap.transform.localScale = new Vector3(
+                    trapData.scaleX,
+                    trapData.scaleY,
+                    1
+                );
+
+                ITrapConfig config = trap.GetComponent<ITrapConfig>();
+                Debug.Log(trapData.configJson);
+                if (config != null && !string.IsNullOrEmpty(trapData.configJson))
+                {
+                    config.FromJson(trapData.configJson);
+                }
+                MovingBlock movingBlock = trap.GetComponent<MovingBlock>();
+
+                if(movingBlock != null)
+                {
+                    movingBlock.Init();
+                }
+
+            }
+
             Debug.Log("Load map thành công: " + mapData.mapName);
         }
         catch (System.Exception e)
         {
             Debug.LogError("Load map thất bại: " + e);
+        }
+    }
+
+    void ClearOldTraps()
+    {
+        if (trapParent == null) return;
+
+        for (int i = trapParent.childCount - 1; i >= 0; i--)
+        {
+            Destroy(trapParent.GetChild(i).gameObject);
         }
     }
 

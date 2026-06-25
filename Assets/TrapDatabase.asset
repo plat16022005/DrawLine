@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bb0dcaf8ab80cc408d4e5fe5af82d6c, type: 3}
+  m_Name: TrapDatabase
+  m_EditorClassIdentifier: 
+  trapOptions:
+  - id: 1
+    trapName: MovingBlock
+    icon: {fileID: 21300004, guid: 84632f772d45a04488e6c5318eb12242, type: 3}
+    description: Moving Block
+    editorPrefab: {fileID: 6249037215342488997, guid: 3ee16b08f9a5f5243b124a95953f1a2d, type: 3}
+    runtimePrefab: {fileID: 6249037215342488997, guid: c2c24440bb3c7b44c99c6deadb716f86, type: 3}
+  - id: 2
+    trapName: StrikeTrap
+    icon: {fileID: 21300018, guid: 2776dd9c65d95e448a0c39ae0d26639a, type: 3}
+    description: StrikeTrap
+    editorPrefab: {fileID: 4800996373017744713, guid: 84cddea51be9a4043885e04622960c85, type: 3}
+    runtimePrefab: {fileID: 4800996373017744713, guid: 3218739df387d3e4795087e240cea618, type: 3}
+  - id: 3
+    trapName: StrikeTrap
+    icon: {fileID: -1524080393, guid: d8587b0d66e6a344988792e3a54f48a1, type: 3}
+    description: StrikeTrap
+    editorPrefab: {fileID: 4593271935288894070, guid: 5cb3e772179d6564c86e623995d387a9, type: 3}
+    runtimePrefab: {fileID: 4593271935288894070, guid: 7a0f82428026d884c851b6cb1807dc6b, type: 3}

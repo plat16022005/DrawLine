@@ -65,8 +65,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\GameController.cs" />
+    <Compile Include="Assets\Scripts\TrapDatabase.cs" />
     <Compile Include="Assets\Scripts\BreakablePlatform.cs" />
     <Compile Include="Assets\Firebase\FirebaseApp\Internal\FirebaseInterops.cs" />
+    <Compile Include="Assets\Scripts\TrapData.cs" />
+    <Compile Include="Assets\Scripts\ITrapConfig.cs" />
     <Compile Include="Assets\Scripts\RubberBehavior.cs" />
     <Compile Include="Assets\Scripts\CameraPinchZoom.cs" />
     <Compile Include="Assets\Scripts\LevelSceneManager.cs" />
@@ -80,14 +83,21 @@
     <Compile Include="Assets\Scripts\ConstantSpeedBehavior.cs" />
     <Compile Include="Assets\Scripts\LineCreator.cs" />
     <Compile Include="Assets\Scripts\FirebaseMapSaver.cs" />
+    <Compile Include="Assets\Scripts\PlacementModeManager.cs" />
     <Compile Include="Assets\Scripts\WebGL\FirebaseJSBridge.cs" />
     <Compile Include="Assets\Scripts\MovingBlock.cs" />
     <Compile Include="Assets\Firebase\FirebaseApp\Internal\HttpHelpers.cs" />
     <Compile Include="Assets\Scripts\RemoveTouchedTile.cs" />
+    <Compile Include="Assets\Scripts\TrapSaveData.cs" />
+    <Compile Include="Assets\Scripts\TrapDropdownUI.cs" />
+    <Compile Include="Assets\Scripts\TrapInfoPanelUI.cs" />
     <Compile Include="Assets\Scripts\SlowDownBehavior.cs" />
     <Compile Include="Assets\Scripts\TileDatabase.cs" />
     <Compile Include="Assets\Scripts\WebGLZoomBridge.cs" />
     <Compile Include="Assets\Scripts\TileOption.cs" />
+    <Compile Include="Assets\Scripts\TrapMoveController.cs" />
+    <Compile Include="Assets\Scripts\RotationCircleUI.cs" />
+    <Compile Include="Assets\Scripts\TrapSettingController.cs" />
     <Compile Include="Assets\Scripts\CurrentLevel.cs" />
     <Compile Include="Assets\Scripts\StoryController.cs" />
     <Compile Include="Assets\Scripts\LevelManager.cs" />
@@ -96,12 +106,14 @@
     <Compile Include="Assets\Scripts\InkManager.cs" />
     <Compile Include="Assets\Scripts\Demon.cs" />
     <Compile Include="Assets\Scripts\MySkin.cs" />
+    <Compile Include="Assets\Scripts\TrapPlacementController.cs" />
     <Compile Include="Assets\Scripts\FirebaseDataManager.cs" />
     <Compile Include="Assets\Scripts\BangSlideToggle.cs" />
     <Compile Include="Assets\Scripts\TutorialManager.cs" />
     <Compile Include="Assets\Scripts\SelectLevelManager.cs" />
     <Compile Include="Assets\Scripts\UISfxInstaller.cs" />
     <Compile Include="Assets\Scripts\FirebaseAuthManager.cs" />
+    <Compile Include="Assets\Scripts\TrapEditorObject.cs" />
     <Compile Include="Assets\Scripts\SpikeTrap.cs" />
     <Compile Include="Assets\Scripts\TileData.cs" />
     <Compile Include="Assets\Scripts\FireDamage.cs" />
@@ -111,6 +123,7 @@
     <Compile Include="Assets\Scripts\PlayerHealth.cs" />
     <Compile Include="Assets\Scripts\DataGame.cs" />
     <Compile Include="Assets\Scripts\MapData.cs" />
+    <Compile Include="Assets\Scripts\MovingBlockConfigData.cs" />
     <Compile Include="Assets\Scripts\MapEditor.cs" />
     <Compile Include="Assets\Scripts\AutoScaleBackground.cs" />
     <Compile Include="Assets\Scripts\MainMenuAuthFlow.cs" />
@@ -118,14 +131,17 @@
     <Compile Include="Assets\Scripts\TutorialScenario.cs" />
     <Compile Include="Assets\Scripts\UIManager.cs" />
     <Compile Include="Assets\Scripts\LineType.cs" />
+    <Compile Include="Assets\Scripts\TrapOption.cs" />
     <Compile Include="Assets\Scripts\CameraController.cs" />
     <Compile Include="Assets\Scripts\SpeedBoostBehavior.cs" />
     <Compile Include="Assets\Scripts\FirebaseMapLoader.cs" />
+    <Compile Include="Assets\Scripts\TrapSettingPanelUI.cs" />
     <Compile Include="Assets\Scripts\Line.cs" />
     <Compile Include="Assets\TooCubeForest\demoScenes\Movement.cs" />
     <Compile Include="Assets\Scripts\TutorialTarget.cs" />
     <Compile Include="Assets\Scripts\RotateObject.cs" />
     <Compile Include="Assets\Scripts\Princess.cs" />
+    <Compile Include="Assets\Scripts\MovingBlockConfig.cs" />
     <Compile Include="Assets\Scripts\SessionManager.cs" />
     <Compile Include="Assets\Scripts\UIButtonSfx.cs" />
   </ItemGroup>

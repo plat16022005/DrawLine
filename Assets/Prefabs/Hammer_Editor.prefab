@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1517885245026608636}
   - component: {fileID: 6649659468555040291}
-  - component: {fileID: 3885737902138427532}
-  m_Layer: 0
-  m_Name: Hammer
+  - component: {fileID: -5987719217514349781}
+  m_Layer: 12
+  m_Name: Hammer_Editor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -86,7 +86,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &3885737902138427532
+--- !u!114 &-5987719217514349781
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -95,12 +95,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4593271935288894070}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2019e4835c03cd04f9e94e0af42b94c8, type: 3}
+  m_Script: {fileID: 11500000, guid: f62c3194477d9f245927b760a6adce96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: 50
-  startRotation: {x: 0, y: 0, z: 0}
-  TraiPhai: -1
+  trapId: 3
 --- !u!1 &5610725113869124469
 GameObject:
   m_ObjectHideFlags: 0
@@ -113,7 +111,7 @@ GameObject:
   - component: {fileID: 6488060729524701956}
   - component: {fileID: 8706519916742288240}
   - component: {fileID: 4075345493462337116}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: hammer_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}

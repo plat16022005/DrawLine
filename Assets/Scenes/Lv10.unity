@@ -438,6 +438,10 @@ PrefabInstance:
       propertyPath: moveX
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 4826665298401581145, guid: c2c24440bb3c7b44c99c6deadb716f86, type: 3}
+      propertyPath: moveX
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 6249037215342488997, guid: c2c24440bb3c7b44c99c6deadb716f86, type: 3}
       propertyPath: m_Name
       value: MovingBlock (1)
@@ -682,6 +686,10 @@ PrefabInstance:
       propertyPath: moveX
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 4826665298401581145, guid: c2c24440bb3c7b44c99c6deadb716f86, type: 3}
+      propertyPath: moveX
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 6249037215342488997, guid: c2c24440bb3c7b44c99c6deadb716f86, type: 3}
       propertyPath: m_Name
       value: MovingBlock (2)
@@ -740,6 +748,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2720738326985109340, guid: c2c24440bb3c7b44c99c6deadb716f86, type: 3}
+      propertyPath: moveX
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4826665298401581145, guid: c2c24440bb3c7b44c99c6deadb716f86, type: 3}
       propertyPath: moveX
       value: 10
       objectReference: {fileID: 0}

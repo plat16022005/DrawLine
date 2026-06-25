@@ -9,6 +9,11 @@ public class TilePreview : MonoBehaviour
 
     void Update()
     {
+        if (PlacementModeManager.CurrentMode != PlacementMode.Tile)
+        {
+            spriteRenderer.enabled = false;
+            return;
+        }
         TileBase selectedTile = tileDropdownUI.selectedTile;
 
         if (selectedTile == null)
@@ -30,7 +35,7 @@ public class TilePreview : MonoBehaviour
         if (tile != null)
         {
             spriteRenderer.sprite = tile.sprite;
-            spriteRenderer.color = new Color(1, 1, 1, 0.5f);
+            spriteRenderer.color = new Color(1, 1, 1, 0.7f);
         }
     }
 }

@@ -16,6 +16,7 @@ public class FirebaseMapSaver : MonoBehaviour
     private DatabaseReference dbRef;
     private FirebaseAuth auth;
     private bool firebaseReady = false;
+    public Transform trapParent;
 
     async void Start()
     {
@@ -62,6 +63,32 @@ public async void SaveMap()
         {
             mapData.tiles.Add(new TileData(pos.x, pos.y, tileId));
         }
+    }
+
+    foreach (Transform child in trapParent)
+    {
+        TrapEditorObject trapEditor = child.GetComponent<TrapEditorObject>();
+
+        if (trapEditor == null)
+            continue;
+
+        ITrapConfig config = child.GetComponent<ITrapConfig>();
+
+        string configJson = config != null ? config.ToJson() : "";
+
+        Vector3 pos = child.position;
+        Vector3 scale = child.localScale;
+        float angle = child.eulerAngles.z;
+
+        mapData.traps.Add(new TrapData(
+            trapEditor.trapId,
+            pos.x,
+            pos.y,
+            angle,
+            scale.x,
+            scale.y,
+            configJson
+        ));
     }
 
     string json = JsonUtility.ToJson(mapData);

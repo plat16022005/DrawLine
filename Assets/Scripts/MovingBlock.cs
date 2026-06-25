@@ -14,7 +14,17 @@ public class MovingBlock : MonoBehaviour
 
     private Vector3 startPos;
     private Vector3 targetPos;
+    public void Init()
+    {
+        MovingBlockConfig config = GetComponent<MovingBlockConfig>();
 
+        moveX = config.moveX;
+        moveY = config.moveY;
+        speed = config.speed;
+
+        startPos = transform.position;
+        targetPos = startPos + new Vector3(moveX, moveY, 0f);
+    }
     void Awake()
     {
         // Lưu vị trí ban đầu (dùng Awake để ResetBlock() có thể khôi phục đúng khi StopSimulation)
