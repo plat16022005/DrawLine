@@ -93,6 +93,7 @@
     <Compile Include="Assets\Scripts\TrapInfoPanelUI.cs" />
     <Compile Include="Assets\Scripts\SlowDownBehavior.cs" />
     <Compile Include="Assets\Scripts\TileDatabase.cs" />
+    <Compile Include="Assets\Scripts\SpawnPointEditor.cs" />
     <Compile Include="Assets\Scripts\WebGLZoomBridge.cs" />
     <Compile Include="Assets\Scripts\TileOption.cs" />
     <Compile Include="Assets\Scripts\TrapMoveController.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="Assets\Scripts\TrapSettingController.cs" />
     <Compile Include="Assets\Scripts\CurrentLevel.cs" />
     <Compile Include="Assets\Scripts\StoryController.cs" />
+    <Compile Include="Assets\Scripts\BreakablePlatformConfig.cs" />
     <Compile Include="Assets\Scripts\LevelManager.cs" />
     <Compile Include="Assets\Scripts\Level.cs" />
     <Compile Include="Assets\Scripts\UIController.cs" />
@@ -113,11 +115,14 @@
     <Compile Include="Assets\Scripts\SelectLevelManager.cs" />
     <Compile Include="Assets\Scripts\UISfxInstaller.cs" />
     <Compile Include="Assets\Scripts\FirebaseAuthManager.cs" />
+    <Compile Include="Assets\Scripts\BreakablePlatformConfigData.cs" />
     <Compile Include="Assets\Scripts\TrapEditorObject.cs" />
     <Compile Include="Assets\Scripts\SpikeTrap.cs" />
     <Compile Include="Assets\Scripts\TileData.cs" />
     <Compile Include="Assets\Scripts\FireDamage.cs" />
     <Compile Include="Assets\Scripts\CameraControl.cs" />
+    <Compile Include="Assets\Scripts\HammerConfigData.cs" />
+    <Compile Include="Assets\Scripts\HammerConfig.cs" />
     <Compile Include="Assets\Scripts\TutorialStep.cs" />
     <Compile Include="Assets\Scripts\TotalPoint.cs" />
     <Compile Include="Assets\Scripts\PlayerHealth.cs" />
@@ -131,6 +136,7 @@
     <Compile Include="Assets\Scripts\TutorialScenario.cs" />
     <Compile Include="Assets\Scripts\UIManager.cs" />
     <Compile Include="Assets\Scripts\LineType.cs" />
+    <Compile Include="Assets\Scripts\TrapConfigPanelUI.cs" />
     <Compile Include="Assets\Scripts\TrapOption.cs" />
     <Compile Include="Assets\Scripts\CameraController.cs" />
     <Compile Include="Assets\Scripts\SpeedBoostBehavior.cs" />

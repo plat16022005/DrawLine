@@ -5,6 +5,18 @@ public class BreakablePlatform : MonoBehaviour
 {
     public float breakDelay = 1f;
 
+    /// <summary>
+    /// Gọi từ FirebaseMapLoader sau khi Instantiate để áp dụng config từ Firebase.
+    /// </summary>
+    public void Init()
+    {
+        BreakablePlatformConfig config = GetComponent<BreakablePlatformConfig>();
+        if (config != null)
+        {
+            breakDelay = config.breakDelay;
+        }
+    }
+
     private bool isBreaking = false;
 
     // Lưu trạng thái ban đầu để có thể khôi phục khi StopSimulation

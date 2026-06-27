@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class MovingBlockConfig : MonoBehaviour, ITrapConfig
 {
-    public float moveX = 3f;
+    public float moveX = 0f;
     public float moveY = 0f;
-    public float speed = 2f;
+    public float speed = 0f;
 
     public string ToJson()
     {

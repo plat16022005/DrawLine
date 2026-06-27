@@ -104,6 +104,16 @@ void UpdateInfoPanel()
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             return;
 
+        // Apply giá trị đã nhập trong config panel vào preview object trước
+        if (trapInfoPanelUI != null && trapInfoPanelUI.trapConfigPanel != null)
+            trapInfoPanelUI.trapConfigPanel.Apply();
+
+        // Lấy configJson từ preview (nếu có)
+        string configJson = null;
+        ITrapConfig previewConfig = previewObject.GetComponentInChildren<ITrapConfig>();
+        if (previewConfig != null)
+            configJson = previewConfig.ToJson();
+
         Vector3 pos = previewObject.transform.position;
 
         GameObject trap = Instantiate(
@@ -114,5 +124,13 @@ void UpdateInfoPanel()
         );
 
         trap.transform.localScale = previewObject.transform.localScale;
+
+        // Copy config vào trap vừa tạo
+        if (!string.IsNullOrEmpty(configJson))
+        {
+            ITrapConfig trapConfig = trap.GetComponentInChildren<ITrapConfig>();
+            if (trapConfig != null)
+                trapConfig.FromJson(configJson);
+        }
     }
 }

@@ -30,6 +30,10 @@ public class PlacementModeManager : MonoBehaviour
     {
         CurrentMode = PlacementMode.TrapSetting;
     }
+    public void SetSpawnPointMode()
+    {
+        CurrentMode = PlacementMode.SpawnPoint;
+    }
 }
 
 public enum PlacementMode
@@ -38,5 +42,6 @@ public enum PlacementMode
     Tile,
     Trap,
     MoveTrap,
-    TrapSetting
+    TrapSetting,
+    SpawnPoint
 }

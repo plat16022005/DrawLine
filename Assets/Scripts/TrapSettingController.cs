@@ -8,6 +8,7 @@ public class TrapSettingController : MonoBehaviour
     public TrapSettingPanelUI settingPanelUI;
 
     private Transform selectedTrap;
+    private PlacementMode lastMode = PlacementMode.None;
 
     void Start()
     {
@@ -17,7 +18,17 @@ public class TrapSettingController : MonoBehaviour
 
     void Update()
     {
-        if (PlacementModeManager.CurrentMode != PlacementMode.TrapSetting)
+        PlacementMode currentMode = PlacementModeManager.CurrentMode;
+
+        // Phát hiện khi vừa thoát khỏi TrapSetting mode → tự đóng panel
+        if (lastMode == PlacementMode.TrapSetting && currentMode != PlacementMode.TrapSetting)
+        {
+            settingPanelUI.Close();
+        }
+
+        lastMode = currentMode;
+
+        if (currentMode != PlacementMode.TrapSetting)
             return;
 
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())

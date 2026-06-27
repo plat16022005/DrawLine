@@ -12,6 +12,9 @@ public class TrapSettingPanelUI : MonoBehaviour
 
     public RotationCircleUI rotationCircleUI;
 
+    [Header("Config panel cho thuộc tính riêng của từng loại bẫy")]
+    public TrapConfigPanelUI trapConfigPanel;
+
     private Transform targetTrap;
 
     void Start()
@@ -24,6 +27,14 @@ public class TrapSettingPanelUI : MonoBehaviour
         targetTrap = trap;
         panel.SetActive(true);
         RefreshUI();
+
+        if (trapConfigPanel != null)
+        {
+            ITrapConfig config = trap != null
+                ? trap.GetComponentInChildren<ITrapConfig>(true)
+                : null;
+            trapConfigPanel.SetConfig(config);
+        }
     }
 
     void RefreshUI()
@@ -42,6 +53,10 @@ public class TrapSettingPanelUI : MonoBehaviour
     public void Confirm()
     {
         if (targetTrap == null) return;
+
+        // Ghi giá trị config riêng vào component trước
+        if (trapConfigPanel != null)
+            trapConfigPanel.Apply();
 
         Vector3 pos = targetTrap.position;
         Vector3 scale = targetTrap.localScale;
@@ -73,5 +88,8 @@ public class TrapSettingPanelUI : MonoBehaviour
     {
         targetTrap = null;
         panel.SetActive(false);
+
+        if (trapConfigPanel != null)
+            trapConfigPanel.SetConfig(null);
     }
 }

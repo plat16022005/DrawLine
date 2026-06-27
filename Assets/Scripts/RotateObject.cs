@@ -16,11 +16,28 @@ public class RotateObject : MonoBehaviour
 
     [Header("Trái phải")]
     public float TraiPhai = 1f;
+    private bool _initializedByLoader = false;
+
+    public void Init()
+    {
+        HammerConfig config = GetComponent<HammerConfig>();
+
+        rotationSpeed = config.rotationSpeed;
+        TraiPhai = config.traiphai;
+
+        // Lưu lại rotation hiện tại (đã được set bởi Instantiate) làm startRotation
+        startRotation = transform.eulerAngles;
+        _initializedByLoader = true;
+    }
 
     private void Start()
     {
-        // Đặt góc quay ban đầu
-        transform.eulerAngles = startRotation;
+        // Chỉ reset rotation nếu KHÔNG được khởi tạo từ FirebaseMapLoader
+        // (tránh ghi đè rotation đã set bởi Instantiate)
+        if (!_initializedByLoader)
+        {
+            transform.eulerAngles = startRotation;
+        }
     }
 
     private void Update()

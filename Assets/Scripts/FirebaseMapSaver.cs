@@ -17,6 +17,7 @@ public class FirebaseMapSaver : MonoBehaviour
     private FirebaseAuth auth;
     private bool firebaseReady = false;
     public Transform trapParent;
+    public SpawnPointEditor spawnPointEditor;
 
     async void Start()
     {
@@ -89,6 +90,14 @@ public async void SaveMap()
             scale.y,
             configJson
         ));
+    }
+
+    // Ghi vị trí spawn của các nhân vật
+    if (spawnPointEditor != null)
+    {
+        mapData.knightSpawn = spawnPointEditor.GetKnightSpawn();
+        mapData.demonSpawn = spawnPointEditor.GetDemonSpawn();
+        mapData.princessSpawn = spawnPointEditor.GetPrincessSpawn();
     }
 
     string json = JsonUtility.ToJson(mapData);

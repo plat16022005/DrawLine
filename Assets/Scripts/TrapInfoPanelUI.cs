@@ -12,7 +12,11 @@ public class TrapInfoPanelUI : MonoBehaviour
 
     public TMP_Text rotationText;
 
+    [Header("Config panel cho thuộc tính riêng của từng loại bẫy")]
+    public TrapConfigPanelUI trapConfigPanel;
+
     private Transform targetTrap;
+    private Transform lastConfigTarget; // cache tránh rebuild mỗi frame
     private bool isUpdatingUI = false;
 
     void Start()
@@ -27,6 +31,16 @@ public class TrapInfoPanelUI : MonoBehaviour
     public void SetTarget(Transform target)
     {
         targetTrap = target;
+
+        // Chỉ rebuild khi target thực sự thay đổi — tránh destroy/recreate InputField mỗi frame
+        if (trapConfigPanel != null && target != lastConfigTarget)
+        {
+            lastConfigTarget = target;
+            ITrapConfig config = target != null
+                ? target.GetComponentInChildren<ITrapConfig>(true) // true = include disabled
+                : null;
+            trapConfigPanel.SetConfig(config);
+        }
     }
 
     public void Show(Vector3 position, float rotationZ, Vector3 scale)
@@ -68,5 +82,11 @@ public class TrapInfoPanelUI : MonoBehaviour
     {
         panel.SetActive(false);
         targetTrap = null;
+        lastConfigTarget = null;
+
+        // Luôn ẩn TrapConfigPanel khi InfoPanel ẩn
+        // TrapSettingPanelUI sẽ tự hiện lại sau đó (trong LateUpdate) nếu đang mở trap cụ thể
+        if (trapConfigPanel != null)
+            trapConfigPanel.SetConfig(null);
     }
 }

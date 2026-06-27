@@ -43,12 +43,48 @@ public class TrapMoveController : MonoBehaviour
     {
         Vector3 mousePos = GetMouseWorldPos();
 
+        // 1. Ưu tiên kiểm tra xem có click trúng Trap nào không (dùng Collider & Layer)
         Collider2D hit = Physics2D.OverlapPoint(mousePos, trapLayer);
 
         if (hit != null)
         {
             selectedTrap = hit.transform;
             offset = selectedTrap.position - mousePos;
+            return;
+        }
+
+        // 2. Nếu không trúng Trap, kiểm tra xem có click trúng Spawn Point marker không
+        // (Tìm marker gần nhất trong bán kính 1 đơn vị)
+        SpawnPointEditor spEditor = FindObjectOfType<SpawnPointEditor>();
+        if (spEditor != null)
+        {
+            Transform closest = null;
+            float minDist = 1.0f; // Bán kính click (world unit)
+
+            Transform[] markers = new Transform[] {
+                spEditor.GetKnightInstance()?.transform,
+                spEditor.GetDemonInstance()?.transform,
+                spEditor.GetPrincessInstance()?.transform
+            };
+
+            foreach (Transform t in markers)
+            {
+                if (t != null && t.gameObject.activeSelf)
+                {
+                    float dist = Vector2.Distance(mousePos, t.position);
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        closest = t;
+                    }
+                }
+            }
+
+            if (closest != null)
+            {
+                selectedTrap = closest;
+                offset = selectedTrap.position - mousePos;
+            }
         }
     }
 

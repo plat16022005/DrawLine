@@ -147,7 +147,6 @@ MonoBehaviour:
   moveX: 0
   moveY: 0
   speed: 2
-  config: {fileID: 4826665298401581145}
 --- !u!114 &4826665298401581145
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -160,6 +159,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b1219c7fbddb594297383a24deb8fbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveX: 3
+  moveX: 0
   moveY: 0
-  speed: 2
+  speed: 0

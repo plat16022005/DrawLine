@@ -11,8 +11,18 @@ public class FirebaseMapLoader : MonoBehaviour
     public TrapDatabase trapDatabase;
     public Transform trapParent;
 
+    [Header("Nhân vật trong gameplay (tìm kiếm theo tên hoặc assign)")]
+    public Transform knightTransform;
+    public Transform demonTransform;
+    public Transform princessTransform;
+    public GameObject princessCagePrefab; // Prefab lồng cho công chúa
+
+    [Header("Editor spawn marker (chỉ dùng khi load vào map editor)")]
+    public SpawnPointEditor spawnPointEditor;
+
     private DatabaseReference dbRef;
     private bool firebaseReady = false;
+    private GameObject currentCage;
 
     async void Start()
     {
@@ -24,7 +34,7 @@ public class FirebaseMapLoader : MonoBehaviour
             firebaseReady = true;
             Debug.Log("Firebase Ready");
 
-            LoadMap("-OvzbwyVMcT1hYCm_BDT");
+            LoadMap("-Ow99XnVeAddnhlg7--g");
         }
         else
         {
@@ -99,15 +109,54 @@ public class FirebaseMapLoader : MonoBehaviour
                     config.FromJson(trapData.configJson);
                 }
                 MovingBlock movingBlock = trap.GetComponent<MovingBlock>();
+                RotateObject rotateObject = trap.GetComponent<RotateObject>();
+                BreakablePlatform breakablePlatform = trap.GetComponent<BreakablePlatform>();
 
                 if(movingBlock != null)
                 {
                     movingBlock.Init();
                 }
+                if (rotateObject != null)
+                {
+                    rotateObject.Init();
+                }
+                if (breakablePlatform != null)
+                {
+                    breakablePlatform.Init();
+                }
 
             }
 
             Debug.Log("Load map thành công: " + mapData.mapName);
+
+            // Teleport các nhân vật đến spawn position
+            if (knightTransform != null && mapData.knightSpawn != Vector2.zero)
+                knightTransform.position = new Vector3(mapData.knightSpawn.x, mapData.knightSpawn.y, 0);
+
+            if (demonTransform != null && mapData.demonSpawn != Vector2.zero)
+                demonTransform.position = new Vector3(mapData.demonSpawn.x, mapData.demonSpawn.y, 0);
+
+            if (princessTransform != null && mapData.princessSpawn != Vector2.zero)
+            {
+                princessTransform.position = new Vector3(mapData.princessSpawn.x, mapData.princessSpawn.y, 0);
+                
+                // Dọn lồng cũ nếu có (vì lồng mới không gán parent, tự quản lý)
+                if (currentCage != null) Destroy(currentCage);
+
+                // Tạo lồng bao quanh công chúa (tạo tự do, không gán parent)
+                if (princessCagePrefab != null)
+                {
+                    currentCage = Instantiate(princessCagePrefab, princessTransform.position, Quaternion.identity);
+                }
+            }
+
+            // Nếu đang trong map editor, load lại marker
+            if (spawnPointEditor != null)
+                spawnPointEditor.LoadSpawnPoints(
+                    mapData.knightSpawn,
+                    mapData.demonSpawn,
+                    mapData.princessSpawn
+                );
         }
         catch (System.Exception e)
         {
