@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -332,5 +333,60 @@ public class Line : MonoBehaviour
         {
             edgeCollider.enabled = false;
         }
+    }
+
+    // ─── Smart Draw ────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Thay thế toàn bộ tập điểm của đường bằng danh sách mới (sau khi SmartLineSmoother xử lý).
+    /// Tương tự RebuildFromPoints nhưng là public để SmartLineSmoother có thể gọi từ ngoài.
+    /// </summary>
+    public void RebuildWithPoints(List<Vector2> newPoints)
+    {
+        RebuildFromPoints(newPoints);
+    }
+
+    /// <summary>
+    /// Hiệu ứng flash trắng ngắn để báo hiệu smart snap đã xảy ra.
+    /// </summary>
+    public void PlaySnapFlash()
+    {
+        if (lineRenderer == null) return;
+        StartCoroutine(SnapFlashCoroutine());
+    }
+
+    private IEnumerator SnapFlashCoroutine()
+    {
+        if (lineRenderer == null || lineRenderer.material == null) yield break;
+
+        Color originalColor = lineRenderer.material.color;
+        Color flashColor    = Color.white;
+
+        // Flash lên trắng nhanh
+        float elapsed = 0f;
+        float flashIn  = 0.06f;
+        float flashOut = 0.18f;
+
+        while (elapsed < flashIn)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / flashIn;
+            lineRenderer.material.color = Color.Lerp(originalColor, flashColor, t);
+            yield return null;
+        }
+
+        lineRenderer.material.color = flashColor;
+
+        // Fade trở về màu gốc
+        elapsed = 0f;
+        while (elapsed < flashOut)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / flashOut;
+            lineRenderer.material.color = Color.Lerp(flashColor, originalColor, t);
+            yield return null;
+        }
+
+        lineRenderer.material.color = originalColor;
     }
 }

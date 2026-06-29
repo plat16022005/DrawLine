@@ -103,7 +103,9 @@
     <Compile Include="Assets\Scripts\StoryController.cs" />
     <Compile Include="Assets\Scripts\BreakablePlatformConfig.cs" />
     <Compile Include="Assets\Scripts\LevelManager.cs" />
+    <Compile Include="Assets\Scripts\GlobalWind.cs" />
     <Compile Include="Assets\Scripts\Level.cs" />
+    <Compile Include="Assets\Scripts\SmartLineSmoother.cs" />
     <Compile Include="Assets\Scripts\UIController.cs" />
     <Compile Include="Assets\Scripts\InkManager.cs" />
     <Compile Include="Assets\Scripts\Demon.cs" />
@@ -144,6 +146,7 @@
     <Compile Include="Assets\Scripts\TrapSettingPanelUI.cs" />
     <Compile Include="Assets\Scripts\Line.cs" />
     <Compile Include="Assets\TooCubeForest\demoScenes\Movement.cs" />
+    <Compile Include="Assets\Scripts\EraserController.cs" />
     <Compile Include="Assets\Scripts\TutorialTarget.cs" />
     <Compile Include="Assets\Scripts\RotateObject.cs" />
     <Compile Include="Assets\Scripts\Princess.cs" />

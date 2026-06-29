@@ -25,6 +25,24 @@ public class LineCreator : MonoBehaviour
     [Tooltip("Bán kính vùng tẩy trong World Space")]
     public float eraserRadius = 0.3f;
 
+    [Header("Smart Draw Settings")]
+    [Tooltip("Toggle UI điều khiển bật/tắt chế độ vẽ thông minh. Nếu không gán thì mặc định là BẬT.")]
+    public Toggle smartDrawToggle;
+    [Tooltip("Số điểm tối thiểu mới xử lý smart draw")]
+    public int smartMinPoints = 5;
+    [Tooltip("Ngưỡng sai số tuyến tính (0=thẳng tuyệt đối): nhỏ hơn ngưỡng này ⇒ cước là đường thẳng")]
+    [Range(0.02f, 0.25f)]
+    public float smartStraightThreshold = 0.08f;
+    [Tooltip("Tỷ lệ width/height tối thiểu để snap vào trục ngang hoặc dọc")]
+    [Range(1.5f, 10f)]
+    public float smartAxisSnapRatio = 3.0f;
+    [Tooltip("Số điểm output khi resample đường cong")]
+    [Range(10, 80)]
+    public int smartCurveResolution = 40;
+    [Tooltip("Số điểm control khi fit spline (càng ít → càng mịn, càng nhữu → càng sát nét gốc)")]
+    [Range(4, 20)]
+    public int smartCurveControlPoints = 8;
+
     void Start()
     {
         SelectNormalPen();
@@ -190,6 +208,41 @@ public class LineCreator : MonoBehaviour
             // Không cần check UI ở đây nữa, vì nếu chạm UI từ đầu, activeLine đã là null
             if (activeLine != null)
             {
+                // ─── SMART DRAW ─────────────────────────────────────────────
+                bool smartDrawEnabled = smartDrawToggle == null || smartDrawToggle.isOn;
+                if (smartDrawEnabled && activeLine.Points.Count >= smartMinPoints)
+                {
+                    // Truyền tham số từ Inspector vào utility class
+                    SmartLineSmoother.StraightLineThreshold = smartStraightThreshold;
+                    SmartLineSmoother.AxisSnapRatio         = smartAxisSnapRatio;
+                    SmartLineSmoother.CurveResolution       = smartCurveResolution;
+                    SmartLineSmoother.CurveControlPoints    = smartCurveControlPoints;
+                    SmartLineSmoother.MinPointsToSmooth     = smartMinPoints;
+
+                    // Nhận dạng hình dạng
+                    SmartLineSmoother.ShapeType shape = SmartLineSmoother.Recognize(activeLine.Points);
+
+                    // Lưu độ dài cũ trước khi smooth
+                    float oldLength = SmartLineSmoother.ComputeLength(activeLine.Points);
+
+                    // Sinh tập điểm mới đã smooth
+                    System.Collections.Generic.List<Vector2> smoothedPoints =
+                        SmartLineSmoother.Smooth(activeLine.Points, shape);
+
+                    // Rebuild đường với điểm mới
+                    activeLine.RebuildWithPoints(smoothedPoints);
+
+                    // Hoàn lại mực nếu đường sau snap ngắn hơn đường thô
+                    float newLength = SmartLineSmoother.ComputeLength(smoothedPoints);
+                    float refund    = oldLength - newLength;
+                    if (refund > 0f && InkManager.Instance != null)
+                        InkManager.Instance.RefundInk(refund);
+
+                    // Visual feedback: flash trắng báo hiệu snap
+                    activeLine.PlaySnapFlash();
+                }
+                // ─────────────────────────────────────────────────────
+
                 if (UndoRedoManager.Instance != null) UndoRedoManager.Instance.SaveState();
             }
             activeLine = null;

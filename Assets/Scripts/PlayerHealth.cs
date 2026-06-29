@@ -26,6 +26,11 @@ public class PlayerHealth : MonoBehaviour
 
     void Start()
     {
+        // Tự động tính toán điểm chết dựa trên vị trí và kích thước Camera lúc đầu + 1 đơn vị
+        if (Camera.main != null)
+        {
+            deathY = Camera.main.transform.position.y - Camera.main.orthographicSize - 1f;
+        }
         ResetHealth();
     }
     void Update()

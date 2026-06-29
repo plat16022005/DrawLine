@@ -162,6 +162,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
-  fallDamageThreshold: 10
-  damageMultiplier: 2
+  fallDamageThreshold: 3
+  damageMultiplier: 5
   deathY: -7
