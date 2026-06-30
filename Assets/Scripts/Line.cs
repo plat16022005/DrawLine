@@ -131,6 +131,34 @@ public class Line : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Giữ nguyên màu sắc của đường nhưng loại bỏ hành vi đặc biệt.
+    /// Dùng khi thời tiết vô hiệu hóa loại đường này → trở thành đường thường về mặt vật lý.
+    /// </summary>
+    public void DowngradeToNormal()
+    {
+        // Xóa các component hành vi đặc biệt nếu có
+        Destroy(GetComponent<SlowDownBehavior>());
+        Destroy(GetComponent<SpeedBoostBehavior>());
+        Destroy(GetComponent<ConstantSpeedBehavior>());
+        Destroy(GetComponent<RubberBehavior>());
+
+        // Reset physics material về bình thường (không nảy, ma sát vừa)
+        PhysicsMaterial2D normalMaterial = new PhysicsMaterial2D("WeatherNormal");
+        normalMaterial.bounciness = 0.0f;
+        normalMaterial.friction   = 0.4f;
+        if (edgeCollider != null)
+            edgeCollider.sharedMaterial = normalMaterial;
+
+        // Gán layer Ground (Bouncy bị skip trước đó nên cần gán lại ở đây)
+        int groundLayer = LayerMask.NameToLayer("Ground");
+        if (groundLayer != -1)
+            gameObject.layer = groundLayer;
+
+        // Cập nhật type để các hệ thống khác biết đây là đường thường
+        myType = LineType.Normal;
+    }
+
     // Hàm này được dùng nội bộ để tái tạo đường từ một danh sách điểm có sẵn
     // (dùng khi tách các mảnh sau khi bị tẩy)
     public void InitializeFromPoints(List<Vector2> existingPoints, LineType lineType)

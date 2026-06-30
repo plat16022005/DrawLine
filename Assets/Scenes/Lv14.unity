@@ -1661,6 +1661,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1831639145}
     m_Modifications:
+    - target: {fileID: 1519111906540043272, guid: 92c886f702095b548a874852f01303c2, type: 3}
+      propertyPath: initialWeather
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 4728319239680238777, guid: 92c886f702095b548a874852f01303c2, type: 3}
       propertyPath: m_LocalScale.x
       value: 2.298142

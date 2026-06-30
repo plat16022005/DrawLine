@@ -42,7 +42,7 @@ ParticleSystem:
   m_GameObject: {fileID: 4935898434548716793}
   serializedVersion: 8
   lengthInSec: 5
-  simulationSpeed: 1
+  simulationSpeed: 0.1
   stopAction: 0
   cullingMode: 0
   ringBufferMode: 0
@@ -4839,13 +4839,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 453710263530506679}
+  - component: {fileID: 4094739501947881672}
   m_Layer: 0
   m_Name: Wind
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &453710263530506679
 Transform:
   m_ObjectHideFlags: 0
@@ -4862,3 +4863,18 @@ Transform:
   - {fileID: 6882890559144130761}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4094739501947881672
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7535514990485676677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e165bfbd79d7ff7468d2d2dd5d3b2624, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  windForce: 0
+  windAngle: 0
+  windParticleSystem: {fileID: 3405340450171331349}

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -14,6 +15,19 @@ public class LineCreator : MonoBehaviour
     public Image CurrentColor;
     public Image CurrentTool;
     public Sprite[] Tools;
+
+    [Header("Weather – Pen Buttons")]
+    [Tooltip("Button của bút Nảy (Bouncy) – bị khóa khi Tuyết")]
+    public Button bouncyPenButton;
+    [Tooltip("Button của bút Cao Su (Rubber) – (tự đứt khi Nắng Gắt, không bị khóa)")]
+    public Button rubberPenButton;
+    [Tooltip("Button của bút Tăng Tốc (SpeedBoost) – bị khóa khi Bão Cát")]
+    public Button speedBoostPenButton;
+    [Tooltip("Button của bút Làm Chậm (SlowDown) – bị khóa khi Mưa")]
+    public Button slowDownPenButton;
+
+    // Alpha khi nút bị vô hiệu hóa do thời tiết
+    private const float DisabledAlpha = 0.35f;
 
     [Header("Cursor Settings")]
     public Texture2D pencilCursor;
@@ -201,6 +215,13 @@ public class LineCreator : MonoBehaviour
             GameObject lineGO = new GameObject("Drawn Line");
             activeLine = lineGO.AddComponent<Line>();
             activeLine.Initialize(currentLineType);
+
+            // Nếu loại đường bị thời tiết vô hiệu hóa → giữ màu nhưng hành xử như đường thường
+            if (WeatherManager.DisabledLineType.HasValue &&
+                currentLineType == WeatherManager.DisabledLineType.Value)
+            {
+                activeLine.DowngradeToNormal();
+            }
         }
 
         if (Input.GetMouseButtonUp(0))
@@ -289,5 +310,65 @@ public class LineCreator : MonoBehaviour
 
         // PC/Editor
         return EventSystem.current.IsPointerOverGameObject();
+    }
+
+    // ─── Weather Integration ──────────────────────────────────────────────────
+
+    /// <summary>
+    /// Được WeatherManager gọi khi thời tiết thay đổi.
+    /// Cập nhật trạng thái interactable và alpha của các nút bút bị cấm.
+    /// </summary>
+    public void RefreshDisabledState()
+    {
+        LineType? disabled = WeatherManager.DisabledLineType;
+
+        SetButtonState(bouncyPenButton,     disabled != LineType.Bouncy);
+        SetButtonState(slowDownPenButton,   disabled != LineType.SlowDown);
+        SetButtonState(speedBoostPenButton, disabled != LineType.SpeedBoost);
+        // Rubber không bị khóa hoàn toàn (chỉ tự đứt khi Nắng Gắt), nút vẫn bật
+        SetButtonState(rubberPenButton, true);
+    }
+
+    private void SetButtonState(Button btn, bool isNormal)
+    {
+        if (btn == null) return;
+        // Nút vẫn luôn nhấn được — chỉ làm mờ để báo hiệu bút bị ảnh hưởng bởi thời tiết
+        btn.interactable = true;
+
+        CanvasGroup cg = btn.GetComponent<CanvasGroup>();
+        if (cg == null) cg = btn.gameObject.AddComponent<CanvasGroup>();
+        cg.alpha = isNormal ? 1f : DisabledAlpha;
+    }
+
+    /// <summary>Rung nút bị khóa một chút để phản hồi người dùng.</summary>
+    private void ShakeDisabledButton(LineType type)
+    {
+        Button target = type switch
+        {
+            LineType.Bouncy     => bouncyPenButton,
+            LineType.SlowDown   => slowDownPenButton,
+            LineType.SpeedBoost => speedBoostPenButton,
+            LineType.Rubber     => rubberPenButton,
+            _                   => null
+        };
+        if (target != null)
+            StartCoroutine(ShakeRoutine(target.transform as RectTransform));
+    }
+
+    private IEnumerator ShakeRoutine(RectTransform rt)
+    {
+        if (rt == null) yield break;
+        Vector2 originalPos = rt.anchoredPosition;
+        float duration = 0.3f;
+        float elapsed  = 0f;
+        float magnitude = 6f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float x = Mathf.Sin(elapsed * 60f) * magnitude * (1f - elapsed / duration);
+            rt.anchoredPosition = originalPos + new Vector2(x, 0f);
+            yield return null;
+        }
+        rt.anchoredPosition = originalPos;
     }
 }

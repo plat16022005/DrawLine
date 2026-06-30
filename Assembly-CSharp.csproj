@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\TrapDatabase.cs" />
     <Compile Include="Assets\Scripts\BreakablePlatform.cs" />
     <Compile Include="Assets\Firebase\FirebaseApp\Internal\FirebaseInterops.cs" />
+    <Compile Include="Assets\Scripts\WeatherIconUI.cs" />
     <Compile Include="Assets\Scripts\TrapData.cs" />
     <Compile Include="Assets\Scripts\ITrapConfig.cs" />
     <Compile Include="Assets\Scripts\RubberBehavior.cs" />
@@ -95,6 +96,8 @@
     <Compile Include="Assets\Scripts\TileDatabase.cs" />
     <Compile Include="Assets\Scripts\SpawnPointEditor.cs" />
     <Compile Include="Assets\Scripts\WebGLZoomBridge.cs" />
+    <Compile Include="Assets\Scripts\WeatherManager.cs" />
+    <Compile Include="Assets\Scripts\WindUIDisplay.cs" />
     <Compile Include="Assets\Scripts\TileOption.cs" />
     <Compile Include="Assets\Scripts\TrapMoveController.cs" />
     <Compile Include="Assets\Scripts\RotationCircleUI.cs" />
@@ -141,6 +144,7 @@
     <Compile Include="Assets\Scripts\TrapConfigPanelUI.cs" />
     <Compile Include="Assets\Scripts\TrapOption.cs" />
     <Compile Include="Assets\Scripts\CameraController.cs" />
+    <Compile Include="Assets\Scripts\TooltipUI.cs" />
     <Compile Include="Assets\Scripts\SpeedBoostBehavior.cs" />
     <Compile Include="Assets\Scripts\FirebaseMapLoader.cs" />
     <Compile Include="Assets\Scripts\TrapSettingPanelUI.cs" />
@@ -151,6 +155,7 @@
     <Compile Include="Assets\Scripts\RotateObject.cs" />
     <Compile Include="Assets\Scripts\Princess.cs" />
     <Compile Include="Assets\Scripts\MovingBlockConfig.cs" />
+    <Compile Include="Assets\Scripts\TooltipTrigger.cs" />
     <Compile Include="Assets\Scripts\SessionManager.cs" />
     <Compile Include="Assets\Scripts\UIButtonSfx.cs" />
   </ItemGroup>

@@ -131,6 +131,13 @@ public class RubberBehavior : MonoBehaviour
 
             prevRb = rb;
         }
+
+        // ─── Nắng Gắt: dây tự đứt sau 1 giây kể từ khi tạo ra ──────────────
+        if (WeatherManager.CurrentWeather == WeatherType.HarshSun && !isBreaking)
+        {
+            isBreaking = true;
+            StartCoroutine(BreakAfterDelay(1f));
+        }
     }
 
     public void OnNodeHitBall()

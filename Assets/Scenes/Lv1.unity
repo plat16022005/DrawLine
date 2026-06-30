@@ -782,6 +782,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2002878624}
     m_Modifications:
+    - target: {fileID: 228360529517366568, guid: 92c886f702095b548a874852f01303c2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1519111906540043272, guid: 92c886f702095b548a874852f01303c2, type: 3}
+      propertyPath: initialWeather
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4728319239680238777, guid: 92c886f702095b548a874852f01303c2, type: 3}
       propertyPath: m_LocalScale.x
       value: 2.2855453
@@ -829,6 +837,14 @@ PrefabInstance:
     - target: {fileID: 4728319239680238777, guid: 92c886f702095b548a874852f01303c2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4970559315286346936, guid: 92c886f702095b548a874852f01303c2, type: 3}
+      propertyPath: simulationSpeed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6011080258835507045, guid: 92c886f702095b548a874852f01303c2, type: 3}
+      propertyPath: windForce
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 9084965234490840360, guid: 92c886f702095b548a874852f01303c2, type: 3}
       propertyPath: m_Name
