@@ -16,4 +16,12 @@ public class MapData
     public Vector2 knightSpawn;
     public Vector2 demonSpawn;
     public Vector2 princessSpawn;
+
+    // Cấu hình map
+    public float cameraLens = 5f;
+    public float inkCostPerUnit = 30f;
+    public int weatherType = 0;
+    public bool enableWind = false;
+    public float windForce = 15f;
+    public float windAngle = 180f;
 }

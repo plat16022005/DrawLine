@@ -155,11 +155,13 @@ MonoBehaviour:
   tileDatabase: {fileID: 11400000, guid: ee22c7f55324b1345b27c1136dc5c5a6, type: 2}
   trapDatabase: {fileID: 11400000, guid: 5d774cb2754a0cc4fbcfb0f0200b94f5, type: 2}
   trapParent: {fileID: 1234284607}
+  globalWind: {fileID: 1115471597}
   knightTransform: {fileID: 1830561466939408654, guid: 0820ec167e75d6243b6fd729b2930c1e, type: 3}
   demonTransform: {fileID: 4934447179007031525, guid: 7d1b6db2ee3cf934b8916dce58225d60, type: 3}
   princessTransform: {fileID: 6302144294866098494, guid: 211ca19726f362f4a935fcfc082fd514, type: 3}
   princessCagePrefab: {fileID: 3711766105991835199, guid: a95464a2d3727c948aa46ea70136601b, type: 3}
   spawnPointEditor: {fileID: 1035873792}
+  mapSettingsUI: {fileID: 0}
 --- !u!4 &26938367
 Transform:
   m_ObjectHideFlags: 0
@@ -438,6 +440,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1115471597 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6011080258835507045, guid: 92c886f702095b548a874852f01303c2, type: 3}
+  m_PrefabInstance: {fileID: 641058320}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e165bfbd79d7ff7468d2d2dd5d3b2624, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1119714411 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4728319239680238777, guid: 92c886f702095b548a874852f01303c2, type: 3}

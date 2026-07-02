@@ -5577,7 +5577,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 228360529517366568, guid: 92c886f702095b548a874852f01303c2, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1519111906540043272, guid: 92c886f702095b548a874852f01303c2, type: 3}
       propertyPath: initialWeather
@@ -5632,8 +5632,28 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4970559315286346936, guid: 92c886f702095b548a874852f01303c2, type: 3}
+      propertyPath: simulationSpeed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4970559315286346936, guid: 92c886f702095b548a874852f01303c2, type: 3}
       propertyPath: ShapeModule.m_Scale.x
       value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 6011080258835507045, guid: 92c886f702095b548a874852f01303c2, type: 3}
+      propertyPath: windAngle
+      value: 270
+      objectReference: {fileID: 0}
+    - target: {fileID: 6011080258835507045, guid: 92c886f702095b548a874852f01303c2, type: 3}
+      propertyPath: windForce
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922725994814940698, guid: 92c886f702095b548a874852f01303c2, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922725994814940698, guid: 92c886f702095b548a874852f01303c2, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 9084965234490840360, guid: 92c886f702095b548a874852f01303c2, type: 3}
       propertyPath: m_Name

@@ -1,5 +1,7 @@
+#if !UNITY_WEBGL || UNITY_EDITOR
 using Firebase;
 using Firebase.Database;
+#endif
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -10,6 +12,7 @@ public class FirebaseMapLoader : MonoBehaviour
 
     public TrapDatabase trapDatabase;
     public Transform trapParent;
+    public GlobalWind globalWind; // Assign in Inspector
 
     [Header("Nhân vật trong gameplay (tìm kiếm theo tên hoặc assign)")]
     public Transform knightTransform;
@@ -19,13 +22,17 @@ public class FirebaseMapLoader : MonoBehaviour
 
     [Header("Editor spawn marker (chỉ dùng khi load vào map editor)")]
     public SpawnPointEditor spawnPointEditor;
+    public MapSettingsPanelUI mapSettingsUI;
 
+#if !UNITY_WEBGL || UNITY_EDITOR
     private DatabaseReference dbRef;
+#endif
     private bool firebaseReady = false;
     private GameObject currentCage;
 
     async void Start()
     {
+#if !UNITY_WEBGL || UNITY_EDITOR
         var result = await FirebaseApp.CheckAndFixDependenciesAsync();
 
         if (result == DependencyStatus.Available)
@@ -34,16 +41,18 @@ public class FirebaseMapLoader : MonoBehaviour
             firebaseReady = true;
             Debug.Log("Firebase Ready");
 
-            LoadMap("-Ow99XnVeAddnhlg7--g");
+            LoadMap("-OwZAwjVfUEh8Yefi_mf");
         }
         else
         {
             Debug.LogError("Firebase lỗi dependency: " + result);
         }
+#endif
     }
 
     public async void LoadMap(string mapId)
     {
+#if !UNITY_WEBGL || UNITY_EDITOR
         if (!firebaseReady)
         {
             Debug.LogError("Firebase chưa khởi tạo xong");
@@ -64,7 +73,23 @@ public class FirebaseMapLoader : MonoBehaviour
             Debug.Log("Map JSON: " + json);
 
             MapData mapData = JsonUtility.FromJson<MapData>(json);
+            LoadMapFromData(mapData);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Load map thất bại: " + e);
+        }
+#else
+        Debug.LogWarning("LoadMap by ID is not supported natively on WebGL. Use FirebaseJSBridge.");
+#endif
+    }
 
+    public void LoadMapFromData(MapData mapData)
+    {
+        if (mapData == null) return;
+
+        try
+        {
             tilemap.ClearAllTiles();
             ClearOldTraps();
 
@@ -103,7 +128,6 @@ public class FirebaseMapLoader : MonoBehaviour
                 );
 
                 ITrapConfig config = trap.GetComponent<ITrapConfig>();
-                Debug.Log(trapData.configJson);
                 if (config != null && !string.IsNullOrEmpty(trapData.configJson))
                 {
                     config.FromJson(trapData.configJson);
@@ -157,10 +181,49 @@ public class FirebaseMapLoader : MonoBehaviour
                     mapData.demonSpawn,
                     mapData.princessSpawn
                 );
+                
+            // Apply Map Settings
+            if (mapData.cameraLens > 0)
+            {
+                if (Camera.main != null)
+                {
+                    Camera.main.orthographicSize = mapData.cameraLens;
+                    CameraController camCtrl = Camera.main.GetComponent<CameraController>();
+                    if (camCtrl != null)
+                    {
+                        camCtrl.UpdateOriginalZoom(mapData.cameraLens);
+                    }
+                }
+            }
+
+            if (mapData.inkCostPerUnit > 0 && InkManager.Instance != null)
+            {
+                InkManager.Instance.inkCostPerUnit = mapData.inkCostPerUnit;
+            }
+
+            if (WeatherManager.Instance != null)
+            {
+                WeatherManager.Instance.SetWeather((WeatherType)mapData.weatherType);
+            }
+
+            if (globalWind != null)
+            {
+                globalWind.gameObject.SetActive(mapData.enableWind);
+                if (mapData.enableWind)
+                {
+                    globalWind.ApplySettings(mapData.windForce, mapData.windAngle);
+                }
+            }
+
+            // Sync settings to UI if in Map Editor
+            if (mapSettingsUI != null)
+            {
+                mapSettingsUI.LoadFromData(mapData);
+            }
         }
         catch (System.Exception e)
         {
-            Debug.LogError("Load map thất bại: " + e);
+            Debug.LogError("Quá trình Load Map Data thất bại: " + e);
         }
     }
 

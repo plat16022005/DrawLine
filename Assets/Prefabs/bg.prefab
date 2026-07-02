@@ -223,6 +223,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7211372330199677387, guid: 127b25bb703df24439272b14cff0f34c, type: 3}
+      propertyPath: scalingMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7211372330199677387, guid: 127b25bb703df24439272b14cff0f34c, type: 3}
+      propertyPath: ShapeModule.m_Scale.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7211372330199677387, guid: 127b25bb703df24439272b14cff0f34c, type: 3}
       propertyPath: InitialModule.startSize.scalar
       value: 1
       objectReference: {fileID: 0}
@@ -255,6 +263,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 813556920291948754, guid: 3b7e0d8b0d00c3240bb44cb7da06c7ef, type: 3}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5520252440168069442, guid: 3b7e0d8b0d00c3240bb44cb7da06c7ef, type: 3}
+      propertyPath: scalingMode
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7318969882658673632, guid: 3b7e0d8b0d00c3240bb44cb7da06c7ef, type: 3}
@@ -368,6 +380,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3405340450171331349, guid: 1849839161d84d24eae279f82f93d41d, type: 3}
+      propertyPath: scalingMode
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7535514990485676677, guid: 1849839161d84d24eae279f82f93d41d, type: 3}
       propertyPath: m_Name
       value: Wind
@@ -429,6 +445,14 @@ PrefabInstance:
     - target: {fileID: 1525673338723501184, guid: 76f3d308158c9234194611ee259a1928, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5280641191643676606, guid: 76f3d308158c9234194611ee259a1928, type: 3}
+      propertyPath: scalingMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5280641191643676606, guid: 76f3d308158c9234194611ee259a1928, type: 3}
+      propertyPath: ShapeModule.m_Scale.x
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5280641191643676606, guid: 76f3d308158c9234194611ee259a1928, type: 3}
       propertyPath: InitialModule.startColor.maxColor.b

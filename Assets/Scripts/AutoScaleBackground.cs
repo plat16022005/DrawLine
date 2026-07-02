@@ -7,7 +7,7 @@ using UnityEngine;
 /// </summary>
 public class AutoScaleBackground : MonoBehaviour
 {
-    private void Start()
+    private void LateUpdate()
     {
         ScaleBackground();
     }

@@ -119,4 +119,13 @@ public class CameraController : MonoBehaviour
             target = playerObj.transform;
         }
     }
+
+    public void UpdateOriginalZoom(float newZoom)
+    {
+        originalZoom = newZoom;
+        if (targetCamera != null && !isFollowing)
+        {
+            targetCamera.orthographicSize = newZoom;
+        }
+    }
 }

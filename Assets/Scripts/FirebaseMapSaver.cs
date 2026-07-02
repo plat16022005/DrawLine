@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+#if !UNITY_WEBGL || UNITY_EDITOR
 using Firebase;
 using Firebase.Auth;
 using Firebase.Database;
+#endif
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -13,14 +15,18 @@ public class FirebaseMapSaver : MonoBehaviour
     public int width = 20;
     public int height = 12;
 
+#if !UNITY_WEBGL || UNITY_EDITOR
     private DatabaseReference dbRef;
     private FirebaseAuth auth;
+#endif
     private bool firebaseReady = false;
     public Transform trapParent;
     public SpawnPointEditor spawnPointEditor;
+    public MapSettingsPanelUI mapSettingsUI;
 
     async void Start()
     {
+#if !UNITY_WEBGL || UNITY_EDITOR
         var result = await FirebaseApp.CheckAndFixDependenciesAsync();
 
         if (result == DependencyStatus.Available)
@@ -35,20 +41,38 @@ public class FirebaseMapSaver : MonoBehaviour
         {
             Debug.LogError("Firebase lỗi dependency: " + result);
         }
+#endif
     }
 
 public async void SaveMap()
 {
-    if (!firebaseReady)
-    {
-        Debug.LogError("Firebase chưa khởi tạo xong");
-        return;
-    }
-
     MapData mapData = new MapData();
     mapData.mapName = "Map 1";
     mapData.width = width;
     mapData.height = height;
+
+    if (mapSettingsUI != null)
+    {
+        mapData.cameraLens = mapSettingsUI.currentCameraLens;
+        mapData.inkCostPerUnit = mapSettingsUI.currentInkCostPerUnit;
+        mapData.weatherType = mapSettingsUI.currentWeatherType;
+        mapData.enableWind = mapSettingsUI.currentEnableWind;
+        mapData.windForce = mapSettingsUI.currentWindForce;
+        mapData.windAngle = mapSettingsUI.currentWindAngle;
+    }
+    else
+    {
+        // Fallback
+        if (Camera.main != null) mapData.cameraLens = Camera.main.orthographicSize;
+        if (InkManager.Instance != null) mapData.inkCostPerUnit = InkManager.Instance.inkCostPerUnit;
+        if (WeatherManager.Instance != null) mapData.weatherType = (int)WeatherManager.CurrentWeather;
+        GlobalWind wind = FindObjectOfType<GlobalWind>(true);
+        if (wind != null) {
+            mapData.enableWind = wind.gameObject.activeSelf;
+            mapData.windForce = wind.windForce;
+            mapData.windAngle = wind.windAngle;
+        }
+    }
 
     BoundsInt bounds = tilemap.cellBounds;
 
@@ -102,6 +126,13 @@ public async void SaveMap()
 
     string json = JsonUtility.ToJson(mapData);
 
+#if !UNITY_WEBGL || UNITY_EDITOR
+    if (!firebaseReady)
+    {
+        Debug.LogError("Firebase chưa khởi tạo xong");
+        return;
+    }
+
     string mapId = dbRef.Child("maps").Push().Key;
 
     try
@@ -115,6 +146,9 @@ public async void SaveMap()
     {
         Debug.LogError("Lưu map THẤT BẠI: " + e);
     }
+#else
+    Debug.Log("Map JSON (Firebase Native Upload Disabled on WebGL): \n" + json);
+#endif
 }
 
     string GetTileId(TileBase tile)

@@ -87,4 +87,12 @@ public class GlobalWind : MonoBehaviour
             }
         }
     }
+
+    public void ApplySettings(float force, float angle)
+    {
+        windForce = force;
+        windAngle = angle;
+        CalculateWindVector();
+        UpdateVisuals();
+    }
 }
