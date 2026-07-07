@@ -32,7 +32,7 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI Reward;
     public Button NextLevel;
 #if !UNITY_WEBGL || UNITY_EDITOR
-    private FirebaseUser user;
+    // user is fetched lazily in GetUserId() to avoid timing issues
 #endif
     [Header("Star Ink")]
     public Image Star1Ink;
@@ -44,6 +44,7 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI XHLevel;
     public TextMeshProUGUI NamePlayerLevel;
     public TextMeshProUGUI PointPlayerLevel;
+
     void Update()
     {
         if (InkManager.CurrentInk < 700)
@@ -99,14 +100,14 @@ public class UIManager : MonoBehaviour
             winPanel.SetActive(false);
         }
 #if !UNITY_WEBGL || UNITY_EDITOR
-        user = FirebaseAuth.DefaultInstance.CurrentUser;
+        // Firebase user is fetched lazily — no need to initialize here
 #endif
     }
 
     private string GetUserId()
     {
 #if !UNITY_WEBGL || UNITY_EDITOR
-        return user.UserId;
+        return FirebaseAuth.DefaultInstance.CurrentUser?.UserId ?? "";
 #else
         return FirebaseJSBridge.instance.GetCurrentUserId();
 #endif
@@ -188,12 +189,21 @@ public class UIManager : MonoBehaviour
         {
             star = 0;
         }
+        int value = Mathf.RoundToInt(InkManager.CurrentInk * PlayerHealth.currentHealth);
+
+        if (sceneName == "LVCustom" || sceneName == "LvMap")
+        {
+            // Do not save progress for test maps or community maps
+            OpenWinPanel(sceneName, star, value, 0);
+            return;
+        }
+
         Level foundLevel = DataGame.instance.levels
             .Find(l => l != null && l.level == sceneName);
 
         int index = DataGame.instance.levels
             .FindIndex(l => l != null && l.level == sceneName);
-        int value = Mathf.RoundToInt(InkManager.CurrentInk * PlayerHealth.currentHealth);
+        
         Level level = new Level(sceneName, DataGame.instance.users.name, star, value);
         string userId = GetUserId();
         if (foundLevel != null)
@@ -223,6 +233,7 @@ public class UIManager : MonoBehaviour
     void OpenWinPanel(string sceneName, int star, int point, int money)
     {
         winPanel.SetActive(true);
+        
         DataGame.instance.users.coin += money;
         MusicBackGround.Stop();
         SoundEffect.PlayOneShot(SoundClip[0]);
@@ -241,6 +252,7 @@ public class UIManager : MonoBehaviour
             Star3.color = Color.white;
         }
         Point.text = point.ToString();
+        if (SceneManager.GetActiveScene().name == "LVCustom" || SceneManager.GetActiveScene().name == "LvMap") return;
         Reward.text = "+" + money.ToString() + " vàng";
 
         string prefix = new string(sceneName.TakeWhile(c => !char.IsDigit(c)).ToArray());
@@ -292,5 +304,31 @@ public class UIManager : MonoBehaviour
             NamePlayerLevel.text = DataGame.instance.users.name;
             PointPlayerLevel.text = "0";                  
         }
+    }
+    public void BackToEditMap()
+    {
+        Time.timeScale = 1f;
+        GameController.isPlaying = false;
+
+        FirebaseMapLoader loader = FindObjectOfType<FirebaseMapLoader>();
+        if (loader != null && !string.IsNullOrEmpty(loader.currentMapId))
+        {
+            if (DataGame.instance != null)
+            {
+                DataGame.instance.currentEditMapId = loader.currentMapId;
+            }
+        }
+        else if (DataGame.instance != null && !string.IsNullOrEmpty(DataGame.instance.currentTestMapId))
+        {
+            // Fallback in case it wasn't cleared
+            DataGame.instance.currentEditMapId = DataGame.instance.currentTestMapId;
+        }
+        else if (PlayerPrefs.HasKey("TestMapId"))
+        {
+             if (DataGame.instance != null)
+                DataGame.instance.currentEditMapId = PlayerPrefs.GetString("TestMapId");
+        }
+
+        SceneManager.LoadScene("MakeMap");
     }
 }

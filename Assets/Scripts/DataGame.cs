@@ -26,6 +26,13 @@ public class DataGame : MonoBehaviour
     public List<Level> LvXRank;
     public bool Tutorial = false;
 
+    // Truyền ID map cần edit từ SelectLevel sang MakeMap
+    public string currentEditMapId = "";
+    // Truyền ID map cần test từ MakeMap sang LVCustom
+    public string currentTestMapId = "";
+    // Truyền ID map community cần chơi từ SelectLevel sang LvMap
+    public string currentCommunityMapId = "";
+
     private void Awake()
     {
         instance = this;

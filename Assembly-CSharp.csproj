@@ -136,6 +136,7 @@
     <Compile Include="Assets\Scripts\MovingBlockConfigData.cs" />
     <Compile Include="Assets\Scripts\MapEditor.cs" />
     <Compile Include="Assets\Scripts\AutoScaleBackground.cs" />
+    <Compile Include="Assets\Scripts\FirebaseInitializer.cs" />
     <Compile Include="Assets\Scripts\MainMenuAuthFlow.cs" />
     <Compile Include="Assets\Scripts\TutorialTargetRegistry.cs" />
     <Compile Include="Assets\Scripts\TutorialScenario.cs" />

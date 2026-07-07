@@ -12,6 +12,8 @@ public class TrapPlacementController : MonoBehaviour
     private GameObject previewObject;
     private float currentRotationZ = 0f;
     public RotationCircleUI rotationCircleUI;
+    
+    private GameObject lastSelectedTrapPrefab;
     void Start()
     {
         if (mainCamera == null)
@@ -33,10 +35,20 @@ public class TrapPlacementController : MonoBehaviour
             return;
         }
 
+        if (trapDropdownUI.selectedTrapPrefab != lastSelectedTrapPrefab)
+        {
+            lastSelectedTrapPrefab = trapDropdownUI.selectedTrapPrefab;
+            trapInfoPanelUI.isHiddenByUser = false;
+        }
+
         UpdatePreviewPosition();
         currentRotationZ = rotationCircleUI.Angle;
         previewObject.transform.rotation = Quaternion.Euler(0, 0, currentRotationZ);
-        UpdateInfoPanel();
+        
+        if (!trapInfoPanelUI.isHiddenByUser)
+        {
+            UpdateInfoPanel();
+        }
 
         if (Input.GetMouseButtonDown(0))
         {

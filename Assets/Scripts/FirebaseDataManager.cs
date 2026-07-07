@@ -22,11 +22,18 @@ public class FirebaseDataManager : MonoBehaviour
     {
         instance = this;
         DontDestroyOnLoad(this);
-#if !UNITY_WEBGL || UNITY_EDITOR
-        FirebaseApp app = FirebaseApp.DefaultInstance;
-        reference = FirebaseDatabase.DefaultInstance.RootReference;
-#endif
     }
+
+#if !UNITY_WEBGL || UNITY_EDITOR
+    private async void Start()
+    {
+        var result = await FirebaseInitializer.EnsureInitializedAsync();
+        if (result == DependencyStatus.Available)
+            reference = FirebaseDatabase.DefaultInstance.RootReference;
+        else
+            Debug.LogError("[FirebaseDataManager] Firebase dependency lỗi: " + result);
+    }
+#endif
 
 #if !UNITY_WEBGL || UNITY_EDITOR
     public void WriteDatabase<T>(string child, string id, T data)

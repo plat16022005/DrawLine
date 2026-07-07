@@ -19,6 +19,9 @@ public class TrapInfoPanelUI : MonoBehaviour
     private Transform lastConfigTarget; // cache tránh rebuild mỗi frame
     private bool isUpdatingUI = false;
 
+    [HideInInspector]
+    public bool isHiddenByUser = false;
+
     void Start()
     {
         if (scaleXText != null)
@@ -86,6 +89,14 @@ public class TrapInfoPanelUI : MonoBehaviour
 
         // Luôn ẩn TrapConfigPanel khi InfoPanel ẩn
         // TrapSettingPanelUI sẽ tự hiện lại sau đó (trong LateUpdate) nếu đang mở trap cụ thể
+        if (trapConfigPanel != null)
+            trapConfigPanel.SetConfig(null);
+    }
+    public void Close()
+    {
+        panel.SetActive(false);
+        isHiddenByUser = true;
+
         if (trapConfigPanel != null)
             trapConfigPanel.SetConfig(null);
     }

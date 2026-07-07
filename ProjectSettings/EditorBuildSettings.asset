@@ -15,6 +15,12 @@ EditorBuildSettings:
     path: Assets/Scenes/SampleScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
+    path: Assets/Scenes/MakeMap.unity
+    guid: be62b540f78f91441af219266513a5f6
+  - enabled: 1
+    path: Assets/Scenes/LVCustom.unity
+    guid: d49bd99cc741b3549b793466b4d64182
+  - enabled: 1
     path: Assets/Scenes/Tutorial1.unity
     guid: 5082e4565d5613f4c9a3e2ef0566864f
   - enabled: 1
@@ -26,6 +32,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Tutorial4.unity
     guid: 1b9141c939987724ba339f6861179d93
+  - enabled: 1
+    path: Assets/Scenes/LvMap.unity
+    guid: f39027ee48ab1094b95674992402c967
   - enabled: 1
     path: Assets/Scenes/Lv1.unity
     guid: 14ed4aaff43c87943b30ab18e3198330

@@ -2,6 +2,20 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    public static CameraController Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
+    
     [Header("Target Settings")]
     [Tooltip("Kéo thả Player/Ball vào đây. Nếu để trống, script sẽ tự tìm object có tag 'Player' hoặc tên 'Ball'.")]
     public Transform target;
@@ -22,6 +36,10 @@ public class CameraController : MonoBehaviour
     // Original states
     private Vector3 originalPosition;
     private float originalZoom;
+    private Vector3 mapCenter; // Tâm gốc của map để giới hạn pan
+
+    // Pan state
+    private Vector3 dragOrigin;
 
     void Start()
     {
@@ -32,11 +50,17 @@ public class CameraController : MonoBehaviour
         {
             originalPosition = targetCamera.transform.position;
             originalZoom = targetCamera.orthographicSize;
+            mapCenter = targetCamera.transform.position;
         }
 
         FindTarget();
     }
-
+    public void LoadCamera(){
+        targetCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
+        originalPosition = targetCamera.transform.position;
+        originalZoom = targetCamera.orthographicSize;
+        mapCenter = targetCamera.transform.position;
+    }
     void LateUpdate()
     {
         if (targetCamera == null) return;
@@ -78,6 +102,69 @@ public class CameraController : MonoBehaviour
                 isReturning = false;
             }
         }
+        else
+        {
+            // Chỉ cho phép pan camera trong scene MakeMap (Edit Map)
+            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "MakeMap")
+            {
+                // Cho phép pan camera bằng chuột giữa (chỉ khi không follow/return)
+                if (Input.GetMouseButtonDown(2))
+            {
+                dragOrigin = targetCamera.ScreenToWorldPoint(Input.mousePosition);
+            }
+            else if (Input.GetMouseButton(2))
+            {
+                Vector3 difference = dragOrigin - targetCamera.ScreenToWorldPoint(Input.mousePosition);
+                // Giữ nguyên trục Z của camera
+                difference.z = 0; 
+                targetCamera.transform.position += difference;
+                
+                ClampCameraPosition();
+            }
+
+            // Hỗ trợ cảm ứng cho Mobile (PE) - Dùng 2 ngón tay để kéo thả, tránh trùng lấp với việc đặt bẫy/vẽ bằng 1 ngón
+            if (Input.touchCount == 2)
+            {
+                Touch t0 = Input.GetTouch(0);
+                Touch t1 = Input.GetTouch(1);
+
+                // Lấy điểm chính giữa 2 ngón tay
+                Vector2 midPoint = (t0.position + t1.position) / 2f;
+
+                if (t0.phase == TouchPhase.Began || t1.phase == TouchPhase.Began)
+                {
+                    dragOrigin = targetCamera.ScreenToWorldPoint(midPoint);
+                }
+                else if (t0.phase == TouchPhase.Moved || t1.phase == TouchPhase.Moved)
+                {
+                    Vector3 difference = dragOrigin - targetCamera.ScreenToWorldPoint(midPoint);
+                    difference.z = 0;
+                    targetCamera.transform.position += difference;
+                    
+                    ClampCameraPosition();
+                }
+            }
+        }
+    }
+}
+
+    private void ClampCameraPosition()
+    {
+        if (targetCamera == null || !targetCamera.orthographic) return;
+
+        float maxLens = 25f;
+        float currentLens = targetCamera.orthographicSize;
+        float aspect = targetCamera.aspect;
+        
+        // Tính khoảng cách tối đa camera được phép lệch khỏi mapCenter
+        float maxY = Mathf.Max(0, maxLens - currentLens);
+        float maxX = Mathf.Max(0, (maxLens - currentLens) * aspect);
+        
+        Vector3 pos = targetCamera.transform.position;
+        pos.x = Mathf.Clamp(pos.x, mapCenter.x - maxX, mapCenter.x + maxX);
+        pos.y = Mathf.Clamp(pos.y, mapCenter.y - maxY, mapCenter.y + maxY);
+        
+        targetCamera.transform.position = pos;
     }
 
     public void CancelReturn()

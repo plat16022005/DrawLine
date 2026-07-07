@@ -58,11 +58,17 @@ public class EraserController : MonoBehaviour
                 if (tilemap != null && hit.gameObject == tilemap.gameObject)
                     continue;
 
-                // Nếu click vào một trap, spawn point hoặc Line vẽ (nếu có collider)
-                if (hit.gameObject.CompareTag("Untagged") || hit.gameObject.CompareTag("Trap") || hit.gameObject.CompareTag("SpawnPoint"))
+                // Tránh lỗi CompareTag khi Tag chưa được tạo trong Unity
+                bool isTrap = hit.GetComponentInParent<TrapEditorObject>() != null;
+                bool isUntagged = false;
+                try { isUntagged = hit.gameObject.CompareTag("Untagged"); } catch { isUntagged = hit.gameObject.tag == "Untagged"; }
+                
+                // Tránh xóa nhầm các object quan trọng như Player, Demon, Princess (thường có component riêng hoặc tên cụ thể)
+                bool isCharacter = hit.name.Contains("Player") || hit.name.Contains("Demon") || hit.name.Contains("Princess") || hit.name.Contains("Knight");
+
+                if (!isCharacter && (isTrap || isUntagged))
                 {
-                    // Nếu là trap do TrapPlacementController sinh ra (nằm trong trapParent)
-                    // Hoặc spawn point, line
+                    // Nếu là trap hoặc object vô danh (vẽ nét, etc.)
                     Destroy(hit.gameObject);
                 }
             }

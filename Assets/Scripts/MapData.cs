@@ -2,10 +2,18 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum MapStatus
+{
+    Private,
+    Publish,
+    Maintenance
+}
+
 [System.Serializable]
 public class MapData
 {
     public string mapName;
+    public string status = "private"; // private | publish | maintenance
     // public string ownerId;
     public int width;
     public int height;
