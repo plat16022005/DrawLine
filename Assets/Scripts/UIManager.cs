@@ -44,7 +44,11 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI XHLevel;
     public TextMeshProUGUI NamePlayerLevel;
     public TextMeshProUGUI PointPlayerLevel;
-
+    [Header("Comment Panel")]
+    public GameObject PanelComment;
+    public TMP_InputField Comment;
+    public Button[] PointStar;
+    public int star;
     void Update()
     {
         if (InkManager.CurrentInk < 700)
@@ -168,7 +172,7 @@ public class UIManager : MonoBehaviour
 
         SetWinThisLv();
     }
-    void SetWinThisLv()
+    async void SetWinThisLv()
     {
         string sceneName = SceneManager.GetActiveScene().name;
         int star;
@@ -191,10 +195,40 @@ public class UIManager : MonoBehaviour
         }
         int value = Mathf.RoundToInt(InkManager.CurrentInk * PlayerHealth.currentHealth);
 
-        if (sceneName == "LVCustom" || sceneName == "LvMap")
+        if (sceneName == "LVCustom")
         {
-            // Do not save progress for test maps or community maps
+            // Do not save progress for test maps
             OpenWinPanel(sceneName, star, value, 0);
+            return;
+        }
+
+        if (sceneName == "LvMap")
+        {
+            string mapId = DataGame.instance.currentCommunityMapId;
+            Level mapLevel = new Level("LvMap", DataGame.instance.users.name, star, value);
+            string mapUserId = GetUserId();
+
+            Level prevScore = await DataGame.instance.GetMyCommunityMapScore(mapId);
+            
+            if (prevScore != null)
+            {
+                if (prevScore.point < mapLevel.point)
+                {
+                    FirebaseDataManager.instance.WriteDatabase("CommunityMapLeaderboard/" + mapId, mapUserId, mapLevel);
+                }
+            }
+            else
+            {
+                FirebaseDataManager.instance.WriteDatabase("CommunityMapLeaderboard/" + mapId, mapUserId, mapLevel);
+            }
+
+            OpenWinPanel(sceneName, star, value, 0);
+
+            bool isComment = await MapCommentManager.instance.HasMyComment(mapId);
+            if (!isComment)
+            {
+                PanelComment.SetActive(true);
+            }
             return;
         }
 
@@ -252,7 +286,14 @@ public class UIManager : MonoBehaviour
             Star3.color = Color.white;
         }
         Point.text = point.ToString();
-        if (SceneManager.GetActiveScene().name == "LVCustom" || SceneManager.GetActiveScene().name == "LvMap") return;
+        
+        if (SceneManager.GetActiveScene().name == "LVCustom") return;
+        
+        if (SceneManager.GetActiveScene().name == "LvMap") 
+        {
+            LoadCommunityMapRank(DataGame.instance.currentCommunityMapId);
+            return;
+        }
         Reward.text = "+" + money.ToString() + " vàng";
 
         string prefix = new string(sceneName.TakeWhile(c => !char.IsDigit(c)).ToArray());
@@ -305,6 +346,47 @@ public class UIManager : MonoBehaviour
             PointPlayerLevel.text = "0";                  
         }
     }
+
+    public async void LoadCommunityMapRank(string mapId)
+    {
+        foreach (Transform item in ContentLevelDetail)
+        {
+            Destroy(item.gameObject);
+        }
+        await DataGame.instance.LoadTop10CommunityMap(mapId);
+        int currentRantPlayer = 0;
+        if (DataGame.instance.CommunityMapRank != null)
+        {
+            foreach (Level level in DataGame.instance.CommunityMapRank)
+            {
+                currentRantPlayer++;
+                GameObject obj = Instantiate(LevelDetailPrefab, ContentLevelDetail);
+                TextMeshProUGUI XH = obj.transform.Find("XH")?.GetComponent<TextMeshProUGUI>();
+                TextMeshProUGUI Name = obj.transform.Find("Name")?.GetComponent<TextMeshProUGUI>();
+                TextMeshProUGUI Point = obj.transform.Find("Point")?.GetComponent<TextMeshProUGUI>();
+
+                XH.text = currentRantPlayer.ToString();
+                Name.text = level.namePlayer;
+                Point.text = level.point.ToString();
+            }
+        }
+        int myRank = await DataGame.instance.FindMyCommunityMapRank(mapId);
+        Level myLevel = await DataGame.instance.GetMyCommunityMapScore(mapId);
+        
+        if (myLevel != null)
+        {
+            XHLevel.text = myRank.ToString();
+            NamePlayerLevel.text = DataGame.instance.users.name;
+            PointPlayerLevel.text = myLevel.point.ToString();        
+        }
+        else
+        {
+            XHLevel.text = "???";
+            NamePlayerLevel.text = DataGame.instance.users.name;
+            PointPlayerLevel.text = "0";                  
+        }
+    }
+
     public void BackToEditMap()
     {
         Time.timeScale = 1f;
@@ -330,5 +412,23 @@ public class UIManager : MonoBehaviour
         }
 
         SceneManager.LoadScene("MakeMap");
+    }
+    public void SetPoint(int point)
+    {
+        star = point;
+        Debug.Log(star);
+        SetUIStar();
+    }
+void SetUIStar()
+{
+    for (int i = 0; i < PointStar.Length; i++)
+    {
+        PointStar[i].image.color = (i < star) ? Color.white : Color.black;
+    }
+}
+    public void ConfirmComment()
+    {
+        MapCommentManager.instance.SendComment(DataGame.instance.currentCommunityMapId, DataGame.instance.users.name, Comment.text, star);
+        PanelComment.SetActive(false);
     }
 }

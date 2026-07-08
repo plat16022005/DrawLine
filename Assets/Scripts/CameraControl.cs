@@ -81,6 +81,11 @@ public class CameraControl : MonoBehaviour
         // Tìm CameraController cũ để quản lý xung đột
         _legacyCameraController = FindObjectOfType<CameraController>();
     }
+    public void LoadCamera()
+    {
+        _maxOrthographicSize = _cam.orthographicSize;
+        CalculateInitialBounds();
+    }
 
     private void CalculateInitialBounds()
     {

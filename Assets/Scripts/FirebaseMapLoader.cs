@@ -121,6 +121,7 @@ public class FirebaseMapLoader : MonoBehaviour
             LoadMapFromData(mapData);
             LevelSceneManager.instance.LoadSkin();
             CameraController.Instance.LoadCamera();
+            CameraControl.Instance.LoadCamera();
         }
         catch (System.Exception e)
         {
@@ -165,6 +166,7 @@ public class FirebaseMapLoader : MonoBehaviour
             LoadMapFromData(mapData);
             LevelSceneManager.instance.LoadSkin();
             CameraController.Instance.LoadCamera();
+            CameraControl.Instance.LoadCamera();
         }
         catch (System.Exception e)
         {

@@ -24,6 +24,7 @@ public class DataGame : MonoBehaviour
     public List<TotalPoint> TotalPointRank;
     public List<CurrentLevel> LevelRank;
     public List<Level> LvXRank;
+    public List<Level> CommunityMapRank;
     public bool Tutorial = false;
 
     // Truyền ID map cần edit từ SelectLevel sang MakeMap
@@ -168,7 +169,49 @@ public class DataGame : MonoBehaviour
                 if (all[i].namePlayer == users.name) return i + 1;
             }
         }
+        }
         return -1;
+#endif
+    }
+
+    public async Task LoadTop10CommunityMap(string mapId) {
+#if !UNITY_WEBGL || UNITY_EDITOR
+        CommunityMapRank = await FirebaseDataManager.instance.GetTop10CommunityMap(mapId);
+#else
+        string json = GetCleanJson(await QueryDatabaseAsync("CommunityMapLeaderboard/" + mapId, "point", 10));
+        if (json != null) {
+            CommunityMapRank = JsonConvert.DeserializeObject<List<Level>>(json);
+            CommunityMapRank = CommunityMapRank.OrderByDescending(x => x.point).ToList();
+        }
+#endif
+    }
+
+    public async Task<int> FindMyCommunityMapRank(string mapId) {
+#if !UNITY_WEBGL || UNITY_EDITOR
+        return await FirebaseDataManager.instance.GetMyCommunityMapRank(mapId);
+#else
+        string json = GetCleanJson(await QueryDatabaseAsync("CommunityMapLeaderboard/" + mapId, "point", 0));
+        if (json != null) {
+            var all = JsonConvert.DeserializeObject<List<Level>>(json);
+            all = all.OrderByDescending(x => x.point).ToList();
+            for (int i = 0; i < all.Count; i++) {
+                if (all[i].namePlayer == users.name) return i + 1;
+            }
+        }
+        return -1;
+#endif
+    }
+
+    public async Task<Level> GetMyCommunityMapScore(string mapId) {
+#if !UNITY_WEBGL || UNITY_EDITOR
+        return await FirebaseDataManager.instance.GetMyCommunityMapScore(mapId);
+#else
+        string uid = FirebaseJSBridge.instance.GetCurrentUserId();
+        string json = GetCleanJson(await ReadDatabaseAsync("CommunityMapLeaderboard/" + mapId + "/" + uid));
+        if (json != null) {
+            return JsonConvert.DeserializeObject<Level>(json);
+        }
+        return null;
 #endif
     }
 

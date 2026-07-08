@@ -91,6 +91,16 @@ public class SelectLevelManager : MonoBehaviour
     public GameObject PanelDetailMapCommunity;
     public TextMeshProUGUI NameMapCommunity;
     public Button PlayNowCommunityButton;
+    public Transform ContentComment;
+    public GameObject CommentPrefabs;
+    public TextMeshProUGUI AveragePoint;
+
+    [Header("Panel Detail Map Community - Leaderboard")]
+    public Transform ContentCommunityMapRank;
+    public GameObject CommunityMapRankPrefab; // Có thể dùng lại LevelDetailPrefab
+    public TextMeshProUGUI XHCommunityMap;
+    public TextMeshProUGUI NamePlayerCommunityMap;
+    public TextMeshProUGUI PointPlayerCommunityMap;
 
     [Header("Tìm kiếm Map Community")]
     public TMP_InputField SearchMapNameInput;
@@ -919,8 +929,101 @@ public class SelectLevelManager : MonoBehaviour
                 SceneManager.LoadScene("LvMap");
             });
         }
+        Debug.Log("Load Comment");
+        LoadAllCommentThisMap(mapId);
+        LoadCommunityMapRank(mapId);
     }
 
+    public async void LoadCommunityMapRank(string mapId)
+    {
+        if (ContentCommunityMapRank == null) return;
+        
+        foreach (Transform item in ContentCommunityMapRank) Destroy(item.gameObject);
+        
+        await DataGame.instance.LoadTop10CommunityMap(mapId);
+        
+        int currentRantPlayer = 0;
+        if (DataGame.instance.CommunityMapRank != null)
+        {
+            foreach (Level level in DataGame.instance.CommunityMapRank)
+            {
+                currentRantPlayer++;
+                if (CommunityMapRankPrefab != null)
+                {
+                    GameObject obj = Instantiate(CommunityMapRankPrefab, ContentCommunityMapRank);
+                    TextMeshProUGUI XH = obj.transform.Find("XH")?.GetComponent<TextMeshProUGUI>();
+                    TextMeshProUGUI Name = obj.transform.Find("Name")?.GetComponent<TextMeshProUGUI>();
+                    TextMeshProUGUI Point = obj.transform.Find("Point")?.GetComponent<TextMeshProUGUI>();
+
+                    if (XH != null) XH.text = currentRantPlayer.ToString();
+                    if (Name != null) Name.text = level.namePlayer;
+                    if (Point != null) Point.text = level.point.ToString();
+                }
+            }
+        }
+        
+        int myRank = await DataGame.instance.FindMyCommunityMapRank(mapId);
+        Level myLevel = await DataGame.instance.GetMyCommunityMapScore(mapId);
+        
+        if (myLevel != null)
+        {
+            if (XHCommunityMap != null) XHCommunityMap.text = myRank.ToString();
+            if (NamePlayerCommunityMap != null) NamePlayerCommunityMap.text = DataGame.instance.users.name;
+            if (PointPlayerCommunityMap != null) PointPlayerCommunityMap.text = myLevel.point.ToString();        
+        }
+        else
+        {
+            if (XHCommunityMap != null) XHCommunityMap.text = "???";
+            if (NamePlayerCommunityMap != null) NamePlayerCommunityMap.text = DataGame.instance.users.name;
+            if (PointPlayerCommunityMap != null) PointPlayerCommunityMap.text = "0";                  
+        }
+    }
+    public float CalculateAveragePoint(List<CommentData> comments)
+    {
+        if (comments == null || comments.Count == 0)
+            return 0f;
+
+        int total = 0;
+
+        foreach (CommentData comment in comments)
+        {
+            total += comment.point;
+        }
+
+        return (float)total / comments.Count;
+    }
+    public async void LoadAllCommentThisMap(string mapId)
+    {
+        Debug.Log("Đang load");
+        foreach (Transform obj in ContentComment)
+        {
+            Destroy(obj.gameObject);
+        }
+        List<CommentData> comments = await MapCommentManager.instance.LoadComments(mapId);
+        AveragePoint.text = CalculateAveragePoint(comments).ToString();
+        foreach (CommentData comment in comments)
+        {
+            GameObject obj = Instantiate(CommentPrefabs, ContentComment);
+            Transform nguoinhanxet = obj.transform.Find("NguoiNhanXet");
+            if (nguoinhanxet != null)
+            {
+                TextMeshProUGUI TenNguoiNhanXet = nguoinhanxet.GetComponent<TextMeshProUGUI>();
+                TenNguoiNhanXet.text = comment.name;
+            }
+            Transform binhluan = obj.transform.Find("NhanXet");
+            if (binhluan != null)
+            {
+                TextMeshProUGUI BinhLuan = binhluan.GetComponent<TextMeshProUGUI>();
+                BinhLuan.text = comment.comment;
+            }
+            Transform diem = obj.transform.Find("Score/Diem");
+            if (diem != null)
+            {
+                TextMeshProUGUI Diem = diem.GetComponent<TextMeshProUGUI>();
+                Diem.text = comment.point.ToString();
+            }
+        }
+    }
     public void CloseCommunityMapDetail()
     {
         if (PanelDetailMapCommunity != null) PanelDetailMapCommunity.SetActive(false);

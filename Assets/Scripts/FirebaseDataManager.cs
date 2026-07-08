@@ -160,25 +160,67 @@ public class FirebaseDataManager : MonoBehaviour
             FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
             if (user == null) return -1;
             var allSnapshot = await reference.Child(levelName).OrderByChild("point").GetValueAsync();
-            List<Level> all = new List<Level>();
-            Level myData = null;
+            List<string> uids = new List<string>();
             foreach (var child in allSnapshot.Children) {
-                string json = child.GetRawJsonValue();
-                if (!string.IsNullOrEmpty(json)) {
-                    Level ld = JsonConvert.DeserializeObject<Level>(json);
-                    if (ld != null) {
-                        all.Add(ld);
-                        if (child.Key == user.UserId) myData = ld;
-                    }
-                }
+                uids.Add(child.Key);
             }
-            if (myData == null) return -1;
-            all.Sort((a, b) => b.point.CompareTo(a.point));
-            for (int i = 0; i < all.Count; i++) {
-                if (all[i].namePlayer == myData.namePlayer && all[i].point == myData.point) return i + 1;
+            uids.Reverse(); // Sắp xếp giảm dần theo điểm, giữ nguyên thứ tự UID của Firebase
+            for (int i = 0; i < uids.Count; i++) {
+                if (uids[i] == user.UserId) return i + 1;
             }
         } catch (Exception ex) { Debug.LogError("Lỗi lấy rank: " + ex.Message); }
         return -1;
+    }
+
+    public async Task<List<Level>> GetTop10CommunityMap(string mapId)
+    {
+        List<Level> top10 = new List<Level>();
+        try {
+            var snapshot = await reference.Child("CommunityMapLeaderboard").Child(mapId).OrderByChild("point").LimitToLast(10).GetValueAsync();
+            foreach (var child in snapshot.Children) {
+                string json = child.GetRawJsonValue();
+                if (!string.IsNullOrEmpty(json)) {
+                    Level ld = JsonConvert.DeserializeObject<Level>(json);
+                    if (ld != null) top10.Add(ld);
+                }
+            }
+            top10.Reverse();
+        } catch (Exception ex) { Debug.LogError("Lỗi lấy Top 10 Map: " + ex.Message); }
+        return top10;
+    }
+
+    public async Task<int> GetMyCommunityMapRank(string mapId)
+    {
+        try {
+            FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
+            if (user == null) return -1;
+            var allSnapshot = await reference.Child("CommunityMapLeaderboard").Child(mapId).OrderByChild("point").GetValueAsync();
+            List<string> uids = new List<string>();
+            foreach (var child in allSnapshot.Children) {
+                uids.Add(child.Key);
+            }
+            uids.Reverse(); // Sắp xếp giảm dần theo điểm, giữ nguyên thứ tự phân định của Firebase
+            for (int i = 0; i < uids.Count; i++) {
+                if (uids[i] == user.UserId) return i + 1;
+            }
+        } catch (Exception ex) { Debug.LogError("Lỗi lấy rank map: " + ex.Message); }
+        return -1;
+    }
+
+    public async Task<Level> GetMyCommunityMapScore(string mapId)
+    {
+        try {
+            FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
+            if (user == null) return null;
+            var snapshot = await reference.Child("CommunityMapLeaderboard").Child(mapId).Child(user.UserId).GetValueAsync();
+            if (snapshot.Exists) {
+                string json = snapshot.GetRawJsonValue();
+                if (!string.IsNullOrEmpty(json)) {
+                    return JsonConvert.DeserializeObject<Level>(json);
+                }
+            }
+        } catch (Exception ex) { Debug.LogError("Lỗi lấy score map: " + ex.Message); }
+        return null;
     }
 
 #else
@@ -198,5 +240,8 @@ public class FirebaseDataManager : MonoBehaviour
     public Task<int> GetMyLevelRank() => Task.FromResult(0);
     public Task<List<Level>> GetTop10Level(string levelName) => Task.FromResult(new List<Level>());
     public Task<int> GetMyLevelRank(string levelName) => Task.FromResult(-1);
+    public Task<List<Level>> GetTop10CommunityMap(string mapId) => Task.FromResult(new List<Level>());
+    public Task<int> GetMyCommunityMapRank(string mapId) => Task.FromResult(-1);
+    public Task<Level> GetMyCommunityMapScore(string mapId) => Task.FromResult<Level>(null);
 #endif
 }
