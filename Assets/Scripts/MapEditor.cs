@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
@@ -11,16 +12,16 @@ public class MapEditor : MonoBehaviour
     {
         if (PlacementModeManager.CurrentMode != PlacementMode.Tile)
             return;
-        // Không vẽ khi đang bấm UI dropdown/button
-        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+
+        if (IsPointerOverUI())
             return;
 
-        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(GetPointerPosition());
         Vector3Int cellPos = tilemap.WorldToCell(mouseWorld);
         cellPos.z = 0;
 
-        // Chuột trái: vẽ tile
-        if (Input.GetMouseButton(0))
+        // Chuột trái / chạm màn hình: vẽ tile
+        if (Input.GetMouseButton(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase != TouchPhase.Ended && Input.GetTouch(0).phase != TouchPhase.Canceled))
         {
             TileBase selectedTile = tileDropdownUI.selectedTile;
 
@@ -35,5 +36,29 @@ public class MapEditor : MonoBehaviour
         {
             tilemap.SetTile(cellPos, null);
         }
+    }
+
+    private bool IsPointerOverUI()
+    {
+        if (EventSystem.current == null)
+            return false;
+
+        PointerEventData eventData = new PointerEventData(EventSystem.current);
+        eventData.position = GetPointerPosition();
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+        return results.Count > 0;
+    }
+
+    private Vector2 GetPointerPosition()
+    {
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            if (touch.phase != TouchPhase.Canceled)
+                return touch.position;
+        }
+
+        return Input.mousePosition;
     }
 }

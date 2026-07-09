@@ -7774,8 +7774,8 @@ MonoBehaviour:
   slowDownPenButton: {fileID: 0}
   pencilCursor: {fileID: 2800000, guid: b777f18e8a40a154ba5a0f283b48015c, type: 3}
   eraserCursor: {fileID: 2800000, guid: 893ea265254070e40bbcb71b012c31d7, type: 3}
-  pencilHotSpot: {x: 55, y: 160}
-  eraserHotSpot: {x: 55, y: 160}
+  pencilHotSpot: {x: 40, y: 120}
+  eraserHotSpot: {x: 40, y: 120}
   eraserRadius: 0.2
   smartDrawToggle: {fileID: 4382687602606616806}
   smartMinPoints: 5

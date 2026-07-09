@@ -402,7 +402,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &218538854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -649,13 +649,29 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 161866651471528359, guid: 22c94c733d826434b8ab82ac489ca167, type: 3}
+      propertyPath: refreshInterval
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1464414682736034432, guid: 22c94c733d826434b8ab82ac489ca167, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 93
       objectReference: {fileID: 0}
     - target: {fileID: 2708849568137444804, guid: 22c94c733d826434b8ab82ac489ca167, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3202858738135018009, guid: 22c94c733d826434b8ab82ac489ca167, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1488845564}
+    - target: {fileID: 3202858738135018009, guid: 22c94c733d826434b8ab82ac489ca167, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: BackToSelect
+      objectReference: {fileID: 0}
+    - target: {fileID: 3202858738135018009, guid: 22c94c733d826434b8ab82ac489ca167, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UIManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3453492965319907061, guid: 22c94c733d826434b8ab82ac489ca167, type: 3}
       propertyPath: m_AnchorMax.x

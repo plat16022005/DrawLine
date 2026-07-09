@@ -5,8 +5,7 @@ using UnityEngine;
 public enum MapStatus
 {
     Private,
-    Publish,
-    Maintenance
+    Publish
 }
 
 [System.Serializable]

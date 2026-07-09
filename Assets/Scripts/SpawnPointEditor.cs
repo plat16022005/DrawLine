@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -48,7 +49,7 @@ public class SpawnPointEditor : MonoBehaviour
             return;
         }
 
-        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+        if (IsPointerOverUI())
         {
             if (previewObject != null) previewObject.SetActive(false);
             return;
@@ -56,7 +57,7 @@ public class SpawnPointEditor : MonoBehaviour
 
         UpdatePreview();
 
-        if (Input.GetMouseButtonDown(0))
+        if (WasPointerPressed())
         {
             PlaceSpawnPoint();
         }
@@ -101,14 +102,14 @@ public class SpawnPointEditor : MonoBehaviour
         }
 
         previewObject.SetActive(true);
-        Vector3 worldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 worldPos = mainCamera.ScreenToWorldPoint(GetPointerPosition());
         worldPos.z = 0;
         previewObject.transform.position = worldPos;
     }
 
     void PlaceSpawnPoint()
     {
-        Vector3 worldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 worldPos = mainCamera.ScreenToWorldPoint(GetPointerPosition());
         worldPos.z = 0;
 
         switch (selectedCharacter)
@@ -174,6 +175,41 @@ public class SpawnPointEditor : MonoBehaviour
     {
         selectedCharacter = SpawnCharacterType.Princess;
         PlacementModeManager.CurrentMode = PlacementMode.SpawnPoint;
+    }
+
+    private bool IsPointerOverUI()
+    {
+        if (EventSystem.current == null)
+            return false;
+
+        PointerEventData eventData = new PointerEventData(EventSystem.current);
+        eventData.position = GetPointerPosition();
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+        return results.Count > 0;
+    }
+
+    private bool WasPointerPressed()
+    {
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            return touch.phase == TouchPhase.Began;
+        }
+
+        return Input.GetMouseButtonDown(0);
+    }
+
+    private Vector2 GetPointerPosition()
+    {
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            if (touch.phase != TouchPhase.Canceled)
+                return touch.position;
+        }
+
+        return Input.mousePosition;
     }
 
     // -------------------------------------------------------

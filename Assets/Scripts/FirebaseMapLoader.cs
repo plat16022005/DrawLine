@@ -122,6 +122,7 @@ public class FirebaseMapLoader : MonoBehaviour
             LevelSceneManager.instance.LoadSkin();
             CameraController.Instance.LoadCamera();
             CameraControl.Instance.LoadCamera();
+            WindUIDisplay.Instance.RefreshWindUI();
         }
         catch (System.Exception e)
         {
@@ -167,6 +168,7 @@ public class FirebaseMapLoader : MonoBehaviour
             LevelSceneManager.instance.LoadSkin();
             CameraController.Instance.LoadCamera();
             CameraControl.Instance.LoadCamera();
+            WindUIDisplay.Instance.RefreshWindUI();
         }
         catch (System.Exception e)
         {

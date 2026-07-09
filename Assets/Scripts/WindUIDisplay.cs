@@ -10,6 +10,8 @@ using TMPro;
 /// </summary>
 public class WindUIDisplay : MonoBehaviour
 {
+    public static WindUIDisplay Instance { get; private set; }
+
     [Header("Arrow Indicator")]
     [Tooltip("GameObject mũi tên (hoặc icon gió) sẽ được xoay theo hướng gió")]
     public Transform arrowObject;
@@ -37,13 +39,24 @@ public class WindUIDisplay : MonoBehaviour
     private GlobalWind wind;
     private float timer;
 
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
+
     private void Start()
     {
         FindWind();
         Refresh();
         timer = refreshInterval;
     }
-
+    public void RefreshWindUI()
+    {
+        FindWind();
+        Refresh();
+        timer = refreshInterval;
+    }
     private void Update()
     {
         if (refreshInterval <= 0f) return;

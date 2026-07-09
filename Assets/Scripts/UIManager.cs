@@ -431,4 +431,13 @@ void SetUIStar()
         MapCommentManager.instance.SendComment(DataGame.instance.currentCommunityMapId, DataGame.instance.users.name, Comment.text, star);
         PanelComment.SetActive(false);
     }
+    public async void BackToSelect()
+    {
+        bool isComment = await MapCommentManager.instance.HasMyComment(DataGame.instance.currentCommunityMapId);
+        if (!isComment)
+        {
+            PanelComment.SetActive(true);
+        }
+        else SceneManager.LoadScene("SampleScene");
+    }
 }

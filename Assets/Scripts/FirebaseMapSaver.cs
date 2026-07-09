@@ -97,7 +97,8 @@ public async System.Threading.Tasks.Task<string> CreateMap(string mapName)
         {
             { "mapName", mapName },
             { "ownerId", userId },
-            { "status", "private" }
+            { "status", "private" },
+            { "hasPublishedOnce", false }
         };
 
         await dbRef.Child("maps").Child(userId).Child(mapId).SetValueAsync(mapEntry);
@@ -418,7 +419,7 @@ void ShowNotification(string message, bool success)
     }
 
     // ─────────────────────────────────────────────────────────
-    // Quản lý trạng thái map: private | publish | maintenance
+    // Quản lý trạng thái map: private | publish
     // ─────────────────────────────────────────────────────────
 
     /// <summary>Đổi trạng thái map lên Firebase theo mapId đang edit.</summary>
@@ -448,8 +449,7 @@ void ShowNotification(string message, bool success)
         try
         {
             await dbRef.Child("maps").Child(userId).Child(mapId).Child("status").SetValueAsync(newStatus);
-            string displayName = newStatus == "private" ? "Riêng tư" :
-                                 newStatus == "publish" ? "Công khai" : "Bảo trì";
+            string displayName = newStatus == "publish" ? "Công khai" : "Riêng tư";
             ShowNotification($"Trạng thái map: {displayName}", true);
             Debug.Log($"[MapSaver] Đổi status map {mapId} thành: {newStatus}");
         }
@@ -467,6 +467,4 @@ void ShowNotification(string message, bool success)
     public void OnClickPublishMap() => SetMapStatus("publish");
     /// <summary>Nút "Private" — đặt map về riêng tư.</summary>
     public void OnClickSetPrivate() => SetMapStatus("private");
-    /// <summary>Nút "Maintenance" — đặt map vào chế độ bảo trì.</summary>
-    public void OnClickSetMaintenance() => SetMapStatus("maintenance");
 }

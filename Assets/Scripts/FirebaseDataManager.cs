@@ -175,35 +175,80 @@ public class FirebaseDataManager : MonoBehaviour
     public async Task<List<Level>> GetTop10CommunityMap(string mapId)
     {
         List<Level> top10 = new List<Level>();
-        try {
-            var snapshot = await reference.Child("CommunityMapLeaderboard").Child(mapId).OrderByChild("point").LimitToLast(10).GetValueAsync();
-            foreach (var child in snapshot.Children) {
+        try
+        {
+            var snapshot = await reference
+                .Child("CommunityMapLeaderboard")
+                .Child(mapId)
+                .GetValueAsync();
+
+            foreach (var child in snapshot.Children)
+            {
                 string json = child.GetRawJsonValue();
-                if (!string.IsNullOrEmpty(json)) {
+                if (!string.IsNullOrEmpty(json))
+                {
                     Level ld = JsonConvert.DeserializeObject<Level>(json);
                     if (ld != null) top10.Add(ld);
                 }
             }
-            top10.Reverse();
-        } catch (Exception ex) { Debug.LogError("Lỗi lấy Top 10 Map: " + ex.Message); }
+
+            top10 = top10
+                .OrderByDescending(x => x.point) // điểm cao hơn đứng trước
+                .ThenBy(x => x.time)            // cùng điểm thì time thấp hơn đứng trước
+                .Take(10)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Lỗi lấy Top 10 Map: " + ex.Message);
+        }
+
         return top10;
     }
 
     public async Task<int> GetMyCommunityMapRank(string mapId)
     {
-        try {
+        try
+        {
             FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
             if (user == null) return -1;
-            var allSnapshot = await reference.Child("CommunityMapLeaderboard").Child(mapId).OrderByChild("point").GetValueAsync();
-            List<string> uids = new List<string>();
-            foreach (var child in allSnapshot.Children) {
-                uids.Add(child.Key);
+
+            var snapshot = await reference
+                .Child("CommunityMapLeaderboard")
+                .Child(mapId)
+                .GetValueAsync();
+
+            List<(string uid, Level data)> players = new List<(string, Level)>();
+
+            foreach (var child in snapshot.Children)
+            {
+                string json = child.GetRawJsonValue();
+                if (!string.IsNullOrEmpty(json))
+                {
+                    Level level = JsonConvert.DeserializeObject<Level>(json);
+                    if (level != null)
+                    {
+                        players.Add((child.Key, level));
+                    }
+                }
             }
-            uids.Reverse(); // Sắp xếp giảm dần theo điểm, giữ nguyên thứ tự phân định của Firebase
-            for (int i = 0; i < uids.Count; i++) {
-                if (uids[i] == user.UserId) return i + 1;
+
+            players = players
+                .OrderByDescending(x => x.data.point) // Điểm cao hơn
+                .ThenBy(x => x.data.time)             // Cùng điểm -> thời gian nhỏ hơn
+                .ToList();
+
+            for (int i = 0; i < players.Count; i++)
+            {
+                if (players[i].uid == user.UserId)
+                    return i + 1;
             }
-        } catch (Exception ex) { Debug.LogError("Lỗi lấy rank map: " + ex.Message); }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Lỗi lấy rank map: " + ex.Message);
+        }
+
         return -1;
     }
 

@@ -18,8 +18,7 @@ public class MapSettingsPanelUI : MonoBehaviour
     public Slider windForceSlider;
     public TextMeshProUGUI windForceText;
 
-    public Slider windAngleSlider;
-    public TextMeshProUGUI windAngleText;
+    public RotationCircleUI windAngleCircle;
 
     [Header("Applied Values (Saved to Map)")]
     public float currentCameraLens = 5f;
@@ -71,11 +70,9 @@ public class MapSettingsPanelUI : MonoBehaviour
             windForceSlider.onValueChanged.AddListener(OnWindForceChanged);
         }
 
-        if (windAngleSlider != null)
+        if (windAngleCircle != null)
         {
-            windAngleSlider.minValue = 0f;
-            windAngleSlider.maxValue = 360f;
-            windAngleSlider.onValueChanged.AddListener(OnWindAngleChanged);
+            windAngleCircle.OnAngleChanged += OnWindAngleChanged;
         }
     }
 
@@ -91,11 +88,10 @@ public class MapSettingsPanelUI : MonoBehaviour
         if (windSettingsPanel != null) windSettingsPanel.SetActive(tempEnableWind);
 
         if (windForceSlider != null) windForceSlider.value = tempWindForce;
-        if (windAngleSlider != null) windAngleSlider.value = tempWindAngle;
+        if (windAngleCircle != null) windAngleCircle.SetAngle(tempWindAngle, false);
 
         if (cameraLensText != null) cameraLensText.text = tempCameraLens.ToString("F1");
         if (windForceText != null) windForceText.text = tempWindForce.ToString("F1");
-        if (windAngleText != null) windAngleText.text = tempWindAngle.ToString("F0") + "°";
     }
 
     public void OnEnableWindChanged(bool isOn)
@@ -132,7 +128,6 @@ public class MapSettingsPanelUI : MonoBehaviour
     public void OnWindAngleChanged(float value)
     {
         tempWindAngle = value;
-        if (windAngleText != null) windAngleText.text = tempWindAngle.ToString("F0") + "°";
     }
 
     // Gán hàm này vào nút Xác nhận (Confirm)

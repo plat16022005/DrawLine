@@ -85,6 +85,10 @@ public class SelectLevelManager : MonoBehaviour
     public GameObject PanelDetailMap;
     public TextMeshProUGUI DetailMapName;
     public TMP_Dropdown DetailMapStatusDropdown;
+    public Transform ContentMyMap;
+    public GameObject CommentMyMapPrefab;
+    public TextMeshProUGUI AveragePointMyMap;
+    public TextMeshProUGUI PlayCountMyMapText;
     // Dropdown thứ tự: 0=Publish, 1=Private, 2=Maintenance
 
     [Header("Panel Detail Map Community")]
@@ -94,6 +98,7 @@ public class SelectLevelManager : MonoBehaviour
     public Transform ContentComment;
     public GameObject CommentPrefabs;
     public TextMeshProUGUI AveragePoint;
+    public TextMeshProUGUI PlayCountCommunityMapText;
 
     [Header("Panel Detail Map Community - Leaderboard")]
     public Transform ContentCommunityMapRank;
@@ -119,6 +124,7 @@ public class SelectLevelManager : MonoBehaviour
     private string _selectedMapId;
     private string _selectedMapName;
     private string _selectedMapStatus; // track status hiện tại để revert dropdown nếu cần
+    private bool _selectedMapHasPublishedOnce;
 
     // Cache cho tìm kiếm map community
     private struct CommunityMapEntry
@@ -735,6 +741,7 @@ public class SelectLevelManager : MonoBehaviour
                 var mapIds   = new List<string>();
                 var mapNames = new List<string>();
                 var statusTasks = new List<Task<DataSnapshot>>();
+                var publishedOnceTasks = new List<Task<DataSnapshot>>();
 
                 foreach (DataSnapshot child in snapshot.Children)
                 {
@@ -743,9 +750,11 @@ public class SelectLevelManager : MonoBehaviour
                     mapIds.Add(mapId);
                     mapNames.Add(mapName);
                     statusTasks.Add(dbRef.Child("mapscommunity").Child(mapId).Child("status").GetValueAsync());
+                    publishedOnceTasks.Add(dbRef.Child("mapscommunity").Child(mapId).Child("hasPublishedOnce").GetValueAsync());
                 }
 
                 await Task.WhenAll(statusTasks);
+                await Task.WhenAll(publishedOnceTasks);
 
                 // Bước 3: Tạo button cho từng map
                 for (int i = 0; i < mapIds.Count; i++)
@@ -755,12 +764,14 @@ public class SelectLevelManager : MonoBehaviour
                     string mapStatus = statusTasks[i].Result != null && statusTasks[i].Result.Exists
                         ? statusTasks[i].Result.Value.ToString()
                         : "private";
+                    bool hasPublishedOnce = publishedOnceTasks[i].Result != null && publishedOnceTasks[i].Result.Exists && publishedOnceTasks[i].Result.Value != null
+                        ? (bool)publishedOnceTasks[i].Result.Value
+                        : false;
 
                     string statusIcon = mapStatus switch
                     {
                         "publish"     => "Công khai",
-                        "maintenance" => "Bảo trì",
-                        _             => "Bảo mật"
+                        _             => "Riêng tư"
                     };
 
                     GameObject btnObj = Instantiate(MapButtonPrefab, ContentMapList);
@@ -803,7 +814,6 @@ public class SelectLevelManager : MonoBehaviour
                         txtStatus.color = mapStatus switch
                         {
                             "publish"     => Color.green,
-                            "maintenance" => Color.yellow,
                             _             => Color.red
                         };
                     }
@@ -815,7 +825,8 @@ public class SelectLevelManager : MonoBehaviour
                         string cId     = mapId;
                         string cName   = mapName;
                         string cStatus = mapStatus;
-                        btn.onClick.AddListener(() => OpenMapDetail(cId, cName, cStatus));
+                        bool cHasPublishedOnce = hasPublishedOnce;
+                        btn.onClick.AddListener(() => OpenMapDetail(cId, cName, cStatus, cHasPublishedOnce));
                     }
                 }
             }
@@ -838,23 +849,25 @@ public class SelectLevelManager : MonoBehaviour
     // Panel Detail Map
     // ─────────────────────────────────────────────────────────
 
-    void OpenMapDetail(string mapId, string mapName, string mapStatus)
+    void OpenMapDetail(string mapId, string mapName, string mapStatus, bool hasPublishedOnce)
     {
         _selectedMapId     = mapId;
         _selectedMapName   = mapName;
         _selectedMapStatus = mapStatus;
+        _selectedMapHasPublishedOnce = hasPublishedOnce;
 
         if (PanelDetailMap != null) PanelDetailMap.SetActive(true);
         if (DetailMapName  != null) DetailMapName.text = mapName;
 
+        LoadPlayCountMyMap(mapId);
+
         // Cập nhật dropdown theo trạng thái hiện tại từ mapscommunity
-        // Thứ tự dropdown: 0=Publish, 1=Private, 2=Maintenance
+        // Thứ tự dropdown: 0=Publish, 1=Private
         if (DetailMapStatusDropdown != null)
         {
             int dropdownIndex = mapStatus switch
             {
                 "publish"     => 0,
-                "maintenance" => 2,
                 _             => 1 // private
             };
 
@@ -863,36 +876,47 @@ public class SelectLevelManager : MonoBehaviour
             DetailMapStatusDropdown.value = dropdownIndex;
             DetailMapStatusDropdown.RefreshShownValue();
 
-            // Người chơi chỉ được chọn Private / Maintenance — KHÔNG được chọn Publish từ dropdown
             DetailMapStatusDropdown.onValueChanged.AddListener(OnDropdownStatusChanged);
         }
+        LoadAllCommentMyMap(mapId);
+    }
+
+    private async void LoadPlayCountMyMap(string mapId)
+    {
+        if (PlayCountMyMapText != null) PlayCountMyMapText.text = "...";
+#if !UNITY_WEBGL || UNITY_EDITOR
+        try
+        {
+            DatabaseReference dbRef = FirebaseDatabase.DefaultInstance.RootReference;
+            DataSnapshot snapshot = await dbRef.Child("mapscommunity").Child(mapId).Child("playCount").GetValueAsync();
+            int count = snapshot.Exists && snapshot.Value != null ? System.Convert.ToInt32(snapshot.Value) : 0;
+            if (PlayCountMyMapText != null) PlayCountMyMapText.text = count.ToString();
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError(e);
+        }
+#endif
     }
 
     /// <summary>
     /// Xử lý khi người chơi đổi dropdown trạng thái.
-    /// Chỉ cho phép Private (1) và Maintenance (2).
-    /// Publish (0) chỉ được đặt qua nút "Đăng tải".
+    /// Nếu chọn Publish (0) nhưng map chưa được Đăng tải lần nào thì chặn lại.
     /// </summary>
     async void OnDropdownStatusChanged(int newIndex)
     {
-        // Ngăn chọn Publish từ dropdown
-        if (newIndex == 0)
+        if (newIndex == 0 && !_selectedMapHasPublishedOnce)
         {
-            // Revert về trạng thái hợp lệ trước đó
-            int revert = _selectedMapStatus switch
-            {
-                "maintenance" => 2,
-                _             => 1 // private
-            };
+            // Revert về Private (1)
             DetailMapStatusDropdown.onValueChanged.RemoveAllListeners();
-            DetailMapStatusDropdown.value = revert;
+            DetailMapStatusDropdown.value = 1;
             DetailMapStatusDropdown.RefreshShownValue();
             DetailMapStatusDropdown.onValueChanged.AddListener(OnDropdownStatusChanged);
-            Debug.Log("[DetailMap] Không thể chọn Publish từ dropdown. Dùng nút Đăng tải!");
+            ShowNotification("Bạn phải Đăng tải map lên cộng đồng lần đầu tiên trước khi có thể đổi tự do!", false);
             return;
         }
 
-        string newStatus = newIndex == 2 ? "maintenance" : "private";
+        string newStatus = newIndex == 0 ? "publish" : "private";
         _selectedMapStatus = newStatus;
 
 #if !UNITY_WEBGL || UNITY_EDITOR
@@ -924,6 +948,7 @@ public class SelectLevelManager : MonoBehaviour
             PlayNowCommunityButton.onClick.RemoveAllListeners();
             PlayNowCommunityButton.onClick.AddListener(() => 
             {
+                IncrementPlayCount(mapId);
                 if (DataGame.instance != null)
                     DataGame.instance.currentCommunityMapId = mapId;
                 SceneManager.LoadScene("LvMap");
@@ -932,6 +957,52 @@ public class SelectLevelManager : MonoBehaviour
         Debug.Log("Load Comment");
         LoadAllCommentThisMap(mapId);
         LoadCommunityMapRank(mapId);
+        LoadPlayCountCommunityMap(mapId);
+    }
+
+    private async void LoadPlayCountCommunityMap(string mapId)
+    {
+        if (PlayCountCommunityMapText != null) PlayCountCommunityMapText.text = "...";
+#if !UNITY_WEBGL || UNITY_EDITOR
+        try
+        {
+            DatabaseReference dbRef = FirebaseDatabase.DefaultInstance.RootReference;
+            DataSnapshot snapshot = await dbRef.Child("mapscommunity").Child(mapId).Child("playCount").GetValueAsync();
+            int count = snapshot.Exists && snapshot.Value != null ? System.Convert.ToInt32(snapshot.Value) : 0;
+            if (PlayCountCommunityMapText != null) PlayCountCommunityMapText.text = count.ToString();
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError(e);
+        }
+#endif
+    }
+
+    private void IncrementPlayCount(string mapId)
+    {
+#if !UNITY_WEBGL || UNITY_EDITOR
+        try
+        {
+            DatabaseReference dbRef = FirebaseDatabase.DefaultInstance.RootReference;
+            var mapRef = dbRef.Child("mapscommunity").Child(mapId).Child("playCount");
+            
+            mapRef.RunTransaction(mutableData =>
+            {
+                int currentPlayCount = 0;
+                if (mutableData.Value != null)
+                {
+                    int.TryParse(mutableData.Value.ToString(), out currentPlayCount);
+                }
+                mutableData.Value = currentPlayCount + 1;
+                Debug.Log("IncrementPlayCount: " + (currentPlayCount + 1));
+                return TransactionResult.Success(mutableData);
+            });
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("IncrementPlayCount error: " + e);
+        }
+#endif
     }
 
     public async void LoadCommunityMapRank(string mapId)
@@ -1000,10 +1071,42 @@ public class SelectLevelManager : MonoBehaviour
             Destroy(obj.gameObject);
         }
         List<CommentData> comments = await MapCommentManager.instance.LoadComments(mapId);
-        AveragePoint.text = CalculateAveragePoint(comments).ToString();
+        AveragePoint.text = CalculateAveragePoint(comments).ToString("F1");
         foreach (CommentData comment in comments)
         {
             GameObject obj = Instantiate(CommentPrefabs, ContentComment);
+            Transform nguoinhanxet = obj.transform.Find("NguoiNhanXet");
+            if (nguoinhanxet != null)
+            {
+                TextMeshProUGUI TenNguoiNhanXet = nguoinhanxet.GetComponent<TextMeshProUGUI>();
+                TenNguoiNhanXet.text = comment.name;
+            }
+            Transform binhluan = obj.transform.Find("NhanXet");
+            if (binhluan != null)
+            {
+                TextMeshProUGUI BinhLuan = binhluan.GetComponent<TextMeshProUGUI>();
+                BinhLuan.text = comment.comment;
+            }
+            Transform diem = obj.transform.Find("Score/Diem");
+            if (diem != null)
+            {
+                TextMeshProUGUI Diem = diem.GetComponent<TextMeshProUGUI>();
+                Diem.text = comment.point.ToString();
+            }
+        }
+    }
+    public async void LoadAllCommentMyMap(string mapId)
+    {
+        Debug.Log("Đang load");
+        foreach (Transform obj in ContentMyMap)
+        {
+            Destroy(obj.gameObject);
+        }
+        List<CommentData> comments = await MapCommentManager.instance.LoadComments(mapId);
+        AveragePointMyMap.text = CalculateAveragePoint(comments).ToString("F1");
+        foreach (CommentData comment in comments)
+        {
+            GameObject obj = Instantiate(CommentMyMapPrefab, ContentMyMap);
             Transform nguoinhanxet = obj.transform.Find("NguoiNhanXet");
             if (nguoinhanxet != null)
             {
@@ -1086,6 +1189,17 @@ public class SelectLevelManager : MonoBehaviour
             // Ghi đè các field community
             communityData["ownerId"] = userId;
             communityData["status"]  = "publish";
+            communityData["hasPublishedOnce"] = true;
+
+            // Preserve existing community fields like playCount
+            DataSnapshot existingCommunitySnap = await dbRef.Child("mapscommunity").Child(_selectedMapId).GetValueAsync();
+            if (existingCommunitySnap != null && existingCommunitySnap.Exists)
+            {
+                if (existingCommunitySnap.HasChild("playCount"))
+                {
+                    communityData["playCount"] = existingCommunitySnap.Child("playCount").Value;
+                }
+            }
 
             // Ghi vào mapscommunity (ghi đè toàn bộ entry)
             await dbRef.Child("mapscommunity").Child(_selectedMapId).SetValueAsync(communityData);
@@ -1196,6 +1310,10 @@ public class SelectLevelManager : MonoBehaviour
     public void CloseNotification()
     {
         if (BangThongBao != null) BangThongBao.SetActive(false);
+    }
+    public void EnterTutorial(int tutorial)
+    {
+        SceneManager.LoadScene("Tutorial" + tutorial);
     }
 }
 
