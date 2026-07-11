@@ -45,6 +45,10 @@ public class GameController : MonoBehaviour
 
     public void StopSimulation()
     {
+        // Ghi nhận lần người chơi bấm Reset
+        if (LevelAnalyticsManager.instance != null)
+            LevelAnalyticsManager.instance.OnResetSimulation();
+
         // 1. Đóng băng thời gian ngay lập tức
         Time.timeScale = 0f;
         isPlaying = false;

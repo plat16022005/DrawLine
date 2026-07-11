@@ -646,7 +646,52 @@ public class SelectLevelManager : MonoBehaviour
             Debug.LogError("[Community] Lỗi load community maps: " + e);
         }
 #else
-        Debug.LogWarning("[Community] LoadCommunityMaps chưa hỗ trợ WebGL native.");
+        if (FirebaseJSBridge.instance == null) return;
+        try
+        {
+            string json = await FirebaseJSBridge.instance.QueryDatabaseAsync("mapscommunity", "status", "publish");
+            if (string.IsNullOrEmpty(json))
+            {
+                Debug.Log("[Community] Chưa có map nào được publish.");
+                return;
+            }
+            var dict = Newtonsoft.Json.JsonConvert.DeserializeObject<System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, object>>>(json);
+            if (dict == null) return;
+
+            var entries = new List<CommunityMapEntry>();
+            var ownerTasks = new List<Task<string>>();
+            foreach (var kvp in dict)
+            {
+                var cData = kvp.Value;
+                var entry = new CommunityMapEntry
+                {
+                    mapId = kvp.Key,
+                    mapName = cData.ContainsKey("mapName") ? cData["mapName"]?.ToString() : "Unnamed",
+                    ownerId = cData.ContainsKey("ownerId") ? cData["ownerId"]?.ToString() : "",
+                    ownerName = ""
+                };
+                entries.Add(entry);
+                if (!string.IsNullOrEmpty(entry.ownerId))
+                    ownerTasks.Add(FirebaseJSBridge.instance.ReadDatabaseAsync($"Users/{entry.ownerId}/name"));
+                else
+                    ownerTasks.Add(Task.FromResult<string>(null));
+            }
+            await Task.WhenAll(ownerTasks);
+            for (int i = 0; i < entries.Count; i++)
+            {
+                var e = entries[i];
+                var nameJson = ownerTasks[i].Result;
+                if (!string.IsNullOrEmpty(nameJson))
+                    e.ownerName = nameJson.Trim('"');
+                entries[i] = e;
+            }
+            _cachedCommunityMaps = entries;
+            RenderCommunityMapList(_cachedCommunityMaps);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("[Community] Lỗi load community maps WebGL: " + e);
+        }
 #endif
     }
 
@@ -836,7 +881,87 @@ public class SelectLevelManager : MonoBehaviour
             Debug.LogError("Lỗi khi load danh sách map: " + e);
         }
 #else
-        Debug.LogWarning("LoadUserMaps chưa được hỗ trợ hoàn toàn trên WebGL native.");
+        if (FirebaseJSBridge.instance == null) return;
+        try
+        {
+            string userId = string.IsNullOrEmpty(currentUserId) ? "guest_maps" : currentUserId;
+            string json = await FirebaseJSBridge.instance.ReadDatabaseAsync($"maps/{userId}");
+            if (string.IsNullOrEmpty(json)) return;
+
+            var dict = Newtonsoft.Json.JsonConvert.DeserializeObject<System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, object>>>(json);
+            if (dict == null) return;
+
+            var mapIds = new List<string>();
+            var mapNames = new List<string>();
+            var statusTasks = new List<Task<string>>();
+            var publishedOnceTasks = new List<Task<string>>();
+
+            foreach (var kvp in dict)
+            {
+                string mapId = kvp.Key;
+                string mapName = kvp.Value.ContainsKey("mapName") ? kvp.Value["mapName"]?.ToString() : "Unnamed Map";
+                mapIds.Add(mapId);
+                mapNames.Add(mapName);
+                statusTasks.Add(FirebaseJSBridge.instance.ReadDatabaseAsync($"mapscommunity/{mapId}/status"));
+                publishedOnceTasks.Add(FirebaseJSBridge.instance.ReadDatabaseAsync($"mapscommunity/{mapId}/hasPublishedOnce"));
+            }
+
+            await Task.WhenAll(statusTasks);
+            await Task.WhenAll(publishedOnceTasks);
+
+            for (int i = 0; i < mapIds.Count; i++)
+            {
+                string mapId = mapIds[i];
+                string mapName = mapNames[i];
+                string mapStatus = "private";
+                if (!string.IsNullOrEmpty(statusTasks[i].Result)) mapStatus = statusTasks[i].Result.Trim('"');
+
+                bool hasPublishedOnce = false;
+                if (!string.IsNullOrEmpty(publishedOnceTasks[i].Result))
+                    bool.TryParse(publishedOnceTasks[i].Result, out hasPublishedOnce);
+
+                string statusIcon = mapStatus == "publish" ? "Công khai" : "Riêng tư";
+
+                GameObject btnObj = Instantiate(MapButtonPrefab, ContentMapList);
+                Transform tenMapTrans = btnObj.transform.Find("TenMap");
+                if (tenMapTrans != null)
+                {
+                    TextMeshProUGUI txtName = tenMapTrans.GetComponent<TextMeshProUGUI>();
+                    if (txtName != null) txtName.text = mapName;
+                }
+                else
+                {
+                    TextMeshProUGUI txt = btnObj.GetComponentInChildren<TextMeshProUGUI>();
+                    if (txt != null) txt.text = $"{mapName}";
+                }
+
+                Transform chuMapTrans = btnObj.transform.Find("ChuMap");
+                if (chuMapTrans != null) chuMapTrans.gameObject.SetActive(false);
+
+                Transform statusTrans = btnObj.transform.Find("TrangThai");
+                if (statusTrans != null)
+                {
+                    statusTrans.gameObject.SetActive(true);
+                    TextMeshProUGUI txtStatus = statusTrans.GetComponent<TextMeshProUGUI>();
+                    if (txtStatus != null) txtStatus.text = statusIcon;
+                    txtStatus.color = mapStatus == "publish" ? Color.green : Color.red;
+                }
+
+                Button btn = btnObj.GetComponent<Button>();
+                if (btn != null)
+                {
+                    string cId = mapId;
+                    string cName = mapName;
+                    string cStatus = mapStatus;
+                    bool cHasPublishedOnce = hasPublishedOnce;
+                    btn.onClick.AddListener(() => OpenMapDetail(cId, cName, cStatus, cHasPublishedOnce));
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Lỗi khi load danh sách map WebGL: " + e);
+        }
 #endif
     }
     public void OpenLevel()
@@ -896,6 +1021,17 @@ public class SelectLevelManager : MonoBehaviour
         {
             Debug.LogError(e);
         }
+#else
+        if (FirebaseJSBridge.instance != null)
+        {
+            try
+            {
+                string json = await FirebaseJSBridge.instance.ReadDatabaseAsync($"mapscommunity/{mapId}/playCount");
+                int count = !string.IsNullOrEmpty(json) ? System.Convert.ToInt32(json) : 0;
+                if (PlayCountMyMapText != null) PlayCountMyMapText.text = count.ToString();
+            }
+            catch (System.Exception e) { Debug.LogError(e); }
+        }
 #endif
     }
 
@@ -929,6 +1065,19 @@ public class SelectLevelManager : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError("[DetailMap] Lỗi cập nhật status: " + e);
+        }
+#else
+        if (FirebaseJSBridge.instance != null)
+        {
+            try
+            {
+                await FirebaseJSBridge.instance.WriteDatabaseAsync($"mapscommunity/{_selectedMapId}/status", $"\"{newStatus}\"");
+                Debug.Log($"[DetailMap] Cập nhật status mapscommunity/{_selectedMapId} → {newStatus}");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("[DetailMap] Lỗi cập nhật status: " + e);
+            }
         }
 #endif
     }
@@ -975,10 +1124,21 @@ public class SelectLevelManager : MonoBehaviour
         {
             Debug.LogError(e);
         }
+#else
+        if (FirebaseJSBridge.instance != null)
+        {
+            try
+            {
+                string json = await FirebaseJSBridge.instance.ReadDatabaseAsync($"mapscommunity/{mapId}/playCount");
+                int count = !string.IsNullOrEmpty(json) ? System.Convert.ToInt32(json) : 0;
+                if (PlayCountCommunityMapText != null) PlayCountCommunityMapText.text = count.ToString();
+            }
+            catch (System.Exception e) { Debug.LogError(e); }
+        }
 #endif
     }
 
-    private void IncrementPlayCount(string mapId)
+    private async void IncrementPlayCount(string mapId)
     {
 #if !UNITY_WEBGL || UNITY_EDITOR
         try
@@ -1001,6 +1161,19 @@ public class SelectLevelManager : MonoBehaviour
         catch (System.Exception e)
         {
             Debug.LogError("IncrementPlayCount error: " + e);
+        }
+#else
+        if (FirebaseJSBridge.instance != null)
+        {
+            try
+            {
+                string json = await FirebaseJSBridge.instance.ReadDatabaseAsync($"mapscommunity/{mapId}/playCount");
+                int currentPlayCount = 0;
+                if (!string.IsNullOrEmpty(json)) int.TryParse(json, out currentPlayCount);
+                await FirebaseJSBridge.instance.WriteDatabaseAsync($"mapscommunity/{mapId}/playCount", (currentPlayCount + 1).ToString());
+                Debug.Log("IncrementPlayCount WebGL: " + (currentPlayCount + 1));
+            }
+            catch (Exception e) { Debug.LogError("IncrementPlayCount error: " + e); }
         }
 #endif
     }
@@ -1213,9 +1386,77 @@ public class SelectLevelManager : MonoBehaviour
         {
             Debug.LogError("[DetailMap] Lỗi đăng tải: " + e);
         }
+#else
+        if (FirebaseJSBridge.instance != null)
+        {
+            try
+            {
+                string userId = string.IsNullOrEmpty(currentUserId) ? "guest_maps" : currentUserId;
+                string mapJson = await FirebaseJSBridge.instance.ReadDatabaseAsync($"maps/{userId}/{_selectedMapId}");
+                if (string.IsNullOrEmpty(mapJson))
+                {
+                    Debug.LogError($"[DetailMap] Không tìm thấy map {_selectedMapId} trong maps/{userId}");
+                    return;
+                }
+                var communityData = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(mapJson);
+                
+                bool knightOk = SpawnIsValidWebGL(communityData, "knightSpawn");
+                bool demonOk = SpawnIsValidWebGL(communityData, "demonSpawn");
+                bool princessOk = SpawnIsValidWebGL(communityData, "princessSpawn");
+                
+                if (!knightOk || !demonOk || !princessOk)
+                {
+                    var missing = new System.Text.StringBuilder("Map chưa đầy đủ vị trí spawn: ");
+                    if (!knightOk)   missing.Append("[Người chơi] ");
+                    if (!demonOk)    missing.Append("[Demon] ");
+                    if (!princessOk) missing.Append("[Princess] ");
+                    missing.Append("\nVui lòng vào Chỉnh sửa và đặt đủ spawn point trước khi Đăng tải!");
+                    Debug.LogWarning("[DetailMap] " + missing);
+                    ShowNotification(missing.ToString(), false);
+                    return;
+                }
+
+                communityData["ownerId"] = userId;
+                communityData["status"]  = "publish";
+                communityData["hasPublishedOnce"] = true;
+
+                string existingPlayCountStr = await FirebaseJSBridge.instance.ReadDatabaseAsync($"mapscommunity/{_selectedMapId}/playCount");
+                if (!string.IsNullOrEmpty(existingPlayCountStr))
+                {
+                    if (int.TryParse(existingPlayCountStr, out int pc)) communityData["playCount"] = pc;
+                }
+
+                await FirebaseJSBridge.instance.WriteDatabaseAsync($"mapscommunity/{_selectedMapId}", Newtonsoft.Json.JsonConvert.SerializeObject(communityData));
+                _selectedMapStatus = "publish";
+
+                Debug.Log($"[DetailMap] Đã đăng tải map {_selectedMapId} lên mapscommunity với status=publish");
+                LoadUserMaps();
+                CloseMapDetail();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("[DetailMap] Lỗi đăng tải: " + e);
+            }
+        }
 #endif
     }
 
+    bool SpawnIsValidWebGL(Dictionary<string, object> mapData, string spawnKey)
+    {
+        if (!mapData.ContainsKey(spawnKey)) return false;
+        var spawnObj = mapData[spawnKey];
+        if (spawnObj == null) return false;
+        try
+        {
+            var jObj = Newtonsoft.Json.Linq.JObject.FromObject(spawnObj);
+            float x = jObj["x"] != null ? (float)jObj["x"] : 0f;
+            float y = jObj["y"] != null ? (float)jObj["y"] : 0f;
+            return x != 0f || y != 0f;
+        }
+        catch { return false; }
+    }
+
+#if !UNITY_WEBGL || UNITY_EDITOR
     /// <summary>
     /// Kiểm tra spawn point trong Firebase snapshot có hợp lệ không.
     /// Hợp lệ = tồn tại và có ít nhất x hoặc y khác 0.
@@ -1236,6 +1477,7 @@ public class SelectLevelManager : MonoBehaviour
         // (0,0) được coi là chưa đặt (giá trị mặc định của Vector2)
         return x != 0f || y != 0f;
     }
+#endif
 
     /// <summary>Nút "Xóa map" — hiện panel xác nhận trước.</summary>
     public void OnDetailDeleteMap()
@@ -1277,6 +1519,26 @@ public class SelectLevelManager : MonoBehaviour
         {
             Debug.LogError("[DetailMap] Lỗi xóa map: " + e);
             ShowNotification("Xóa map thất bại. Vui lòng thử lại!", false);
+        }
+#else
+        if (FirebaseJSBridge.instance != null)
+        {
+            try
+            {
+                string userId = string.IsNullOrEmpty(currentUserId) ? "guest_maps" : currentUserId;
+                await Task.WhenAll(
+                    FirebaseJSBridge.instance.RemoveDatabaseAsync($"maps/{userId}/{_selectedMapId}"),
+                    FirebaseJSBridge.instance.RemoveDatabaseAsync($"mapscommunity/{_selectedMapId}")
+                );
+                Debug.Log($"[DetailMap] Đã xóa map {_selectedMapId} khỏi maps và mapscommunity");
+                LoadUserMaps();
+                CloseMapDetail();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("[DetailMap] Lỗi xóa map: " + e);
+                ShowNotification("Xóa map thất bại. Vui lòng thử lại!", false);
+            }
         }
 #endif
     }

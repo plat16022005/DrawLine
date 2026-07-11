@@ -81,8 +81,36 @@ public class FirebaseMapLoader : MonoBehaviour
         {
             Debug.LogError("Firebase lỗi dependency: " + result);
         }
+#else
+        StartCoroutine(WebGLStartSequence());
 #endif
     }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+    private System.Collections.IEnumerator WebGLStartSequence()
+    {
+        while (FirebaseJSBridge.instance == null || !FirebaseJSBridge.instance.IsFirebaseReady())
+            yield return new WaitForSeconds(0.2f);
+            
+        if (DataGame.instance != null && !string.IsNullOrEmpty(DataGame.instance.currentEditMapId) && SceneManager.GetActiveScene().name == "MakeMap")
+        {
+            LoadMapForEditor(DataGame.instance.currentEditMapId);
+        }
+        else if (DataGame.instance != null && !string.IsNullOrEmpty(DataGame.instance.currentCommunityMapId) && SceneManager.GetActiveScene().name == "LvMap")
+        {
+            LoadMapFromCommunity(DataGame.instance.currentCommunityMapId);
+        }
+        else if (DataGame.instance != null && !string.IsNullOrEmpty(DataGame.instance.currentTestMapId) && SceneManager.GetActiveScene().name == "LVCustom")
+        {
+            LoadMap(DataGame.instance.currentTestMapId);
+        }
+        else
+        {
+            // Hardcode load map tạm thời cho gameplay
+            LoadMap("-OwZAwjVfUEh8Yefi_mf");
+        }
+    }
+#endif
 
     // ─────────────────────────────────────────────────────────
     // GAMEPLAY – Load map vào scene gameplay (dùng runtimePrefab)
@@ -129,7 +157,39 @@ public class FirebaseMapLoader : MonoBehaviour
             Debug.LogError("Load map thất bại: " + e);
         }
 #else
-        Debug.LogWarning("LoadMap by ID is not supported natively on WebGL. Use FirebaseJSBridge.");
+        if (FirebaseJSBridge.instance == null)
+        {
+            Debug.LogError("Firebase chưa khởi tạo xong");
+            return;
+        }
+
+        try
+        {
+            string userId = FirebaseJSBridge.instance.GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId)) userId = "guest_maps";
+
+            string json = await FirebaseJSBridge.instance.ReadDatabaseAsync($"maps/{userId}/{mapId}");
+
+            if (string.IsNullOrEmpty(json))
+            {
+                Debug.LogError("Không tìm thấy map: " + mapId);
+                return;
+            }
+
+            Debug.Log("Map JSON: " + json);
+
+            MapData mapData = JsonUtility.FromJson<MapData>(json);
+            currentMapId = mapId;
+            LoadMapFromData(mapData);
+            LevelSceneManager.instance.LoadSkin();
+            CameraController.Instance.LoadCamera();
+            CameraControl.Instance.LoadCamera();
+            WindUIDisplay.Instance.RefreshWindUI();
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Load map thất bại: " + e);
+        }
 #endif
     }
 
@@ -175,7 +235,36 @@ public class FirebaseMapLoader : MonoBehaviour
             Debug.LogError("[MapLoader] Load community map thất bại: " + e);
         }
 #else
-        Debug.LogWarning("[MapLoader] LoadMapFromCommunity không hỗ trợ WebGL native.");
+        if (FirebaseJSBridge.instance == null)
+        {
+            Debug.LogError("[MapLoader] Firebase chưa khởi tạo xong");
+            return;
+        }
+
+        try
+        {
+            string json = await FirebaseJSBridge.instance.ReadDatabaseAsync($"mapscommunity/{mapId}");
+
+            if (string.IsNullOrEmpty(json))
+            {
+                Debug.LogError("[MapLoader] Không tìm thấy map community: " + mapId);
+                return;
+            }
+
+            Debug.Log("[MapLoader] Community map JSON: " + json);
+
+            MapData mapData = JsonUtility.FromJson<MapData>(json);
+            currentMapId = mapId;
+            LoadMapFromData(mapData);
+            LevelSceneManager.instance.LoadSkin();
+            CameraController.Instance.LoadCamera();
+            CameraControl.Instance.LoadCamera();
+            WindUIDisplay.Instance.RefreshWindUI();
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("[MapLoader] Load community map thất bại: " + e);
+        }
 #endif
     }
 
@@ -224,7 +313,35 @@ public class FirebaseMapLoader : MonoBehaviour
             Debug.LogError("[MapLoader] Load map for editor thất bại: " + e);
         }
 #else
-        Debug.LogWarning("LoadMapForEditor không hỗ trợ WebGL native.");
+        if (FirebaseJSBridge.instance == null)
+        {
+            Debug.LogError("[MapLoader] Firebase chưa khởi tạo xong");
+            return;
+        }
+
+        try
+        {
+            string userId = FirebaseJSBridge.instance.GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId)) userId = "guest_maps";
+
+            string json = await FirebaseJSBridge.instance.ReadDatabaseAsync($"maps/{userId}/{mapId}");
+
+            if (string.IsNullOrEmpty(json))
+            {
+                Debug.LogError("[MapLoader] Không tìm thấy map: " + mapId);
+                return;
+            }
+
+            Debug.Log("[MapLoader] Load editor map JSON: " + json);
+
+            MapData mapData = JsonUtility.FromJson<MapData>(json);
+            currentMapId = mapId;
+            LoadMapFromDataForEditor(mapData);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("[MapLoader] Load map for editor thất bại: " + e);
+        }
 #endif
     }
 

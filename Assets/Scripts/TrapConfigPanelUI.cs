@@ -97,11 +97,32 @@ public class TrapConfigPanelUI : MonoBehaviour
             // Dùng helper để tránh bắt nhầm TMP_Text bên trong TMP_InputField
             TMP_Text label = FindLabelText(row);
             if (label != null)
-                label.text = FormatFieldName(field.Name);
+            {
+                if (type.Name == "HammerConfig" && field.Name == "traiphai")
+                    label.text = "Hướng Quay";
+                else
+                    label.text = FormatFieldName(field.Name);
+            }
 
             // --- InputField ---
             TMP_InputField input = row.GetComponentInChildren<TMP_InputField>();
             if (input == null) continue;
+
+            // Xử lý riêng cho trường hợp traiphai của HammerConfig
+            if (type.Name == "HammerConfig" && field.Name == "traiphai")
+            {
+                TMP_Text placeholder = input.placeholder as TMP_Text;
+                if (placeholder != null)
+                {
+                    placeholder.text = "1 (trái), -1 (phải)";
+                }
+
+                input.onEndEdit.AddListener(val => {
+                    if (val != "1" && val != "-1") {
+                        input.text = "1";
+                    }
+                });
+            }
 
             // Thiết lập keyboard type phù hợp
             if (field.FieldType == typeof(int))

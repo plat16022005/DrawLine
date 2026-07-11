@@ -285,8 +285,171 @@ public class FirebaseDataManager : MonoBehaviour
     public Task<int> GetMyLevelRank() => Task.FromResult(0);
     public Task<List<Level>> GetTop10Level(string levelName) => Task.FromResult(new List<Level>());
     public Task<int> GetMyLevelRank(string levelName) => Task.FromResult(-1);
-    public Task<List<Level>> GetTop10CommunityMap(string mapId) => Task.FromResult(new List<Level>());
-    public Task<int> GetMyCommunityMapRank(string mapId) => Task.FromResult(-1);
-    public Task<Level> GetMyCommunityMapScore(string mapId) => Task.FromResult<Level>(null);
+
+    public async Task<List<Level>> GetTop10CommunityMap(string mapId)
+    {
+        List<Level> top10 = new List<Level>();
+        if (FirebaseJSBridge.instance == null) return top10;
+        try {
+            string json = await FirebaseJSBridge.instance.ReadDatabaseAsync($"CommunityMapLeaderboard/{mapId}");
+            if (!string.IsNullOrEmpty(json)) {
+                var dict = JsonConvert.DeserializeObject<Dictionary<string, Level>>(json);
+                if (dict != null) {
+                    top10 = dict.Values.ToList();
+                    top10 = top10.OrderByDescending(x => x.point).ThenBy(x => x.time).Take(10).ToList();
+                }
+            }
+        } catch (Exception ex) { Debug.LogError("Lỗi lấy Top 10 Map WebGL: " + ex.Message); }
+        return top10;
+    }
+
+    public async Task<int> GetMyCommunityMapRank(string mapId)
+    {
+        if (FirebaseJSBridge.instance == null) return -1;
+        try {
+            string uid = FirebaseJSBridge.instance.GetCurrentUserId();
+            if (string.IsNullOrEmpty(uid)) return -1;
+
+            string json = await FirebaseJSBridge.instance.ReadDatabaseAsync($"CommunityMapLeaderboard/{mapId}");
+            if (string.IsNullOrEmpty(json)) return -1;
+
+            var dict = JsonConvert.DeserializeObject<Dictionary<string, Level>>(json);
+            if (dict != null) {
+                var players = dict.Select(kvp => (uid: kvp.Key, data: kvp.Value))
+                                  .OrderByDescending(x => x.data.point)
+                                  .ThenBy(x => x.data.time)
+                                  .ToList();
+                for (int i = 0; i < players.Count; i++) {
+                    if (players[i].uid == uid) return i + 1;
+                }
+            }
+        } catch (Exception ex) { Debug.LogError("Lỗi lấy rank map WebGL: " + ex.Message); }
+        return -1;
+    }
+
+    public async Task<Level> GetMyCommunityMapScore(string mapId)
+    {
+        if (FirebaseJSBridge.instance == null) return null;
+        try {
+            string uid = FirebaseJSBridge.instance.GetCurrentUserId();
+            if (string.IsNullOrEmpty(uid)) return null;
+
+            string json = await FirebaseJSBridge.instance.ReadDatabaseAsync($"CommunityMapLeaderboard/{mapId}/{uid}");
+            if (!string.IsNullOrEmpty(json)) {
+                return JsonConvert.DeserializeObject<Level>(json);
+            }
+        } catch (Exception ex) { Debug.LogError("Lỗi lấy score map WebGL: " + ex.Message); }
+        return null;
+    }
 #endif
+
+    public async void UpdateLevelStats(string levelName, string status, float timeSpent, int deathIncrement, int resetIncrement, int sessionTotalFrames, float sessionMinFps)
+    {
+        string path = $"LevelStats/{levelName}";
+        LevelStats stats = new LevelStats();
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        if (FirebaseJSBridge.instance != null)
+        {
+            string json = await FirebaseJSBridge.instance.ReadDatabaseAsync(path);
+            if (!string.IsNullOrEmpty(json) && !json.StartsWith("ERROR|") && !json.StartsWith("NULL|"))
+            {
+                string cleanJson = json.StartsWith("OK|") ? json.Substring(3) : json;
+                stats = JsonConvert.DeserializeObject<LevelStats>(cleanJson) ?? new LevelStats();
+            }
+        }
+#else
+        if (reference != null)
+        {
+            var snapshot = await reference.Child("LevelStats").Child(levelName).GetValueAsync();
+            if (snapshot != null && snapshot.Exists)
+            {
+                string json = snapshot.GetRawJsonValue();
+                if (!string.IsNullOrEmpty(json))
+                {
+                    stats = JsonConvert.DeserializeObject<LevelStats>(json) ?? new LevelStats();
+                }
+            }
+        }
+#endif
+
+        if (status == "play") stats.playCount++;
+        else if (status == "win") stats.winCount++;
+        else if (status == "lose") stats.loseCount++;
+        else if (status == "quit") stats.quitCount++;
+
+        stats.totalTimeSpent += timeSpent;
+        stats.deathCount += deathIncrement;
+        stats.resetCount += resetIncrement;
+        
+        // Cập nhật FPS
+        stats.totalFrames += sessionTotalFrames;
+        if (sessionMinFps < stats.minFps) 
+        {
+            // Tránh lưu 0 nếu session mới khởi tạo
+            if (sessionMinFps > 0f) stats.minFps = sessionMinFps;
+        }
+
+        if (stats.totalTimeSpent > 0f)
+        {
+            stats.avgFps = stats.totalFrames / stats.totalTimeSpent;
+        }
+
+        WriteDatabase("LevelStats", levelName, stats);
+    }
+
+    public void LogFPSData(string levelName, int sessionTotalFrames, float sessionMinFps, float timeSpent)
+    {
+        string uid = "unknown";
+#if !UNITY_WEBGL || UNITY_EDITOR
+        if (FirebaseAuth.DefaultInstance != null && FirebaseAuth.DefaultInstance.CurrentUser != null)
+            uid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+#else
+        if (FirebaseJSBridge.instance != null)
+            uid = FirebaseJSBridge.instance.GetCurrentUserId();
+#endif
+
+        float avgFps = 0f;
+        if (timeSpent > 0f) avgFps = sessionTotalFrames / timeSpent;
+
+        FPSLog log = new FPSLog
+        {
+            uid = uid,
+            avgFps = avgFps,
+            minFps = sessionMinFps > 0f ? sessionMinFps : 0f,
+            timeSpent = timeSpent,
+            date = System.DateTime.UtcNow.ToString("O"),
+            platform = GetPlatformName()
+        };
+
+        string logId = System.Guid.NewGuid().ToString();
+        WriteDatabase("FPSLogs/" + levelName, logId, log);
+    }
+
+    private string GetPlatformName()
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        return "webgl";
+#elif UNITY_ANDROID || UNITY_IOS
+        return "pe";
+#else
+        if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+            return "pe";
+        else if (Application.platform == RuntimePlatform.WebGLPlayer)
+            return "webgl";
+        else
+            return "pc";
+#endif
+    }
+}
+
+[System.Serializable]
+public class FPSLog
+{
+    public string uid;
+    public float avgFps;
+    public float minFps;
+    public float timeSpent;
+    public string date;
+    public string platform;
 }

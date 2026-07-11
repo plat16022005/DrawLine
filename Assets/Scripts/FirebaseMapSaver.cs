@@ -113,8 +113,49 @@ public async System.Threading.Tasks.Task<string> CreateMap(string mapName)
         return "";
     }
 #else
-    Debug.LogWarning("CreateMap không hỗ trợ trên WebGL.");
-    return "";
+    if (FirebaseJSBridge.instance == null)
+    {
+        Debug.LogError("FirebaseJSBridge chưa khởi tạo xong");
+        return "";
+    }
+
+    if (string.IsNullOrWhiteSpace(mapName))
+    {
+        Debug.LogError("Tên map không được để trống");
+        return "";
+    }
+
+    string userId = FirebaseJSBridge.instance.GetCurrentUserId();
+    if (string.IsNullOrEmpty(userId)) userId = "guest_maps";
+
+    string mapId = await FirebaseJSBridge.instance.PushKeyAsync($"maps/{userId}");
+
+    try
+    {
+        var mapEntry = new System.Collections.Generic.Dictionary<string, object>
+        {
+            { "mapName", mapName }
+        };
+
+        var communityEntry = new System.Collections.Generic.Dictionary<string, object>
+        {
+            { "mapName", mapName },
+            { "ownerId", userId },
+            { "status", "private" },
+            { "hasPublishedOnce", false }
+        };
+
+        await FirebaseJSBridge.instance.WriteDatabaseAsync($"maps/{userId}/{mapId}", Newtonsoft.Json.JsonConvert.SerializeObject(mapEntry));
+        await FirebaseJSBridge.instance.WriteDatabaseAsync($"mapscommunity/{mapId}", Newtonsoft.Json.JsonConvert.SerializeObject(communityEntry));
+
+        Debug.Log($"Tạo map THÀNH CÔNG: mapId={mapId}, tên={mapName}");
+        return mapId;
+    }
+    catch (System.Exception e)
+    {
+        Debug.LogError("Tạo map THẤT BẠI: " + e);
+        return "";
+    }
 #endif
 }
 
@@ -223,7 +264,26 @@ public async void SaveMap(string mapName)
         Debug.LogError("Lưu map THẤT BẠI: " + e);
     }
 #else
-    Debug.Log("Map JSON (Firebase Native Upload Disabled on WebGL): \n" + json);
+    if (FirebaseJSBridge.instance == null)
+    {
+        Debug.LogError("Firebase chưa khởi tạo xong");
+        return;
+    }
+
+    string userId = FirebaseJSBridge.instance.GetCurrentUserId();
+    if (string.IsNullOrEmpty(userId)) userId = "guest_maps";
+
+    string mapId = await FirebaseJSBridge.instance.PushKeyAsync($"maps/{userId}");
+
+    try
+    {
+        await FirebaseJSBridge.instance.WriteDatabaseAsync($"maps/{userId}/{mapId}", json);
+        Debug.Log("Lưu map MỚI THÀNH CÔNG: " + mapId);
+    }
+    catch (System.Exception e)
+    {
+        Debug.LogError("Lưu map THẤT BẠI: " + e);
+    }
 #endif
 }
 
@@ -274,7 +334,24 @@ public async void SaveMapToId(string mapId, string mapName)
         Debug.LogError("[MapSaver] Lưu đè map THẤT BẠI: " + e);
     }
 #else
-    Debug.Log("[MapSaver] Map JSON (WebGL, không upload): \n" + json);
+    if (FirebaseJSBridge.instance == null)
+    {
+        Debug.LogError("[MapSaver] Firebase chưa khởi tạo xong");
+        return;
+    }
+
+    string userId = FirebaseJSBridge.instance.GetCurrentUserId();
+    if (string.IsNullOrEmpty(userId)) userId = "guest_maps";
+
+    try
+    {
+        await FirebaseJSBridge.instance.WriteDatabaseAsync($"maps/{userId}/{mapId}", json);
+        Debug.Log($"[MapSaver] Lưu đè map THÀNH CÔNG: mapId={mapId}, tên={mapName}");
+    }
+    catch (System.Exception e)
+    {
+        Debug.LogError("[MapSaver] Lưu đè map THẤT BẠI: " + e);
+    }
 #endif
 }
 
@@ -459,7 +536,37 @@ void ShowNotification(string message, bool success)
             Debug.LogError("[MapSaver] SetMapStatus lỗi: " + e);
         }
 #else
-        Debug.LogWarning("SetMapStatus không hỗ trợ trên WebGL.");
+        if (FirebaseJSBridge.instance == null)
+        {
+            ShowNotification("Firebase chưa sẵn sàng!", false);
+            return;
+        }
+
+        string mapId = mapLoader != null ? mapLoader.currentMapId : "";
+        if (string.IsNullOrEmpty(mapId) && DataGame.instance != null)
+            mapId = DataGame.instance.currentEditMapId;
+
+        if (string.IsNullOrEmpty(mapId))
+        {
+            ShowNotification("Không tìm thấy Map ID!", false);
+            return;
+        }
+
+        string userId = FirebaseJSBridge.instance.GetCurrentUserId();
+        if (string.IsNullOrEmpty(userId)) userId = "guest_maps";
+
+        try
+        {
+            await FirebaseJSBridge.instance.WriteDatabaseAsync($"maps/{userId}/{mapId}/status", $"\"{newStatus}\"");
+            string displayName = newStatus == "publish" ? "Công khai" : "Riêng tư";
+            ShowNotification($"Trạng thái map: {displayName}", true);
+            Debug.Log($"[MapSaver] Đổi status map {mapId} thành: {newStatus}");
+        }
+        catch (System.Exception e)
+        {
+            ShowNotification("Đổi trạng thái thất bại!", false);
+            Debug.LogError("[MapSaver] SetMapStatus lỗi: " + e);
+        }
 #endif
     }
 

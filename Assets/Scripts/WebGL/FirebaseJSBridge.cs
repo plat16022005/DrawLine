@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
@@ -60,6 +62,14 @@ public class FirebaseJSBridge : MonoBehaviour
     [DllImport("__Internal")] private static extern void   FB_DB_Write(string path, string json, string gameObj, string successMethod, string failMethod);
     [DllImport("__Internal")] private static extern void   FB_DB_Read(string path, string gameObj, string callbackMethod);
     [DllImport("__Internal")] private static extern void   FB_DB_Query(string path, string orderBy, int limit, string gameObj, string callbackMethod);
+    
+    // ASYNC TASK APIs
+    [DllImport("__Internal")] private static extern void   FB_DB_ReadTask(string path, string taskId);
+    [DllImport("__Internal")] private static extern void   FB_DB_QueryTask(string path, string orderBy, string equalTo, int limit, string taskId);
+    [DllImport("__Internal")] private static extern void   FB_DB_WriteTask(string path, string json, string taskId);
+    [DllImport("__Internal")] private static extern void   FB_DB_UpdateTask(string path, string json, string taskId);
+    [DllImport("__Internal")] private static extern void   FB_DB_RemoveTask(string path, string taskId);
+    [DllImport("__Internal")] private static extern void   FB_DB_PushKeyTask(string path, string taskId);
 #endif
 
     // ─────────────────────────────────────────────────────────
@@ -321,5 +331,124 @@ public class FirebaseJSBridge : MonoBehaviour
     private void OnDBWriteFailed(string result)
     {
         Debug.LogWarning($"[FirebaseJSBridge] DB write failed: {result}");
+    }
+
+    // ─────────────────────────────────────────────────────────
+    //  ASYNC/TASK DATABASE WRAPPERS
+    // ─────────────────────────────────────────────────────────
+
+    private Dictionary<string, TaskCompletionSource<string>> _dbTasks = new Dictionary<string, TaskCompletionSource<string>>();
+
+    private string GenerateTaskId()
+    {
+        return Guid.NewGuid().ToString();
+    }
+
+    /// <summary>
+    /// Nhận kết quả từ JSBridge dạng "taskId|OK|json" hoặc "taskId|NULL|" hoặc "taskId|ERROR|msg"
+    /// </summary>
+    private void OnDatabaseTaskResult(string message)
+    {
+        var parts = message.Split(new char[] { '|' }, 3);
+        if (parts.Length < 2) return;
+
+        string taskId = parts[0];
+        string status = parts[1];
+        string payload = parts.Length > 2 ? parts[2] : null;
+
+        if (_dbTasks.TryGetValue(taskId, out var tcs))
+        {
+            _dbTasks.Remove(taskId);
+            if (status == "ERROR")
+            {
+                tcs.TrySetException(new Exception(payload ?? "Unknown error"));
+            }
+            else if (status == "NULL")
+            {
+                tcs.TrySetResult(null); // Không có dữ liệu
+            }
+            else // OK
+            {
+                tcs.TrySetResult(payload);
+            }
+        }
+    }
+
+    public Task<string> ReadDatabaseAsync(string path)
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        var tcs = new TaskCompletionSource<string>();
+        string taskId = GenerateTaskId();
+        _dbTasks[taskId] = tcs;
+        FB_DB_ReadTask(path, taskId);
+        return tcs.Task;
+#else
+        return Task.FromResult<string>(null);
+#endif
+    }
+
+    public Task<string> QueryDatabaseAsync(string path, string orderBy, string equalTo = null, int limit = 0)
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        var tcs = new TaskCompletionSource<string>();
+        string taskId = GenerateTaskId();
+        _dbTasks[taskId] = tcs;
+        FB_DB_QueryTask(path, orderBy ?? "", equalTo ?? "", limit, taskId);
+        return tcs.Task;
+#else
+        return Task.FromResult<string>(null);
+#endif
+    }
+
+    public Task WriteDatabaseAsync(string path, string json)
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        var tcs = new TaskCompletionSource<string>();
+        string taskId = GenerateTaskId();
+        _dbTasks[taskId] = tcs;
+        FB_DB_WriteTask(path, json, taskId);
+        return tcs.Task;
+#else
+        return Task.CompletedTask;
+#endif
+    }
+
+    public Task UpdateDatabaseAsync(string path, string json)
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        var tcs = new TaskCompletionSource<string>();
+        string taskId = GenerateTaskId();
+        _dbTasks[taskId] = tcs;
+        FB_DB_UpdateTask(path, json, taskId);
+        return tcs.Task;
+#else
+        return Task.CompletedTask;
+#endif
+    }
+
+    public Task RemoveDatabaseAsync(string path)
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        var tcs = new TaskCompletionSource<string>();
+        string taskId = GenerateTaskId();
+        _dbTasks[taskId] = tcs;
+        FB_DB_RemoveTask(path, taskId);
+        return tcs.Task;
+#else
+        return Task.CompletedTask;
+#endif
+    }
+
+    public Task<string> PushKeyAsync(string path)
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        var tcs = new TaskCompletionSource<string>();
+        string taskId = GenerateTaskId();
+        _dbTasks[taskId] = tcs;
+        FB_DB_PushKeyTask(path, taskId);
+        return tcs.Task;
+#else
+        return Task.FromResult(Guid.NewGuid().ToString()); // Giả lập id
+#endif
     }
 }

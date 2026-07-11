@@ -53,6 +53,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Sau \u0111\xE2y h\u01B0\u1EDBng d\u1EABn c\xF4ng d\u1EE5ng c\u1EE7a
       c\xE1c lo\u1EA1i \u0111\u01B0\u1EDDng v\u1EBD v\xE0 t\u1ED5ng k\u1EBFt \u0111i\u1EC3m."
     completionCondition: 5
@@ -91,6 +96,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "\u0110\u1EA7u ti\xEAn l\xE0 m\u1EF1c xanh l\xE1."
     completionCondition: 4
     textPanelPreset: 4
@@ -128,6 +138,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "V\u1EBD th\u1EED m\u1ED9t \u0111\u01B0\u1EDDng ch\u1ED7 n\xE0y
       n\xE0o!"
     completionCondition: 6
@@ -166,6 +181,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Nh\u1EA5n play."
     completionCondition: 4
     textPanelPreset: 4
@@ -203,6 +223,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Ch\xFA \xFD v\xE0o hi\u1EC7p s\u0129!"
     completionCondition: 1
     textPanelPreset: 4
@@ -240,6 +265,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Nh\u01B0 ta c\xF3 th\u1EC3 th\u1EA5y, hi\u1EC7p s\u0129 khi r\u01A1i
       xu\u1ED1ng v\xE0 va ch\u1EA1m v\xE0o \u0111\u01B0\u1EDDng n\xE0y khi\u1EBFn
       hi\u1EC7p s\u0129 n\u1EA3y l\xEAn."
@@ -279,6 +309,11 @@ MonoBehaviour:
     freezeTime: 1
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "L\u1EF1c n\u1EA3y t\u0103ng d\u1EA7n khi hi\u1EC7p s\u0129 n\u1EA3y
       li\xEAn t\u1EE5c tr\xEAn \u0111\u01B0\u1EDDng n\xE0y. N\xF3 gi\xFAp hi\u1EC7p
       s\u0129 v\u01B0\u1EE3t qua c\xE1c ch\u01B0\u1EDBng ng\u1EA1i v\u1EADt cao."
@@ -318,6 +353,11 @@ MonoBehaviour:
     freezeTime: 1
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Nh\u1EA5n Reset"
     completionCondition: 5
     textPanelPreset: 4
@@ -355,6 +395,11 @@ MonoBehaviour:
     freezeTime: 1
     clearLinesOnComplete: 1
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Ti\u1EBFp theo l\xE0 m\u1EF1c t\xEDm."
     completionCondition: 4
     textPanelPreset: 4
@@ -392,6 +437,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "C\u1ED1 v\u1EBD m\u1ED9t \u0111\u01B0\u1EDDng kh\xF4ng \u0111\u1EE9t
       qu\xE3ng n\xE0o"
     completionCondition: 6
@@ -430,6 +480,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Nh\u1EA5n Play"
     completionCondition: 4
     textPanelPreset: 4
@@ -467,6 +522,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Ch\xFA \xFD ng\u01B0\u1EDDi ch\u01A1i!"
     completionCondition: 1
     textPanelPreset: 4
@@ -504,6 +564,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Ta c\xF3 th\u1EC3 th\u1EA5y r\u1EB1ng khi b\u1EAFt \u0111\u1EA7u
       ch\u01A1i th\xEC \u0111\u01B0\u1EDDng n\xE0y s\u1EBD t\u1EF1 \u0111\u1ED9ng
       bi\u1EBFn th\xE0nh s\u1EE3i d\xE2y, khi ng\u01B0\u1EDDi ch\u01A1i r\u01A1i
@@ -545,6 +610,11 @@ MonoBehaviour:
     freezeTime: 1
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "T\xE1c d\u1EE5ng gi\xE2y t\xEDm gi\xFAp tri\u1EC7t ti\xEAu ho\xE0n
       to\xE0n l\u1EF1c r\u01A1i c\u1EE7a ng\u01B0\u1EDDi ch\u01A1i v\xE0 khi\u1EBFn
       h\u1ECD kh\xF4ng m\u1EA5t m\xE1u. Sau 5s gi\u1EEF l\u1EA1i, d\xE2y s\u1EBD
@@ -585,6 +655,11 @@ MonoBehaviour:
     freezeTime: 1
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Khi 2 \u0111\u01B0\u1EDDng \u0111\u1EE9t kh\xFAc th\xEC n\xF3 s\u1EBD
       t\xEDnh l\xE0 2 s\u1EE3i d\xE2y v\xEC th\u1EBF khi mu\u1ED1n v\u1EBD m\u1ED9t
       s\u1EE3i d\xE2y l\u1EDBn, c\u1ED1 g\u1EAFng v\u1EBD li\u1EC1n m\u1EA1ch v\u1EDBi
@@ -625,6 +700,11 @@ MonoBehaviour:
     freezeTime: 1
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Nh\u1EA5n Reset"
     completionCondition: 4
     textPanelPreset: 4
@@ -662,6 +742,11 @@ MonoBehaviour:
     freezeTime: 1
     clearLinesOnComplete: 1
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Ti\u1EBFp theo l\xE0 m\u1EF1c \u0111\u1ECF!"
     completionCondition: 4
     textPanelPreset: 4
@@ -699,6 +784,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "V\u1EBD m\u1ED9t \u0111\u01B0\u1EDDng ch\u1ED7 n\xE0y"
     completionCondition: 6
     textPanelPreset: 4
@@ -736,6 +826,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Nh\u1EA5n Play"
     completionCondition: 4
     textPanelPreset: 4
@@ -773,6 +868,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Ch\xFA \xFD ng\u01B0\u1EDDi ch\u01A1i!"
     completionCondition: 1
     textPanelPreset: 4
@@ -810,6 +910,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Ta th\u1EA5y r\u1EB1ng ng\u01B0\u1EDDi ch\u01A1i b\u1ED7ng t\u0103ng
       t\u1ED1c khi \u0111i tr\xEAn \u0111\u01B0\u1EDDng n\xE0y"
     completionCondition: 5
@@ -848,6 +953,11 @@ MonoBehaviour:
     freezeTime: 1
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "\u0110\u01B0\u1EDDng \u0111\u1ECF c\xF3 vai tr\xF2 gi\xFAp t\u0103ng
       t\u1ED1c \u0111\u1ED9 l\u0103n c\u1EE7a ng\u01B0\u1EDDi ch\u01A1i. Khi h\u1ECD
       l\u0103n tr\xEAn \u0111\xE2y, t\u1ED1c \u0111\u1ED9 c\u1EE7a h\u1ECD s\u1EBD
@@ -888,6 +998,11 @@ MonoBehaviour:
     freezeTime: 1
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Nh\u1EA5n Reset"
     completionCondition: 4
     textPanelPreset: 4
@@ -925,6 +1040,11 @@ MonoBehaviour:
     freezeTime: 1
     clearLinesOnComplete: 1
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Ti\u1EBFp theo l\xE0 \u0111\u01B0\u1EDDng xanh d\u01B0\u01A1ng."
     completionCondition: 4
     textPanelPreset: 4
@@ -962,6 +1082,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "V\u1EBD th\u1EED \u0111\u01B0\u1EDDng \u1EDF ch\u1ED7 n\xE0y"
     completionCondition: 6
     textPanelPreset: 4
@@ -999,6 +1124,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Nh\u1EA5n play"
     completionCondition: 4
     textPanelPreset: 4
@@ -1036,6 +1166,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Ch\xFA \xFD ng\u01B0\u1EDDi ch\u01A1i!"
     completionCondition: 1
     textPanelPreset: 4
@@ -1073,6 +1208,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Ta th\u1EA5y kh\xF4ng c\xF3 chuy\u1EC7n g\xEC x\u1EA3y ra, v\xEC
       t\xE1c d\u1EE5ng c\u1EE7a \u0111\u01B0\u1EDDng n\xE0y b\u1EA3o to\xE0n v\u1EADn
       t\u1ED1c."
@@ -1112,6 +1252,11 @@ MonoBehaviour:
     freezeTime: 1
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Nh\u1EA5n Reset"
     completionCondition: 4
     textPanelPreset: 4
@@ -1149,6 +1294,11 @@ MonoBehaviour:
     freezeTime: 1
     clearLinesOnComplete: 1
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Ti\u1EBFp theo l\xE0 \u0111\u01B0\u1EDDng n\xE2u."
     completionCondition: 4
     textPanelPreset: 4
@@ -1186,6 +1336,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "V\u1EBD m\u1ED9t \u0111\u01B0\u1EDDng ngay ch\u1ED7 n\xE0y!"
     completionCondition: 6
     textPanelPreset: 4
@@ -1223,6 +1378,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Nh\u1EA5n Play"
     completionCondition: 4
     textPanelPreset: 4
@@ -1260,6 +1420,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Theo d\xF5i Ng\u01B0\u1EDDi ch\u01A1i!"
     completionCondition: 1
     textPanelPreset: 4
@@ -1297,6 +1462,11 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Ta c\xF3 th\u1EC3 th\u1EA5y ng\u01B0\u1EDDi ch\u01A1i b\u1ED7ng
       nhi\xEAn b\u1ECB h\xE3m l\u1EA1i t\u1ED1c \u0111\u1ED9 l\u0103n l\xE0 v\xEC
       t\xE1c d\u1EE5ng c\u1EE7a lo\u1EA1i \u0111\u01B0\u1EDDng n\xE0y."
@@ -1336,6 +1506,11 @@ MonoBehaviour:
     freezeTime: 1
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Nh\u1EA5n Reset"
     completionCondition: 4
     textPanelPreset: 4
@@ -1373,6 +1548,11 @@ MonoBehaviour:
     freezeTime: 1
     clearLinesOnComplete: 1
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
   - description: "Cu\u1ED1i c\xF9ng l\xE0 v\u1EC1 c\xE1ch t\xEDnh \u0111i\u1EC3m,
       c\u01A1 b\u1EA3n \u0111i\u1EC3m s\u1EBD \u0111\u01B0\u1EE3c t\xEDnh nh\u01B0
       sau: \u0110i\u1EC3m m\u1EF1c c\xF2n l\u1EA1i * l\u01B0\u1EE3ng m\xE1u c\xF2n
@@ -1415,8 +1595,12 @@ MonoBehaviour:
     freezeTime: 0
     clearLinesOnComplete: 0
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
-  - description: "Cu\u1ED1i c\xF9ng, ph\u1EA7n h\u01B0\u1EDBng d\u1EABn \u0111\xE3
-      k\u1EBFt th\xFAc. M\u1EDDi b\u1EA1n tr\u1EA3i nghi\u1EC7m game."
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180
+  - description: "Ph\u1EA7n h\u01B0\u1EDBng d\u1EABn n\xE0y \u0111\xE3 k\u1EBFt th\xFAc"
     completionCondition: 5
     textPanelPreset: 4
     textPanelCustomPos: {x: 0, y: 0}
@@ -1453,3 +1637,8 @@ MonoBehaviour:
     freezeTime: 1
     clearLinesOnComplete: 1
     gizmoColor: {r: 0, g: 0, b: 0, a: 0}
+    changeWeather: 0
+    targetWeather: 0
+    changeWind: 0
+    windForce: 15
+    windAngle: 180

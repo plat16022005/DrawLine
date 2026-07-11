@@ -38,6 +38,13 @@ public class DataGame : MonoBehaviour
     {
         instance = this;
         DontDestroyOnLoad(this);
+        
+        if (gameObject.GetComponent<UserBehaviorManager>() == null)
+            gameObject.AddComponent<UserBehaviorManager>();
+
+        if (gameObject.GetComponent<LevelAnalyticsManager>() == null)
+            gameObject.AddComponent<LevelAnalyticsManager>();
+
 #if !UNITY_WEBGL || UNITY_EDITOR
         user = FirebaseAuth.DefaultInstance.CurrentUser;
         if (user != null) InitializeNative();
@@ -168,7 +175,6 @@ public class DataGame : MonoBehaviour
                 // Giả sử có UID trong Level hoặc so sánh tên
                 if (all[i].namePlayer == users.name) return i + 1;
             }
-        }
         }
         return -1;
 #endif

@@ -149,6 +149,79 @@ mergeInto(LibraryManager.library, {
     }).catch(function(e) {
       SendMessage(g, c, "ERROR|" + e.message);
     });
+  },
+
+  // ─────────────────────────────────────────────────────────
+  //  TASK-BASED DATABASE WRAPPERS (FOR ASYNC/AWAIT)
+  // ─────────────────────────────────────────────────────────
+  
+  FB_DB_ReadTask: function(pathPtr, taskIdPtr) {
+    var path = UTF8ToString(pathPtr), taskId = UTF8ToString(taskIdPtr);
+    if (!window.firebaseDB) { SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|ERROR|Firebase not ready"); return; }
+    window.firebaseDB.ref(path).get().then(function(snap) {
+      if(snap.exists()) SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|OK|" + JSON.stringify(snap.val()));
+      else SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|NULL|");
+    }).catch(function(e) { SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|ERROR|" + e.message); });
+  },
+
+  FB_DB_QueryTask: function(pathPtr, orderByPtr, equalToPtr, limit, taskIdPtr) {
+    var path = UTF8ToString(pathPtr), orderBy = UTF8ToString(orderByPtr), equalTo = UTF8ToString(equalToPtr), taskId = UTF8ToString(taskIdPtr);
+    if (!window.firebaseDB) { SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|ERROR|Firebase not ready"); return; }
+    
+    var ref = window.firebaseDB.ref(path);
+    if (orderBy) {
+      ref = ref.orderByChild(orderBy);
+      if (equalTo) ref = ref.equalTo(equalTo);
+    }
+    if (limit > 0) ref = ref.limitToLast(limit);
+    
+    ref.get().then(function(snap) {
+      if (!snap.exists()) { SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|NULL|"); return; }
+      
+      // Keep key-value mapping just like native snapshot.Value
+      var result = {};
+      snap.forEach(function(child) {
+        result[child.key] = child.val();
+      });
+      SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|OK|" + JSON.stringify(result));
+    }).catch(function(e) { SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|ERROR|" + e.message); });
+  },
+
+  FB_DB_WriteTask: function(pathPtr, jsonPtr, taskIdPtr) {
+    var path = UTF8ToString(pathPtr), json = UTF8ToString(jsonPtr), taskId = UTF8ToString(taskIdPtr);
+    if (!window.firebaseDB) { SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|ERROR|Firebase not ready"); return; }
+    var val; try { val = JSON.parse(json); } catch(e) { val = json; }
+    window.firebaseDB.ref(path).set(val).then(function() {
+      SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|OK|");
+    }).catch(function(e) { SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|ERROR|" + e.message); });
+  },
+
+  FB_DB_UpdateTask: function(pathPtr, jsonPtr, taskIdPtr) {
+    var path = UTF8ToString(pathPtr), json = UTF8ToString(jsonPtr), taskId = UTF8ToString(taskIdPtr);
+    if (!window.firebaseDB) { SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|ERROR|Firebase not ready"); return; }
+    var val; try { val = JSON.parse(json); } catch(e) { val = json; }
+    window.firebaseDB.ref(path).update(val).then(function() {
+      SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|OK|");
+    }).catch(function(e) { SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|ERROR|" + e.message); });
+  },
+
+  FB_DB_RemoveTask: function(pathPtr, taskIdPtr) {
+    var path = UTF8ToString(pathPtr), taskId = UTF8ToString(taskIdPtr);
+    if (!window.firebaseDB) { SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|ERROR|Firebase not ready"); return; }
+    window.firebaseDB.ref(path).remove().then(function() {
+      SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|OK|");
+    }).catch(function(e) { SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|ERROR|" + e.message); });
+  },
+  
+  FB_DB_PushKeyTask: function(pathPtr, taskIdPtr) {
+    var path = UTF8ToString(pathPtr), taskId = UTF8ToString(taskIdPtr);
+    if (!window.firebaseDB) { SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|ERROR|Firebase not ready"); return; }
+    try {
+        var key = window.firebaseDB.ref(path).push().key;
+        SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|OK|" + key);
+    } catch(e) {
+        SendMessage("FirebaseJSBridge", "OnDatabaseTaskResult", taskId + "|ERROR|" + e.message);
+    }
   }
 
 });
